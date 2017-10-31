@@ -1,0 +1,8 @@
+#!/bin/bash
+
+SOURCE_DIRECTORY=$(dirname "${BASH_SOURCE[0]}")
+cd "${SOURCE_DIRECTORY}/.."
+
+mkdir -p testdata
+scripts/test -coverprofile testdata/coverage.out
+go tool cover -html=testdata/coverage.out
