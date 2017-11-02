@@ -7,12 +7,14 @@ import (
 	"github.com/ulule/loukoum/stmt"
 )
 
+// SelectBuilder is a builder used for "SELECT" query.
 type SelectBuilder struct {
 	distinct bool
 	columns  []stmt.Column
 	from     stmt.From
 }
 
+// NewSelectBuilder creates a new SelectBuilder.
 func NewSelectBuilder() SelectBuilder {
 	return SelectBuilder{}
 }
