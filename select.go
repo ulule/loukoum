@@ -8,14 +8,22 @@ import (
 )
 
 type SelectBuilder struct {
-	columns  []stmt.Column
 	distinct bool
+	columns  []stmt.Column
+	from     stmt.From
 }
 
 func NewSelectBuilder() SelectBuilder {
 	return SelectBuilder{}
 }
 
+// Distinct adds a DISTINCT clause to the query.
+func (builder SelectBuilder) Distinct() SelectBuilder {
+	builder.distinct = true
+	return builder
+}
+
+// Columns adds result columns to the query.
 func (builder SelectBuilder) Columns(columns []interface{}) SelectBuilder {
 	if len(builder.columns) != 0 {
 		panic("loukoum: select builder has columns already defined")
@@ -26,21 +34,43 @@ func (builder SelectBuilder) Columns(columns []interface{}) SelectBuilder {
 
 	builder.columns = []stmt.Column{}
 	for i := range columns {
-		switch column := columns[i].(type) {
+		var column stmt.Column
+		switch value := columns[i].(type) {
 		case string:
-			builder.columns = append(builder.columns, stmt.NewColumn(column))
+			column = stmt.NewColumn(value)
 		case stmt.Column:
-			builder.columns = append(builder.columns, column)
+			column = value
 		default:
 			panic(fmt.Sprintf("loukoum: cannot use %T as column", column))
 		}
+		if column.IsEmpty() {
+			panic("loukoum: a column was undefined")
+		}
+		builder.columns = append(builder.columns, column)
 	}
 
 	return builder
 }
 
-func (builder SelectBuilder) Distinct() SelectBuilder {
-	builder.distinct = true
+// From sets the FROM clause of the query.
+func (builder SelectBuilder) From(from interface{}) SelectBuilder {
+	if !builder.from.IsEmpty() {
+		panic("loukoum: select builder has from clause already defined")
+	}
+
+	switch value := from.(type) {
+	case string:
+		builder.from = stmt.NewFrom(value)
+	case stmt.From:
+		builder.from = value
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as from clause", from))
+	}
+
+	if builder.from.IsEmpty() {
+		panic("loukoum: given from clause is undefined")
+	}
+
 	return builder
 }
 
@@ -66,7 +96,10 @@ func (builder SelectBuilder) String() string {
 		builder.columns[i].Write(buffer)
 	}
 
-	// TODO FROM
+	if !builder.from.IsEmpty() {
+		buffer.WriteString(" FROM ")
+		builder.from.Write(buffer)
+	}
 
 	// TODO JOINS
 

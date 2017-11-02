@@ -31,4 +31,8 @@ func TestStatementSelect(t *testing.T) {
 		query := loukoum.Select("test", loukoum.Column("test2").As("foobar"))
 		is.Equal("SELECT test, test2 AS foobar", query.String())
 	}
+	{
+		query := loukoum.Select("a", "b", "c").From("foobar")
+		is.Equal("SELECT a, b, c FROM foobar", query.String())
+	}
 }

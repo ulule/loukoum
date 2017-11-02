@@ -5,6 +5,7 @@ import (
 )
 
 type Column struct {
+	Statement
 	Name  string
 	Alias string
 }
@@ -32,4 +33,9 @@ func (column Column) Write(buffer *bytes.Buffer) {
 		buffer.WriteString(" AS ")
 		buffer.WriteString(column.Alias)
 	}
+}
+
+// IsEmpty return true if statement is undefined.
+func (column Column) IsEmpty() bool {
+	return column.Name == ""
 }
