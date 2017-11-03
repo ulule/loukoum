@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/ulule/loukoum/parser"
 	"github.com/ulule/loukoum/stmt"
+	"github.com/ulule/loukoum/types"
 )
 
 // SelectBuilder is a builder used for "SELECT" query.
@@ -12,6 +14,7 @@ type SelectBuilder struct {
 	distinct bool
 	columns  []stmt.Column
 	from     stmt.From
+	joins    []stmt.Join
 }
 
 // NewSelectBuilder creates a new SelectBuilder.
@@ -36,7 +39,7 @@ func (builder SelectBuilder) Columns(columns []interface{}) SelectBuilder {
 
 	builder.columns = []stmt.Column{}
 	for i := range columns {
-		var column stmt.Column
+		column := stmt.Column{}
 		switch value := columns[i].(type) {
 		case string:
 			column = stmt.NewColumn(value)
@@ -76,6 +79,92 @@ func (builder SelectBuilder) From(from interface{}) SelectBuilder {
 	return builder
 }
 
+// Join adds a JOIN clause to the query.
+func (builder SelectBuilder) Join(args ...interface{}) SelectBuilder {
+	switch len(args) {
+	case 1:
+		return builder.join1(args)
+	case 2:
+		return builder.join2(args)
+	case 3:
+		return builder.join3(args)
+	default:
+		panic("loukoum: given join clause is invalid")
+	}
+}
+
+func (builder SelectBuilder) join1(args []interface{}) SelectBuilder {
+	join := stmt.Join{}
+
+	switch value := args[0].(type) {
+	case string:
+		join = parser.MustParseJoin(value)
+	case stmt.Join:
+		join = value
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as join clause", args[0]))
+	}
+
+	if join.IsEmpty() {
+		panic("loukoum: given join clause is undefined")
+	}
+
+	builder.joins = append(builder.joins, join)
+	return builder
+}
+
+func (builder SelectBuilder) join2(args []interface{}) SelectBuilder {
+	join := handleSelectJoin(args)
+	if join.IsEmpty() {
+		panic("loukoum: given join clause is undefined")
+	}
+
+	builder.joins = append(builder.joins, join)
+	return builder
+}
+
+func (builder SelectBuilder) join3(args []interface{}) SelectBuilder {
+	join := handleSelectJoin(args)
+
+	switch value := args[2].(type) {
+	case types.JoinType:
+		join.Type = value
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as join clause", args[1]))
+	}
+
+	if join.IsEmpty() {
+		panic("loukoum: given join clause is undefined")
+	}
+
+	builder.joins = append(builder.joins, join)
+	return builder
+}
+
+func handleSelectJoin(args []interface{}) stmt.Join {
+	join := stmt.Join{}
+	table := ""
+
+	switch value := args[0].(type) {
+	case string:
+		table = value
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as table argument for join clause", args[0]))
+	}
+
+	switch value := args[1].(type) {
+	case string:
+		join = parser.MustParseJoin(value)
+	case stmt.On:
+		join = stmt.NewInnerJoin(table, value)
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as condition for join clause", args[1]))
+	}
+
+	join.Table = table
+	return join
+}
+
 func (builder SelectBuilder) String() string {
 	if len(builder.columns) == 0 {
 		panic("loukoum: select statements must have at least one column")
@@ -103,7 +192,10 @@ func (builder SelectBuilder) String() string {
 		builder.from.Write(buffer)
 	}
 
-	// TODO JOINS
+	for i := range builder.joins {
+		buffer.WriteString(" ")
+		builder.joins[i].Write(buffer)
+	}
 
 	// TODO WHERE
 
