@@ -28,30 +28,30 @@ func ParseJoin(subquery string) (stmt.Join, error) {
 		e := it.Next()
 
 		// Parse join type
-		if e.Type == token.Inner && it.Peek(token.Join) {
+		if e.Type == token.Inner && it.Is(token.Join) {
 			join.Type = types.InnerJoin
 		}
-		if e.Type == token.Left && it.Peek(token.Join) {
+		if e.Type == token.Left && it.Is(token.Join) {
 			join.Type = types.LeftJoin
 		}
-		if e.Type == token.Right && it.Peek(token.Join) {
+		if e.Type == token.Right && it.Is(token.Join) {
 			join.Type = types.RightJoin
 		}
 
 		// Parse join table
-		if e.Type == token.Literal && it.Peek(token.On) {
+		if e.Type == token.Literal && it.Is(token.On) {
 			join.Table = stmt.NewTable(e.Value)
 		}
 
 		// Parse join condition
-		if e.Type == token.Literal && it.Peek(token.Equals) {
+		if e.Type == token.Literal && it.Is(token.Equals) {
 
 			// Left condition
 			left := stmt.NewColumn(e.Value)
 
 			// Check that we have a right condition
 			e = it.Next()
-			if e.Type != token.Equals && !it.Peek(token.Literal) {
+			if e.Type != token.Equals && !it.Is(token.Literal) {
 				err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
 				return stmt.Join{}, err
 			}
