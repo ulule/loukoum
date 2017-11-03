@@ -188,7 +188,7 @@ func (builder SelectBuilder) String() string {
 	}
 
 	if !builder.from.IsEmpty() {
-		buffer.WriteString(" FROM ")
+		buffer.WriteString(" ")
 		builder.from.Write(buffer)
 	}
 

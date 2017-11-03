@@ -16,6 +16,7 @@ func NewFrom(table string) From {
 }
 
 func (from From) Write(buffer *bytes.Buffer) {
+	buffer.WriteString("FROM ")
 	buffer.WriteString(from.Table)
 }
 
