@@ -64,6 +64,19 @@ func (l *Lexer) next() rune {
 	return l.en
 }
 
+// Iterator returns an Iteratee from reader.
+func (l *Lexer) Iterator() *Iteratee {
+	list := []token.Token{}
+	for {
+		current := l.Next()
+		if current.Type == token.EOF {
+			break
+		}
+		list = append(list, current)
+	}
+	return &Iteratee{list: list}
+}
+
 // Next will return the next token on reader.
 func (l *Lexer) Next() token.Token {
 
