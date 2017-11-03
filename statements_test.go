@@ -41,6 +41,16 @@ func TestStatementSelect(t *testing.T) {
 		is.Equal("SELECT a, b, c AS x FROM foobar", query.String())
 	}
 	{
+		query := loukoum.Select("a", loukoum.Column("b"), loukoum.Column("c").As("x")).
+			From(loukoum.Table("foobar"))
+		is.Equal("SELECT a, b, c AS x FROM foobar", query.String())
+	}
+	{
+		query := loukoum.Select("a", loukoum.Column("b"), loukoum.Column("c").As("x")).
+			From(loukoum.Table("foobar").As("example"))
+		is.Equal("SELECT a, b, c AS x FROM foobar AS example", query.String())
+	}
+	{
 		query := loukoum.Select("a", "b", "c").From("test1").Join("test2 ON test1.id = test2.fk_id")
 		is.Equal("SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id", query.String())
 	}
@@ -78,6 +88,13 @@ func TestStatementSelect(t *testing.T) {
 		query := loukoum.Select("a", "b", "c").From("test2").
 			Join("test4", loukoum.On("test4.gid", "test2.id")).
 			Join("test3", loukoum.On("test4.uid", "test3.id"))
+		is.Equal(fmt.Sprint("SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
+			"INNER JOIN test3 ON test4.uid = test3.id"), query.String())
+	}
+	{
+		query := loukoum.Select("a", "b", "c").From("test2").
+			Join(loukoum.Table("test4"), loukoum.On("test4.gid", "test2.id")).
+			Join(loukoum.Table("test3"), loukoum.On("test4.uid", "test3.id"))
 		is.Equal(fmt.Sprint("SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
 			"INNER JOIN test3 ON test4.uid = test3.id"), query.String())
 	}

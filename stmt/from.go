@@ -6,10 +6,10 @@ import (
 
 type From struct {
 	Statement
-	Table string
+	Table Table
 }
 
-func NewFrom(table string) From {
+func NewFrom(table Table) From {
 	return From{
 		Table: table,
 	}
@@ -17,10 +17,10 @@ func NewFrom(table string) From {
 
 func (from From) Write(buffer *bytes.Buffer) {
 	buffer.WriteString("FROM ")
-	buffer.WriteString(from.Table)
+	from.Table.Write(buffer)
 }
 
 // IsEmpty return true if statement is undefined.
 func (from From) IsEmpty() bool {
-	return from.Table == ""
+	return from.Table.IsEmpty()
 }

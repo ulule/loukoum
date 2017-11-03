@@ -65,9 +65,11 @@ func (builder SelectBuilder) From(from interface{}) SelectBuilder {
 
 	switch value := from.(type) {
 	case string:
-		builder.from = stmt.NewFrom(value)
+		builder.from = stmt.NewFrom(stmt.NewTable(value))
 	case stmt.From:
 		builder.from = value
+	case stmt.Table:
+		builder.from = stmt.NewFrom(value)
 	default:
 		panic(fmt.Sprintf("loukoum: cannot use %T as from clause", from))
 	}
@@ -143,10 +145,12 @@ func (builder SelectBuilder) join3(args []interface{}) SelectBuilder {
 
 func handleSelectJoin(args []interface{}) stmt.Join {
 	join := stmt.Join{}
-	table := ""
+	table := stmt.Table{}
 
 	switch value := args[0].(type) {
 	case string:
+		table = stmt.NewTable(value)
+	case stmt.Table:
 		table = value
 	default:
 		panic(fmt.Sprintf("loukoum: cannot use %T as table argument for join clause", args[0]))

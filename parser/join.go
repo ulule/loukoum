@@ -40,7 +40,7 @@ func ParseJoin(subquery string) (stmt.Join, error) {
 
 		// Parse join table
 		if e.Type == token.Literal && it.Peek(token.On) {
-			join.Table = e.Value
+			join.Table = stmt.NewTable(e.Value)
 		}
 
 		// Parse join condition
