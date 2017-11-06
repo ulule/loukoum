@@ -99,3 +99,26 @@ func TestStatementSelect(t *testing.T) {
 			"INNER JOIN test3 ON test4.uid = test3.id"), query.String())
 	}
 }
+
+func TestStatementWhere(t *testing.T) {
+	is := require.New(t)
+
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").Equal(1))
+
+		is.Equal("SELECT id FROM table WHERE (id = 1)", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").Equal(1)).
+			And(loukoum.Condition("is_active").Equal(true)).
+			Or(loukoum.Condition("slug").Equal("foo"))
+
+		is.Equal("SELECT id FROM table WHERE (id = 1) AND (is_active = true) OR (slug = foo)", query.String())
+	}
+}
