@@ -24,7 +24,7 @@ func (e ComparisonOperator) String() string {
 // Comparison operators
 const (
 	Equal              = ComparisonOperator("=")
-	NotEqual           = ComparisonOperator("<>")
+	NotEqual           = ComparisonOperator("!=")
 	Is                 = ComparisonOperator("IS")
 	IsNot              = ComparisonOperator("IS NOT")
 	GreaterThan        = ComparisonOperator(">")
