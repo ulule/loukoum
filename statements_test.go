@@ -212,7 +212,7 @@ func TestWhere_ComparisonOperators(t *testing.T) {
 			From("table").
 			Where(loukoum.Condition("id").NotEqual(1))
 
-		is.Equal("SELECT id FROM table WHERE (id <> 1)", query.String())
+		is.Equal("SELECT id FROM table WHERE (id != 1)", query.String())
 	}
 
 	// Is
