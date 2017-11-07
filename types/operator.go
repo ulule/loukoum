@@ -30,7 +30,7 @@ const (
 	GreaterThan        = ComparisonOperator(">")
 	GreaterThanOrEqual = ComparisonOperator(">=")
 	LessThan           = ComparisonOperator("<")
-	LessThanOrEqual    = ComparisonOperator("=<")
+	LessThanOrEqual    = ComparisonOperator("<=")
 	In                 = ComparisonOperator("IN")
 	NotIn              = ComparisonOperator("NOT IN")
 	Like               = ComparisonOperator("LIKE")
