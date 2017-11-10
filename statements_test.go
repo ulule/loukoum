@@ -137,105 +137,150 @@ func TestJoin(t *testing.T) {
 	}
 }
 
-func TestWhere_LogicalOperators(t *testing.T) {
+func TestWhere(t *testing.T) {
 	is := require.New(t)
 
-	// AND
-	{
-		query := loukoum.
-			Select("id").
-			From("table").
-			Where(loukoum.Condition("id").Equal(1)).
-			And(loukoum.Condition("slug").Equal("foo")).
-			And(loukoum.Condition("title").Equal("hello"))
-
-		is.Equal("SELECT id FROM table WHERE (id = 1) AND (slug = foo) AND (title = hello)", query.String())
-	}
-
-	// OR
-	{
-		query := loukoum.
-			Select("id").
-			From("table").
-			Where(loukoum.Condition("id").Equal(1)).
-			Or(loukoum.Condition("slug").Equal("foo")).
-			Or(loukoum.Condition("title").Equal("hello"))
-
-		is.Equal("SELECT id FROM table WHERE (id = 1) OR (slug = foo) OR (title = hello)", query.String())
-	}
-
-	// Combined
-	{
-		query := loukoum.
-			Select("id").
-			From("table").
-			Where(
-				loukoum.Condition("id").Equal(1),
-				loukoum.Condition("title", loukoum.Or).Equal("hello")).
-			Or(
-				loukoum.Condition("slug").Equal("foo"),
-				loukoum.Condition("active", loukoum.And).Equal(true))
-
-		is.Equal("SELECT id FROM table WHERE (id = 1 OR title = hello) OR (slug = foo AND active = true)", query.String())
-	}
-
-	// Combined - default AND operator
-	{
-		query := loukoum.
-			Select("id").
-			From("table").
-			Where(
-				loukoum.Condition("id").Equal(1),
-				loukoum.Condition("title").Equal("hello"))
-
-		is.Equal("SELECT id FROM table WHERE (id = 1 AND title = hello)", query.String())
-	}
-}
-
-func TestWhere_ComparisonOperators(t *testing.T) {
-	is := require.New(t)
-
-	// Equal
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1))
 
-		is.Equal("SELECT id FROM table WHERE (id = 1)", query.String())
+		is.Equal(`SELECT id FROM table WHERE (id = 1)`, query.String())
 	}
-
-	// Not equal
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("id").NotEqual(1))
+			Where(loukoum.Condition("id").Equal(1)).
+			And(loukoum.Condition("slug").Equal("'foo'"))
 
-		is.Equal("SELECT id FROM table WHERE (id != 1)", query.String())
+		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (slug = 'foo'))", query.String())
 	}
-
-	// Is
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("active").Is("TRUE"))
+			Where(loukoum.Condition("id").Equal(1)).
+			And(loukoum.Condition("slug").Equal("'foo'")).
+			And(loukoum.Condition("title").Equal("'hello'"))
 
-		is.Equal("SELECT id FROM table WHERE (active IS TRUE)", query.String())
+		is.Equal("SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) AND (title = 'hello'))", query.String())
 	}
-
-	// Is not
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("active").IsNot("TRUE"))
+			Where(loukoum.Condition("id").Equal(1)).
+			Or(loukoum.Condition("slug").Equal("'foo'")).
+			Or(loukoum.Condition("title").Equal("'hello'"))
 
-		is.Equal("SELECT id FROM table WHERE (active IS NOT TRUE)", query.String())
+		is.Equal("SELECT id FROM table WHERE (((id = 1) OR (slug = 'foo')) OR (title = 'hello'))", query.String())
 	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").Equal(1)).
+			Or(loukoum.Condition("slug").Equal("'foo'")).
+			Or(loukoum.Condition("title").Equal("'hello'"))
 
-	// Greater than
+		is.Equal(`SELECT id FROM table WHERE (((id = 1) OR (slug = 'foo')) OR (title = 'hello'))`, query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(
+				loukoum.Or(loukoum.Condition("id").Equal(1), loukoum.Condition("title").Equal("'hello'")),
+			).
+			Or(
+				loukoum.And(loukoum.Condition("slug").Equal("'foo'"), loukoum.Condition("active").Equal(true)),
+			)
+
+		is.Equal(fmt.Sprint("SELECT id FROM table WHERE (((id = 1) OR (title = 'hello')) OR ",
+			"((slug = 'foo') AND (active = true)))"), query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(
+				loukoum.And(loukoum.Condition("id").Equal(1), loukoum.Condition("title").Equal("'hello'")),
+			)
+
+		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").Equal(1)).
+			Where(loukoum.Condition("title").Equal("'hello'"))
+
+		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").Equal(1)).
+			Where(loukoum.Condition("title").Equal("'hello'"))
+
+		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").Equal(1)).
+			Or(
+				loukoum.Condition("slug").Equal("'foo'").And(loukoum.Condition("active").Equal(true)),
+			)
+
+		is.Equal("SELECT id FROM table WHERE ((id = 1) OR ((slug = 'foo') AND (active = true)))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").Equal(1).And(loukoum.Condition("slug").Equal("'foo'"))).
+			Or(loukoum.Condition("active").Equal(true))
+
+		is.Equal("SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) OR (active = true))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("disabled").Equal(false))
+
+		is.Equal("SELECT id FROM table WHERE (disabled = false)", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("disabled").NotEqual(false))
+
+		is.Equal("SELECT id FROM table WHERE (disabled != false)", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("disabled").Is(nil))
+
+		is.Equal("SELECT id FROM table WHERE (disabled IS NULL)", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("active").IsNot(true))
+
+		is.Equal("SELECT id FROM table WHERE (active IS NOT true)", query.String())
+	}
 	{
 		query := loukoum.
 			Select("id").
@@ -244,111 +289,93 @@ func TestWhere_ComparisonOperators(t *testing.T) {
 
 		is.Equal("SELECT id FROM table WHERE (count > 2)", query.String())
 	}
-
-	// Greater than or equal
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").GreaterThanOrEqual(2))
+			Where(loukoum.Condition("count").GreaterThanOrEqual(4))
 
-		is.Equal("SELECT id FROM table WHERE (count >= 2)", query.String())
+		is.Equal("SELECT id FROM table WHERE (count >= 4)", query.String())
 	}
-
-	// Less than
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").LessThan(2))
+			Where(loukoum.Condition("count").LessThan(3))
 
-		is.Equal("SELECT id FROM table WHERE (count < 2)", query.String())
+		is.Equal("SELECT id FROM table WHERE (count < 3)", query.String())
 	}
-
-	// Less than or equal
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").LessThanOrEqual(2))
+			Where(loukoum.Condition("count").LessThanOrEqual(6))
 
-		is.Equal("SELECT id FROM table WHERE (count <= 2)", query.String())
+		is.Equal("SELECT id FROM table WHERE (count <= 6)", query.String())
 	}
-
-	// In
+	{
+		// TODO
+		// query := loukoum.
+		// 	Select("id").
+		// 	From("table").
+		// 	Where(loukoum.Condition("count").In(...))
+		//
+		// is.Equal("SELECT id FROM table WHERE (id IN ...)", query.String())
+	}
+	{
+		// TODO
+		// query := loukoum.
+		// 	Select("id").
+		// 	From("table").
+		// 	Where(loukoum.Condition("count").NotIn(...))
+		//
+		// is.Equal("SELECT id FROM table WHERE (id NOT IN ...)", query.String())
+	}
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("id").In([]interface{}{1, 2, 3}))
+			Where(loukoum.Condition("title").Like("'foo%'"))
 
-		is.Equal("SELECT id FROM table WHERE (id IN (1,2,3))", query.String())
+		is.Equal("SELECT id FROM table WHERE (title LIKE 'foo%')", query.String())
 	}
-
-	// Not In
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("id").NotIn([]interface{}{1, 2, 3}))
+			Where(loukoum.Condition("title").NotLike("'foo%'"))
 
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (1,2,3))", query.String())
+		is.Equal("SELECT id FROM table WHERE (title NOT LIKE 'foo%')", query.String())
 	}
-
-	// Like
-	{
-		query := loukoum.
-			Select("id").
-			From("table").Where(loukoum.Condition("title").Like("foo"))
-
-		is.Equal("SELECT id FROM table WHERE (title LIKE foo)", query.String())
-	}
-
-	// Not like
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("title").NotLike("foo"))
+			Where(loukoum.Condition("title").ILike("'foo%'"))
 
-		is.Equal("SELECT id FROM table WHERE (title NOT LIKE foo)", query.String())
+		is.Equal("SELECT id FROM table WHERE (title ILIKE 'foo%')", query.String())
 	}
-
-	// ILike
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("title").ILike("foo"))
+			Where(loukoum.Condition("title").NotILike("'foo%'"))
 
-		is.Equal("SELECT id FROM table WHERE (title ILIKE foo)", query.String())
+		is.Equal("SELECT id FROM table WHERE (title NOT ILIKE 'foo%')", query.String())
 	}
-
-	// Not ilike
-	{
-		query := loukoum.
-			Select("id").
-			From("table").Where(loukoum.Condition("title").NotILike("foo"))
-
-		is.Equal("SELECT id FROM table WHERE (title NOT ILIKE foo)", query.String())
-	}
-
-	// Between
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").Between([]interface{}{10, 20}))
+			Where(loukoum.Condition("count").Between(10, 20))
 
 		is.Equal("SELECT id FROM table WHERE (count BETWEEN 10 AND 20)", query.String())
 	}
-
-	// Not between
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").NotBetween([]interface{}{10, 20}))
+			Where(loukoum.Condition("count").NotBetween(10, 20))
 
 		is.Equal("SELECT id FROM table WHERE (count NOT BETWEEN 10 AND 20)", query.String())
 	}
