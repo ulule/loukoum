@@ -109,11 +109,11 @@ func (identifier Identifier) LessThanOrEqual(value interface{}) InfixExpression 
 	return NewInfixExpression(identifier, operator, NewExpression(value))
 }
 
-func (identifier Identifier) In(values []interface{}) InfixExpression {
+func (identifier Identifier) In(value interface{}) InfixExpression {
 	panic("TODO")
 }
 
-func (identifier Identifier) NotIn(values []interface{}) InfixExpression {
+func (identifier Identifier) NotIn(value interface{}) InfixExpression {
 	panic("TODO")
 }
 

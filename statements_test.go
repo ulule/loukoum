@@ -314,13 +314,12 @@ func TestWhere(t *testing.T) {
 		is.Equal("SELECT id FROM table WHERE (count <= 6)", query.String())
 	}
 	{
-		// TODO
-		// query := loukoum.
-		// 	Select("id").
-		// 	From("table").
-		// 	Where(loukoum.Condition("count").In(...))
-		//
-		// is.Equal("SELECT id FROM table WHERE (id IN ...)", query.String())
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("count").In([]int64{1, 2, 3}))
+
+		is.Equal("SELECT id FROM table WHERE (id IN ...)", query.String())
 	}
 	{
 		// TODO

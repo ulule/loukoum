@@ -7,6 +7,7 @@ import (
 )
 
 type Between struct {
+	Expression
 	Identifier Identifier
 	Operator   ComparisonOperator
 	From       Expression
