@@ -15,7 +15,7 @@ type SelectBuilder struct {
 	columns  []stmt.Column
 	from     stmt.From
 	joins    []stmt.Join
-	wheres   []stmt.Where
+	where    stmt.Where
 }
 
 // NewSelectBuilder creates a new SelectBuilder.
@@ -145,20 +145,24 @@ func (builder SelectBuilder) join3(args []interface{}) SelectBuilder {
 }
 
 // Where adds WHERE clauses.
-func (builder SelectBuilder) Where(conditions ...stmt.Condition) SelectBuilder {
-	builder.wheres = append(builder.wheres, stmt.NewWhere(types.And, conditions...))
-	return builder
+func (builder SelectBuilder) Where(condition stmt.Expression) SelectBuilder {
+	if builder.where.IsEmpty() {
+		builder.where = stmt.NewWhere(condition)
+		return builder
+	}
+
+	return builder.And(condition)
 }
 
 // And adds AND WHERE conditions.
-func (builder SelectBuilder) And(conditions ...stmt.Condition) SelectBuilder {
-	builder.wheres = append(builder.wheres, stmt.NewWhere(types.And, conditions...))
+func (builder SelectBuilder) And(condition stmt.Expression) SelectBuilder {
+	builder.where = builder.where.And(condition)
 	return builder
 }
 
 // Or adds OR WHERE conditions.
-func (builder SelectBuilder) Or(conditions ...stmt.Condition) SelectBuilder {
-	builder.wheres = append(builder.wheres, stmt.NewWhere(types.Or, conditions...))
+func (builder SelectBuilder) Or(condition stmt.Expression) SelectBuilder {
+	builder.where = builder.where.Or(condition)
 	return builder
 }
 
@@ -220,15 +224,9 @@ func (builder SelectBuilder) String() string {
 		builder.joins[i].Write(buffer)
 	}
 
-	for i, where := range builder.wheres {
+	if !builder.where.IsEmpty() {
 		buffer.WriteString(" ")
-		if i == 0 {
-			buffer.WriteString("WHERE")
-			builder.wheres[i].Write(buffer)
-			continue
-		}
-		buffer.WriteString(where.Operator.String())
-		builder.wheres[i].Write(buffer)
+		builder.where.Write(buffer)
 	}
 
 	// TODO GROUP BY
