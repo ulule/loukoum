@@ -3,7 +3,7 @@
 [![Documentation][godoc-img]][godoc-url]
 ![License][license-img]
 
-*A simple SQL Query Builder.*
+*A simple SQL Query Builder for PostgreSQL.*
 
 > **TODO**
 
