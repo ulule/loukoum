@@ -7,7 +7,7 @@ func (e LogicalOperator) String() string {
 	return string(e)
 }
 
-// Logical operators
+// Logical operators.
 const (
 	And = LogicalOperator("AND")
 	Or  = LogicalOperator("OR")
@@ -21,7 +21,7 @@ func (e ComparisonOperator) String() string {
 	return string(e)
 }
 
-// Comparison operators
+// Comparison operators.
 const (
 	Equal              = ComparisonOperator("=")
 	NotEqual           = ComparisonOperator("!=")
