@@ -46,7 +46,7 @@ func NewExpression(arg interface{}) Expression {
 		return NewValue(strconv.FormatUint(uint64(value), 10))
 	case uint64:
 		return NewValue(strconv.FormatUint(value, 10))
-	case []string, []int, []uint, []int8, []uint8, []int16, []uint16, []int32, []uint32, []int64, []uint64:
+	case []string, []int, []uint, []int8, []uint8, []int16, []uint16, []int32, []uint32, []int64, []uint64, []interface{}:
 		return NewValue(strings.Trim(strings.Join(strings.Fields(fmt.Sprint(value)), ", "), "[]"))
 	default:
 		return NewValue(fmt.Sprint(value))
@@ -126,13 +126,13 @@ func (identifier Identifier) LessThanOrEqual(value interface{}) InfixExpression 
 }
 
 // In performs a "in" condition.
-func (identifier Identifier) In(value interface{}) In {
-	return NewIn(identifier, NewExpression(value))
+func (identifier Identifier) In(value ...interface{}) In {
+	return NewIn(identifier, newInExpression(value...))
 }
 
 // NotIn performs a "not in" condition.
-func (identifier Identifier) NotIn(value interface{}) In {
-	return NewNotIn(identifier, NewExpression(value))
+func (identifier Identifier) NotIn(value ...interface{}) In {
+	return NewNotIn(identifier, newInExpression(value...))
 }
 
 // Like performs a "like" condition.
@@ -191,4 +191,18 @@ func (value Value) Write(buffer *bytes.Buffer) {
 // IsEmpty return true if statement is undefined.
 func (value Value) IsEmpty() bool {
 	return value.Value == ""
+}
+
+func newInExpression(values ...interface{}) Expression {
+	// We pass only one argument and it's a slice or an expression.
+	if len(values) == 1 {
+		value := values[0]
+		switch value.(type) {
+		case []string, []int, []uint, []int8, []uint8, []int16, []uint16, []int32, []uint32, []int64, []uint64, []interface{}, Statement:
+			return NewExpression(value)
+		}
+	}
+
+	// Variadic
+	return NewExpression(values)
 }

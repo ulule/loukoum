@@ -366,7 +366,7 @@ func TestWhere(t *testing.T) {
 func TestWhereIn(t *testing.T) {
 	is := require.New(t)
 
-	// Integers
+	// Slice of integers
 	{
 		query := loukoum.
 			Select("id").
@@ -384,7 +384,25 @@ func TestWhereIn(t *testing.T) {
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (1, 2, 3))", query.String())
 	}
 
-	// Strings
+	// Integers as variadic
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").In(1, 2, 3))
+
+		is.Equal("SELECT id FROM table WHERE (id IN (1, 2, 3))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").NotIn(1, 2, 3))
+
+		is.Equal("SELECT id FROM table WHERE (id NOT IN (1, 2, 3))", query.String())
+	}
+
+	// Slice of strings
 	{
 		query := loukoum.
 			Select("id").
@@ -402,7 +420,25 @@ func TestWhereIn(t *testing.T) {
 		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
 	}
 
-	// Subqueries
+	// Strings as variadic
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("status").In("'read'", "'unread'"))
+
+		is.Equal("SELECT id FROM table WHERE (status IN ('read', 'unread'))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("status").NotIn("'read'", "'unread'"))
+
+		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
+	}
+
+	// Subquery
 	{
 		query := loukoum.
 			Select("id").
