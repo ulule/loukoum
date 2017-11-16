@@ -11,13 +11,7 @@ import (
 
 // SelectBuilder is a builder used for "SELECT" query.
 type SelectBuilder struct {
-	stmt.Statement
-
-	distinct bool
-	columns  []stmt.Column
-	from     stmt.From
-	joins    []stmt.Join
-	where    stmt.Where
+	query stmt.Select
 }
 
 // NewSelectBuilder creates a new SelectBuilder.
@@ -27,20 +21,20 @@ func NewSelectBuilder() SelectBuilder {
 
 // Distinct adds a DISTINCT clause to the query.
 func (builder SelectBuilder) Distinct() SelectBuilder {
-	builder.distinct = true
+	builder.query.Distinct = true
 	return builder
 }
 
 // Columns adds result columns to the query.
 func (builder SelectBuilder) Columns(columns []interface{}) SelectBuilder {
-	if len(builder.columns) != 0 {
+	if len(builder.query.Columns) != 0 {
 		panic("loukoum: select builder has columns already defined")
 	}
 	if len(columns) == 0 {
 		columns = []interface{}{"*"}
 	}
 
-	builder.columns = []stmt.Column{}
+	builder.query.Columns = make([]stmt.Column, 0, len(columns))
 	for i := range columns {
 		column := stmt.Column{}
 		switch value := columns[i].(type) {
@@ -54,7 +48,7 @@ func (builder SelectBuilder) Columns(columns []interface{}) SelectBuilder {
 		if column.IsEmpty() {
 			panic("loukoum: a column was undefined")
 		}
-		builder.columns = append(builder.columns, column)
+		builder.query.Columns = append(builder.query.Columns, column)
 	}
 
 	return builder
@@ -62,22 +56,22 @@ func (builder SelectBuilder) Columns(columns []interface{}) SelectBuilder {
 
 // From sets the FROM clause of the query.
 func (builder SelectBuilder) From(from interface{}) SelectBuilder {
-	if !builder.from.IsEmpty() {
+	if !builder.query.From.IsEmpty() {
 		panic("loukoum: select builder has from clause already defined")
 	}
 
 	switch value := from.(type) {
 	case string:
-		builder.from = stmt.NewFrom(stmt.NewTable(value))
+		builder.query.From = stmt.NewFrom(stmt.NewTable(value))
 	case stmt.From:
-		builder.from = value
+		builder.query.From = value
 	case stmt.Table:
-		builder.from = stmt.NewFrom(value)
+		builder.query.From = stmt.NewFrom(value)
 	default:
 		panic(fmt.Sprintf("loukoum: cannot use %T as from clause", from))
 	}
 
-	if builder.from.IsEmpty() {
+	if builder.query.From.IsEmpty() {
 		panic("loukoum: given from clause is undefined")
 	}
 
@@ -114,7 +108,7 @@ func (builder SelectBuilder) join1(args []interface{}) SelectBuilder {
 		panic("loukoum: given join clause is undefined")
 	}
 
-	builder.joins = append(builder.joins, join)
+	builder.query.Joins = append(builder.query.Joins, join)
 	return builder
 }
 
@@ -124,7 +118,7 @@ func (builder SelectBuilder) join2(args []interface{}) SelectBuilder {
 		panic("loukoum: given join clause is undefined")
 	}
 
-	builder.joins = append(builder.joins, join)
+	builder.query.Joins = append(builder.query.Joins, join)
 	return builder
 }
 
@@ -142,14 +136,14 @@ func (builder SelectBuilder) join3(args []interface{}) SelectBuilder {
 		panic("loukoum: given join clause is undefined")
 	}
 
-	builder.joins = append(builder.joins, join)
+	builder.query.Joins = append(builder.query.Joins, join)
 	return builder
 }
 
 // Where adds WHERE clauses.
 func (builder SelectBuilder) Where(condition stmt.Expression) SelectBuilder {
-	if builder.where.IsEmpty() {
-		builder.where = stmt.NewWhere(condition)
+	if builder.query.Where.IsEmpty() {
+		builder.query.Where = stmt.NewWhere(condition)
 		return builder
 	}
 
@@ -158,75 +152,19 @@ func (builder SelectBuilder) Where(condition stmt.Expression) SelectBuilder {
 
 // And adds AND WHERE conditions.
 func (builder SelectBuilder) And(condition stmt.Expression) SelectBuilder {
-	builder.where = builder.where.And(condition)
+	builder.query.Where = builder.query.Where.And(condition)
 	return builder
 }
 
 // Or adds OR WHERE conditions.
 func (builder SelectBuilder) Or(condition stmt.Expression) SelectBuilder {
-	builder.where = builder.where.Or(condition)
+	builder.query.Where = builder.query.Where.Or(condition)
 	return builder
 }
 
-// IsEmpty implements Statement interface.
-func (builder SelectBuilder) IsEmpty() bool {
-	return builder.from.Table.IsEmpty()
-}
-
-// Write implements Statement interface.
-func (builder SelectBuilder) Write(buffer *bytes.Buffer) {
-	buffer.WriteString(builder.String())
-}
-
 func (builder SelectBuilder) String() string {
-	if len(builder.columns) == 0 {
-		panic("loukoum: select statements must have at least one column")
-	}
-
 	buffer := &bytes.Buffer{}
-
-	// TODO Add prefixes
-
-	buffer.WriteString("SELECT ")
-
-	if builder.distinct {
-		buffer.WriteString("DISTINCT ")
-	}
-
-	for i := range builder.columns {
-		if i != 0 {
-			buffer.WriteString(", ")
-		}
-		builder.columns[i].Write(buffer)
-	}
-
-	if !builder.from.IsEmpty() {
-		buffer.WriteString(" ")
-		builder.from.Write(buffer)
-	}
-
-	for i := range builder.joins {
-		buffer.WriteString(" ")
-		builder.joins[i].Write(buffer)
-	}
-
-	if !builder.where.IsEmpty() {
-		buffer.WriteString(" ")
-		builder.where.Write(buffer)
-	}
-
-	// TODO GROUP BY
-
-	// TODO HAVING
-
-	// TODO ORDER BY
-
-	// TODO LIMIT
-
-	// TODO OFFSET
-
-	// TODO Add suffixes
-
+	builder.query.Write(buffer)
 	return buffer.String()
 }
 
