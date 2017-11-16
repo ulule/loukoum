@@ -168,6 +168,11 @@ func (builder SelectBuilder) String() string {
 	return buffer.String()
 }
 
+// Statement return underlying statement.
+func (builder SelectBuilder) Statement() stmt.Statement {
+	return builder.query
+}
+
 func handleSelectJoin(args []interface{}) stmt.Join {
 	join := stmt.Join{}
 	table := stmt.Table{}

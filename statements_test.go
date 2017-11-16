@@ -437,17 +437,34 @@ func TestWhereIn(t *testing.T) {
 
 		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
 	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("status").In("'read'"))
+
+		is.Equal("SELECT id FROM table WHERE (status IN ('read'))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("status").NotIn("'read'"))
+
+		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read'))", query.String())
+	}
 
 	// Subquery
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(
-				loukoum.Condition("id").In(
-					loukoum.Select("id").
-						From("table").
-						Where(loukoum.Condition("id").Equal(1))))
+			Where(loukoum.Condition("id").In(
+				loukoum.Select("id").
+					From("table").
+					Where(loukoum.Condition("id").Equal(1)).
+					Statement(),
+			))
 
 		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = 1)))", query.String())
 	}
@@ -455,11 +472,12 @@ func TestWhereIn(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(
-				loukoum.Condition("id").NotIn(
-					loukoum.Select("id").
-						From("table").
-						Where(loukoum.Condition("id").Equal(1))))
+			Where(loukoum.Condition("id").NotIn(
+				loukoum.Select("id").
+					From("table").
+					Where(loukoum.Condition("id").Equal(1)).
+					Statement(),
+			))
 
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))", query.String())
 	}
