@@ -9,3 +9,8 @@ func Select(columns ...interface{}) SelectBuilder {
 func SelectDistinct(columns ...interface{}) SelectBuilder {
 	return Select(columns...).Distinct()
 }
+
+// Insert starts an InsertBuilder using the given table as into clause.
+func Insert(into string) InsertBuilder {
+	return NewInsertBuilder().Into(into)
+}
