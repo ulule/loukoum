@@ -4,6 +4,11 @@ import (
 	"bytes"
 )
 
+// Query is a query.
+type Query interface {
+	String() string
+}
+
 // Statement is the interface of the component
 // which is the minimum unit constituting SQL.
 // All types that implement this interface

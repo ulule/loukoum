@@ -109,6 +109,7 @@ func (builder SelectBuilder) join1(args []interface{}) SelectBuilder {
 	}
 
 	builder.query.Joins = append(builder.query.Joins, join)
+
 	return builder
 }
 
@@ -119,6 +120,7 @@ func (builder SelectBuilder) join2(args []interface{}) SelectBuilder {
 	}
 
 	builder.query.Joins = append(builder.query.Joins, join)
+
 	return builder
 }
 
@@ -137,6 +139,7 @@ func (builder SelectBuilder) join3(args []interface{}) SelectBuilder {
 	}
 
 	builder.query.Joins = append(builder.query.Joins, join)
+
 	return builder
 }
 
@@ -191,5 +194,6 @@ func handleSelectJoin(args []interface{}) stmt.Join {
 	}
 
 	join.Table = table
+
 	return join
 }

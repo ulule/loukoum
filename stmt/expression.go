@@ -22,8 +22,6 @@ func NewExpression(arg interface{}) Expression {
 	}
 
 	switch value := arg.(type) {
-	case Expression:
-		return value
 	case string:
 		return NewValue(value)
 	case int:
@@ -47,14 +45,19 @@ func NewExpression(arg interface{}) Expression {
 	case uint64:
 		return NewValue(strconv.FormatUint(value, 10))
 	case []string, []int, []uint, []int8, []uint8, []int16, []uint16, []int32, []uint32, []int64, []uint64, []interface{}:
-		return NewValue(strings.Trim(strings.Join(strings.Fields(fmt.Sprint(value)), ", "), "[]"))
+		return NewArray(value)
+	case Query:
+		return NewSubquery(value)
 	default:
 		return NewValue(fmt.Sprint(value))
 	}
 }
 
+// ----------------------------------------------------------------------------
+// Identifier
+// ----------------------------------------------------------------------------
+
 // Identifier is an identifier.
-// TODO Refacto ?
 type Identifier struct {
 	Identifier string
 }
@@ -127,12 +130,12 @@ func (identifier Identifier) LessThanOrEqual(value interface{}) InfixExpression 
 
 // In performs a "in" condition.
 func (identifier Identifier) In(value ...interface{}) In {
-	return NewIn(identifier, newInExpression(value...))
+	return NewIn(identifier, newVariadicValues(value...))
 }
 
 // NotIn performs a "not in" condition.
 func (identifier Identifier) NotIn(value ...interface{}) In {
-	return NewNotIn(identifier, newInExpression(value...))
+	return NewNotIn(identifier, newVariadicValues(value...))
 }
 
 // Like performs a "like" condition.
@@ -169,8 +172,11 @@ func (identifier Identifier) NotBetween(from, to interface{}) Between {
 	return NewNotBetween(identifier, NewExpression(from), NewExpression(to))
 }
 
+// ----------------------------------------------------------------------------
+// Value
+// ----------------------------------------------------------------------------
+
 // Value is an expression value.
-// TODO Refacto ?
 type Value struct {
 	Value string
 }
@@ -193,16 +199,76 @@ func (value Value) IsEmpty() bool {
 	return value.Value == ""
 }
 
-func newInExpression(values ...interface{}) Expression {
-	// We pass only one argument and it's a slice or an expression.
+// ----------------------------------------------------------------------------
+// Array
+// ----------------------------------------------------------------------------
+
+// Array is an array of values.
+type Array struct {
+	Value string
+}
+
+// NewArray returns a new Array instance.
+func NewArray(value interface{}) Array {
+	return Array{
+		Value: strings.Trim(strings.Join(strings.Fields(fmt.Sprint(value)), ", "), "[]"),
+	}
+}
+
+func (Array) expression() {}
+
+func (array Array) Write(buffer *bytes.Buffer) {
+	buffer.WriteString("(")
+	buffer.WriteString(array.Value)
+	buffer.WriteString(")")
+}
+
+// IsEmpty implements Statement interface.
+func (array Array) IsEmpty() bool {
+	return array.Value == ""
+}
+
+// ----------------------------------------------------------------------------
+// Subquery
+// ----------------------------------------------------------------------------
+
+// Subquery is subquery.
+type Subquery struct {
+	Query Query
+}
+
+// NewSubquery returns a new Subquery instance.
+func NewSubquery(query Query) Subquery {
+	return Subquery{
+		Query: query,
+	}
+}
+
+func (Subquery) expression() {}
+
+func (s Subquery) Write(buffer *bytes.Buffer) {
+	buffer.WriteString("(")
+	buffer.WriteString(s.Query.String())
+	buffer.WriteString(")")
+}
+
+// IsEmpty implements Statement interface.
+func (s Subquery) IsEmpty() bool {
+	return s.Query == nil || (s.Query != nil && s.Query.String() == "")
+}
+
+// ----------------------------------------------------------------------------
+// Helpers
+// ----------------------------------------------------------------------------
+
+func newVariadicValues(values ...interface{}) Expression {
 	if len(values) == 1 {
-		value := values[0]
-		switch value.(type) {
-		case []string, []int, []uint, []int8, []uint8, []int16, []uint16, []int32, []uint32, []int64, []uint64, []interface{}, Statement:
-			return NewExpression(value)
+		if expr, ok := values[0].(Expression); ok {
+			return NewExpression(expr)
 		}
+
+		return NewExpression(values[0])
 	}
 
-	// Variadic
 	return NewExpression(values)
 }
