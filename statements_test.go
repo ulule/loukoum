@@ -317,23 +317,6 @@ func TestWhere(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").In([]int64{1, 2, 3}))
-
-		is.Equal("SELECT id FROM table WHERE (id IN ...)", query.String())
-	}
-	{
-		// TODO
-		// query := loukoum.
-		// 	Select("id").
-		// 	From("table").
-		// 	Where(loukoum.Condition("count").NotIn(...))
-		//
-		// is.Equal("SELECT id FROM table WHERE (id NOT IN ...)", query.String())
-	}
-	{
-		query := loukoum.
-			Select("id").
-			From("table").
 			Where(loukoum.Condition("title").Like("'foo%'"))
 
 		is.Equal("SELECT id FROM table WHERE (title LIKE 'foo%')", query.String())
@@ -377,5 +360,107 @@ func TestWhere(t *testing.T) {
 			Where(loukoum.Condition("count").NotBetween(10, 20))
 
 		is.Equal("SELECT id FROM table WHERE (count NOT BETWEEN 10 AND 20)", query.String())
+	}
+}
+
+func TestWhereIn(t *testing.T) {
+	is := require.New(t)
+
+	// Slice of integers
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").In([]int64{1, 2, 3}))
+
+		is.Equal("SELECT id FROM table WHERE (id IN (1, 2, 3))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").NotIn([]int{1, 2, 3}))
+
+		is.Equal("SELECT id FROM table WHERE (id NOT IN (1, 2, 3))", query.String())
+	}
+
+	// Integers as variadic
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").In(1, 2, 3))
+
+		is.Equal("SELECT id FROM table WHERE (id IN (1, 2, 3))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").NotIn(1, 2, 3))
+
+		is.Equal("SELECT id FROM table WHERE (id NOT IN (1, 2, 3))", query.String())
+	}
+
+	// Slice of strings
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("status").In([]string{"'read'", "'unread'"}))
+
+		is.Equal("SELECT id FROM table WHERE (status IN ('read', 'unread'))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("status").NotIn([]string{"'read'", "'unread'"}))
+
+		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
+	}
+
+	// Strings as variadic
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("status").In("'read'", "'unread'"))
+
+		is.Equal("SELECT id FROM table WHERE (status IN ('read', 'unread'))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("status").NotIn("'read'", "'unread'"))
+
+		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
+	}
+
+	// Subquery
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(
+				loukoum.Condition("id").In(
+					loukoum.Select("id").
+						From("table").
+						Where(loukoum.Condition("id").Equal(1))))
+
+		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = 1)))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(
+				loukoum.Condition("id").NotIn(
+					loukoum.Select("id").
+						From("table").
+						Where(loukoum.Condition("id").Equal(1))))
+
+		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))", query.String())
 	}
 }

@@ -11,6 +11,8 @@ import (
 
 // SelectBuilder is a builder used for "SELECT" query.
 type SelectBuilder struct {
+	stmt.Statement
+
 	distinct bool
 	columns  []stmt.Column
 	from     stmt.From
@@ -166,30 +168,14 @@ func (builder SelectBuilder) Or(condition stmt.Expression) SelectBuilder {
 	return builder
 }
 
-func handleSelectJoin(args []interface{}) stmt.Join {
-	join := stmt.Join{}
-	table := stmt.Table{}
+// IsEmpty implements Statement interface.
+func (builder SelectBuilder) IsEmpty() bool {
+	return builder.from.Table.IsEmpty()
+}
 
-	switch value := args[0].(type) {
-	case string:
-		table = stmt.NewTable(value)
-	case stmt.Table:
-		table = value
-	default:
-		panic(fmt.Sprintf("loukoum: cannot use %T as table argument for join clause", args[0]))
-	}
-
-	switch value := args[1].(type) {
-	case string:
-		join = parser.MustParseJoin(value)
-	case stmt.On:
-		join = stmt.NewInnerJoin(table, value)
-	default:
-		panic(fmt.Sprintf("loukoum: cannot use %T as condition for join clause", args[1]))
-	}
-
-	join.Table = table
-	return join
+// Write implements Statement interface.
+func (builder SelectBuilder) Write(buffer *bytes.Buffer) {
+	buffer.WriteString(builder.String())
 }
 
 func (builder SelectBuilder) String() string {
@@ -242,4 +228,30 @@ func (builder SelectBuilder) String() string {
 	// TODO Add suffixes
 
 	return buffer.String()
+}
+
+func handleSelectJoin(args []interface{}) stmt.Join {
+	join := stmt.Join{}
+	table := stmt.Table{}
+
+	switch value := args[0].(type) {
+	case string:
+		table = stmt.NewTable(value)
+	case stmt.Table:
+		table = value
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as table argument for join clause", args[0]))
+	}
+
+	switch value := args[1].(type) {
+	case string:
+		join = parser.MustParseJoin(value)
+	case stmt.On:
+		join = stmt.NewInnerJoin(table, value)
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as condition for join clause", args[1]))
+	}
+
+	join.Table = table
+	return join
 }
