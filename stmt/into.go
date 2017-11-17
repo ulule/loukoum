@@ -20,7 +20,7 @@ func NewInto(table Table) Into {
 
 // Write implements Statement interface.
 func (into Into) Write(ctx *types.Context) {
-	ctx.Write(string(token.Into))
+	ctx.Write(token.Into.String())
 	ctx.Write(" ")
 	into.Table.Write(ctx)
 }

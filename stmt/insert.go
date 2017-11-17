@@ -25,7 +25,7 @@ func (insert Insert) Write(ctx *types.Context) {
 		panic("loukoum: an insert statement must have at least one column")
 	}
 
-	ctx.Write(string(token.Insert))
+	ctx.Write(token.Insert.String())
 	ctx.Write(" ")
 	insert.Into.Write(ctx)
 

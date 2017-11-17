@@ -20,7 +20,7 @@ func NewReturning(columns []Column) Returning {
 
 // Write implements Statement interface.
 func (returning Returning) Write(ctx *types.Context) {
-	ctx.Write(string(token.Returning))
+	ctx.Write(token.Returning.String())
 	ctx.Write(" ")
 
 	l := len(returning.Columns)

@@ -24,7 +24,7 @@ func (values Values) Write(ctx *types.Context) {
 		return
 	}
 
-	ctx.Write(string(token.Values))
+	ctx.Write(token.Values.String())
 	ctx.Write(" (")
 	values.Values.Write(ctx)
 	ctx.Write(")")
