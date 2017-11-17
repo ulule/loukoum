@@ -5,9 +5,10 @@ import "bytes"
 // Insert is the INSERT statement.
 type Insert struct {
 	Statement
-	Into    Into
-	Columns []Column
-	Values  Values
+	Into      Into
+	Columns   []Column
+	Values    Values
+	Returning Returning
 }
 
 // NewInsert returns a new Insert instance.
@@ -39,8 +40,15 @@ func (insert Insert) Write(buffer *bytes.Buffer) {
 		}
 	}
 
-	buffer.WriteString(" ")
-	insert.Values.Write(buffer)
+	if !insert.Values.IsEmpty() {
+		buffer.WriteString(" ")
+		insert.Values.Write(buffer)
+	}
+
+	if !insert.Returning.IsEmpty() {
+		buffer.WriteString(" ")
+		insert.Returning.Write(buffer)
+	}
 }
 
 // IsEmpty implements Statement interface.

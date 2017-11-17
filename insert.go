@@ -78,11 +78,22 @@ func (builder InsertBuilder) Columns(columns ...interface{}) InsertBuilder {
 
 // Values sets the INSERT values.
 func (builder InsertBuilder) Values(values interface{}) InsertBuilder {
-	if builder.insert.Values.IsEmpty() {
+	if !builder.insert.Values.IsEmpty() {
 		return builder
 	}
 
 	builder.insert.Values = stmt.NewValues(stmt.NewExpression(values))
+
+	return builder
+}
+
+// Returning builds the RETURNING clause.
+func (builder InsertBuilder) Returning(values ...interface{}) InsertBuilder {
+	if !builder.insert.Returning.IsEmpty() {
+		return builder
+	}
+
+	builder.insert.Returning = stmt.NewReturning(stmt.ToColumns(values))
 
 	return builder
 }

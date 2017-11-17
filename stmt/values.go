@@ -7,24 +7,28 @@ import (
 // Values is the VALUES clause.
 type Values struct {
 	Statement
-	Expression Expression
+	Values Expression
 }
 
 // NewValues returns a new Values instance.
-func NewValues(expr Expression) Values {
+func NewValues(values Expression) Values {
 	return Values{
-		Expression: expr,
+		Values: values,
 	}
 }
 
 // Write implements Statement interface.
 func (values Values) Write(buffer *bytes.Buffer) {
+	if values.IsEmpty() {
+		return
+	}
+
 	buffer.WriteString("VALUES (")
-	values.Expression.Write(buffer)
+	values.Values.Write(buffer)
 	buffer.WriteString(")")
 }
 
 // IsEmpty implements Statement interface.
 func (values Values) IsEmpty() bool {
-	return values.Expression != nil && values.Expression.IsEmpty()
+	return values.Values == nil || (values.Values != nil && values.Values.IsEmpty())
 }
