@@ -1,6 +1,9 @@
 package stmt
 
-import "github.com/ulule/loukoum/types"
+import (
+	"github.com/ulule/loukoum/token"
+	"github.com/ulule/loukoum/types"
+)
 
 // Insert is the INSERT statement.
 type Insert struct {
@@ -22,7 +25,8 @@ func (insert Insert) Write(ctx *types.Context) {
 		panic("loukoum: an insert statement must have at least one column")
 	}
 
-	ctx.Write("INSERT ")
+	ctx.Write(string(token.Insert))
+	ctx.Write(" ")
 	insert.Into.Write(ctx)
 
 	if len(insert.Columns) > 0 {
