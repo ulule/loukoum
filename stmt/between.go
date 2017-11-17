@@ -1,8 +1,6 @@
 package stmt
 
 import (
-	"bytes"
-
 	"github.com/ulule/loukoum/types"
 )
 
@@ -37,22 +35,22 @@ func NewNotBetween(identifier Identifier, from, to Expression) Between {
 
 func (Between) expression() {}
 
-func (between Between) Write(buffer *bytes.Buffer) {
+func (between Between) Write(ctx *types.Context) {
 	if between.IsEmpty() {
 		panic("loukoum: expression is undefined")
 	}
 
-	buffer.WriteString("(")
-	between.Identifier.Write(buffer)
-	buffer.WriteString(" ")
-	between.Operator.Write(buffer)
-	buffer.WriteString(" ")
-	between.From.Write(buffer)
-	buffer.WriteString(" ")
-	between.And.Write(buffer)
-	buffer.WriteString(" ")
-	between.To.Write(buffer)
-	buffer.WriteString(")")
+	ctx.Write("(")
+	between.Identifier.Write(ctx)
+	ctx.Write(" ")
+	between.Operator.Write(ctx)
+	ctx.Write(" ")
+	between.From.Write(ctx)
+	ctx.Write(" ")
+	between.And.Write(ctx)
+	ctx.Write(" ")
+	between.To.Write(ctx)
+	ctx.Write(")")
 }
 
 // IsEmpty return true if statement is undefined.

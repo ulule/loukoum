@@ -1,9 +1,7 @@
 package stmt
 
 import (
-	"bytes"
 	"fmt"
-	"strconv"
 
 	"github.com/ulule/loukoum/types"
 )
@@ -17,36 +15,15 @@ type Expression interface {
 // NewExpression returns a new Expression instance from arg.
 func NewExpression(arg interface{}) Expression {
 	if arg == nil {
-		return NewValue("NULL")
+		return NewValue(nil)
 	}
 
 	switch value := arg.(type) {
 	case Expression:
 		return value
-	case string:
-		return NewValueString(value)
-	case int:
-		return NewValueInt(value)
-	case int8:
-		return NewValueInt8(value)
-	case int16:
-		return NewValueInt16(value)
-	case int32:
-		return NewValueInt32(value)
-	case int64:
-		return NewValueInt64(value)
-	case uint:
-		return NewValueUint(value)
-	case uint8:
-		return NewValueUint8(value)
-	case uint16:
-		return NewValueUint16(value)
-	case uint32:
-		return NewValueUint32(value)
-	case uint64:
-		return NewValueUint64(value)
-	case bool:
-		return NewValueBool(value)
+	case string, bool, int, int8, int16, int32, int64,
+		uint, uint8, uint16, uint32, uint64:
+		return NewValue(value)
 	case []string:
 		return NewArrayString(value)
 	case []int:
@@ -94,8 +71,8 @@ func NewIdentifier(identifier string) Identifier {
 
 func (Identifier) expression() {}
 
-func (identifier Identifier) Write(buffer *bytes.Buffer) {
-	buffer.WriteString(identifier.Identifier)
+func (identifier Identifier) Write(ctx *types.Context) {
+	ctx.Write(identifier.Identifier)
 }
 
 // IsEmpty return true if statement is undefined.
@@ -201,80 +178,24 @@ func (identifier Identifier) NotBetween(from, to interface{}) Between {
 
 // Value is an expression value.
 type Value struct {
-	Value string
+	Value interface{}
 }
 
 // NewValue returns an expression value.
-func NewValue(value string) Value {
+func NewValue(value interface{}) Value {
 	return Value{
 		Value: value,
 	}
 }
 
-// NewValueString returns an expression value for "string" type.
-func NewValueString(value string) Value {
-	return NewValue(value)
-}
-
-// NewValueInt returns an expression value for "int" type.
-func NewValueInt(value int) Value {
-	return NewValueInt64(int64(value))
-}
-
-// NewValueInt8 returns an expression value for "int8" type.
-func NewValueInt8(value int8) Value {
-	return NewValueInt64(int64(value))
-}
-
-// NewValueInt16 returns an expression value for "int16" type.
-func NewValueInt16(value int16) Value {
-	return NewValueInt64(int64(value))
-}
-
-// NewValueInt32 returns an expression value for "int32" type.
-func NewValueInt32(value int32) Value {
-	return NewValueInt64(int64(value))
-}
-
-// NewValueInt64 returns an expression value for "int64" type.
-func NewValueInt64(value int64) Value {
-	return NewValue(strconv.FormatInt(value, 10))
-}
-
-// NewValueUint returns an expression value for "uint" type.
-func NewValueUint(value uint) Value {
-	return NewValueUint64(uint64(value))
-}
-
-// NewValueUint8 returns an expression value for "uint8" type.
-func NewValueUint8(value uint8) Value {
-	return NewValueUint64(uint64(value))
-}
-
-// NewValueUint16 returns an expression value for "uint16" type.
-func NewValueUint16(value uint16) Value {
-	return NewValueUint64(uint64(value))
-}
-
-// NewValueUint32 returns an expression value for "uint32" type.
-func NewValueUint32(value uint32) Value {
-	return NewValueUint64(uint64(value))
-}
-
-// NewValueUint64 returns an expression value for "uint64" type.
-func NewValueUint64(value uint64) Value {
-	return NewValue(strconv.FormatUint(value, 10))
-}
-
-// NewValueBool returns an expression value for "bool" type.
-func NewValueBool(value bool) Value {
-	return NewValue(strconv.FormatBool(value))
-}
-
 func (Value) expression() {}
 
-func (value Value) Write(buffer *bytes.Buffer) {
-	buffer.WriteString(value.Value)
+func (value Value) Write(ctx *types.Context) {
+	if value.Value == nil {
+		ctx.Write("NULL")
+	} else {
+		ctx.Bind(value.Value)
+	}
 }
 
 // IsEmpty return true if statement is undefined.
@@ -296,7 +217,7 @@ func NewArray() Array {
 func NewArrayString(values []string) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueString(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -305,7 +226,7 @@ func NewArrayString(values []string) Array {
 func NewArrayInt(values []int) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueInt(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -314,7 +235,7 @@ func NewArrayInt(values []int) Array {
 func NewArrayInt8(values []int8) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueInt8(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -323,7 +244,7 @@ func NewArrayInt8(values []int8) Array {
 func NewArrayInt16(values []int16) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueInt16(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -332,7 +253,7 @@ func NewArrayInt16(values []int16) Array {
 func NewArrayInt32(values []int32) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueInt32(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -341,7 +262,7 @@ func NewArrayInt32(values []int32) Array {
 func NewArrayInt64(values []int64) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueInt64(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -350,7 +271,7 @@ func NewArrayInt64(values []int64) Array {
 func NewArrayUint(values []uint) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueUint(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -359,7 +280,7 @@ func NewArrayUint(values []uint) Array {
 func NewArrayUint8(values []uint8) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueUint8(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -368,7 +289,7 @@ func NewArrayUint8(values []uint8) Array {
 func NewArrayUint16(values []uint16) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueUint16(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -377,7 +298,7 @@ func NewArrayUint16(values []uint16) Array {
 func NewArrayUint32(values []uint32) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueUint32(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -386,7 +307,7 @@ func NewArrayUint32(values []uint32) Array {
 func NewArrayUint64(values []uint64) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueUint64(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
@@ -395,19 +316,19 @@ func NewArrayUint64(values []uint64) Array {
 func NewArrayBool(values []bool) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValueBool(values[i]))
+		array.Add(NewValue(values[i]))
 	}
 	return array
 }
 
 func (Array) expression() {}
 
-func (array Array) Write(buffer *bytes.Buffer) {
+func (array Array) Write(ctx *types.Context) {
 	for i := range array.Values {
 		if i != 0 {
-			buffer.WriteString(", ")
+			ctx.Write(", ")
 		}
-		array.Values[i].Write(buffer)
+		array.Values[i].Write(ctx)
 	}
 }
 
@@ -447,29 +368,29 @@ func NewInExpression(values ...interface{}) Expression {
 	for i := range values {
 		switch value := values[i].(type) {
 		case string:
-			array.Add(NewValueString(value))
+			array.Add(NewValue(value))
 		case int:
-			array.Add(NewValueInt(value))
+			array.Add(NewValue(value))
 		case int8:
-			array.Add(NewValueInt8(value))
+			array.Add(NewValue(value))
 		case int16:
-			array.Add(NewValueInt16(value))
+			array.Add(NewValue(value))
 		case int32:
-			array.Add(NewValueInt32(value))
+			array.Add(NewValue(value))
 		case int64:
-			array.Add(NewValueInt64(value))
+			array.Add(NewValue(value))
 		case uint:
-			array.Add(NewValueUint(value))
+			array.Add(NewValue(value))
 		case uint8:
-			array.Add(NewValueUint8(value))
+			array.Add(NewValue(value))
 		case uint16:
-			array.Add(NewValueUint16(value))
+			array.Add(NewValue(value))
 		case uint32:
-			array.Add(NewValueUint32(value))
+			array.Add(NewValue(value))
 		case uint64:
-			array.Add(NewValueUint64(value))
+			array.Add(NewValue(value))
 		case bool:
-			array.Add(NewValueBool(value))
+			array.Add(NewValue(value))
 		default:
 			panic(fmt.Sprintf("cannot use {%+v}[%T] as loukoum Value", value, value))
 		}

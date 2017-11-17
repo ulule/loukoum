@@ -1,8 +1,6 @@
 package stmt
 
-import (
-	"bytes"
-)
+import "github.com/ulule/loukoum/types"
 
 // Values is the VALUES clause.
 type Values struct {
@@ -18,14 +16,14 @@ func NewValues(values Expression) Values {
 }
 
 // Write implements Statement interface.
-func (values Values) Write(buffer *bytes.Buffer) {
+func (values Values) Write(ctx *types.Context) {
 	if values.IsEmpty() {
 		return
 	}
 
-	buffer.WriteString("VALUES (")
-	values.Values.Write(buffer)
-	buffer.WriteString(")")
+	ctx.Write("VALUES (")
+	values.Values.Write(ctx)
+	ctx.Write(")")
 }
 
 // IsEmpty implements Statement interface.

@@ -1,6 +1,6 @@
 package stmt
 
-import "bytes"
+import "github.com/ulule/loukoum/types"
 
 // Returning is the RETURNING clause.
 type Returning struct {
@@ -16,23 +16,23 @@ func NewReturning(columns []Column) Returning {
 }
 
 // Write implements Statement interface.
-func (returning Returning) Write(buffer *bytes.Buffer) {
-	buffer.WriteString("RETURNING ")
+func (returning Returning) Write(ctx *types.Context) {
+	ctx.Write("RETURNING ")
 
 	l := len(returning.Columns)
 	if l > 1 {
-		buffer.WriteString("(")
+		ctx.Write("(")
 	}
 
 	for i := range returning.Columns {
 		if i > 0 {
-			buffer.WriteString(", ")
+			ctx.Write(", ")
 		}
-		returning.Columns[i].Write(buffer)
+		returning.Columns[i].Write(ctx)
 	}
 
 	if l > 1 {
-		buffer.WriteString(")")
+		ctx.Write(")")
 	}
 }
 

@@ -1,6 +1,6 @@
 package stmt
 
-import "bytes"
+import "github.com/ulule/loukoum/types"
 
 // Into is the INTO clause.
 type Into struct {
@@ -16,9 +16,9 @@ func NewInto(table Table) Into {
 }
 
 // Write implements Statement interface.
-func (into Into) Write(buffer *bytes.Buffer) {
-	buffer.WriteString("INTO ")
-	into.Table.Write(buffer)
+func (into Into) Write(ctx *types.Context) {
+	ctx.Write("INTO ")
+	into.Table.Write(ctx)
 }
 
 // IsEmpty implements Statement interface.

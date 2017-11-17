@@ -1,10 +1,10 @@
 package loukoum
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/ulule/loukoum/stmt"
+	"github.com/ulule/loukoum/types"
 )
 
 // InsertBuilder is a builder used for "INSERT" query.
@@ -20,9 +20,9 @@ func NewInsertBuilder() InsertBuilder {
 }
 
 func (builder InsertBuilder) String() string {
-	buffer := &bytes.Buffer{}
-	builder.insert.Write(buffer)
-	return buffer.String()
+	ctx := types.NewContext()
+	builder.insert.Write(ctx)
+	return ctx.Query()
 }
 
 // Into sets the INTO clause of the query.

@@ -1,8 +1,9 @@
 package stmt
 
 import (
-	"bytes"
 	"fmt"
+
+	"github.com/ulule/loukoum/types"
 )
 
 type Column struct {
@@ -28,11 +29,11 @@ func (column Column) As(alias string) Column {
 	return column
 }
 
-func (column Column) Write(buffer *bytes.Buffer) {
-	buffer.WriteString(column.Name)
+func (column Column) Write(ctx *types.Context) {
+	ctx.Write(column.Name)
 	if column.Alias != "" {
-		buffer.WriteString(" AS ")
-		buffer.WriteString(column.Alias)
+		ctx.Write(" AS ")
+		ctx.Write(column.Alias)
 	}
 }
 

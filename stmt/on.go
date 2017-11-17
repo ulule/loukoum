@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"bytes"
+	"github.com/ulule/loukoum/types"
 )
 
 type On struct {
@@ -16,11 +16,11 @@ func NewOn(left, right Column) On {
 	}
 }
 
-func (on On) Write(buffer *bytes.Buffer) {
-	buffer.WriteString("ON ")
-	buffer.WriteString(on.Left.Name)
-	buffer.WriteString(" = ")
-	buffer.WriteString(on.Right.Name)
+func (on On) Write(ctx *types.Context) {
+	ctx.Write("ON ")
+	ctx.Write(on.Left.Name)
+	ctx.Write(" = ")
+	ctx.Write(on.Right.Name)
 }
 
 // IsEmpty return true if statement is undefined.

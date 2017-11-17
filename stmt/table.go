@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"bytes"
+	"github.com/ulule/loukoum/types"
 )
 
 type Table struct {
@@ -27,11 +27,11 @@ func (table Table) As(alias string) Table {
 	return table
 }
 
-func (table Table) Write(buffer *bytes.Buffer) {
-	buffer.WriteString(table.Name)
+func (table Table) Write(ctx *types.Context) {
+	ctx.Write(table.Name)
 	if table.Alias != "" {
-		buffer.WriteString(" AS ")
-		buffer.WriteString(table.Alias)
+		ctx.Write(" AS ")
+		ctx.Write(table.Alias)
 	}
 }
 

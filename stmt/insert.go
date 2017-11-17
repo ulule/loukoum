@@ -1,6 +1,6 @@
 package stmt
 
-import "bytes"
+import "github.com/ulule/loukoum/types"
 
 // Insert is the INSERT statement.
 type Insert struct {
@@ -17,37 +17,37 @@ func NewInsert() Insert {
 }
 
 // Write implements Statement interface.
-func (insert Insert) Write(buffer *bytes.Buffer) {
+func (insert Insert) Write(ctx *types.Context) {
 	if insert.IsEmpty() {
 		panic("loukoum: an insert statement must have at least one column")
 	}
 
-	buffer.WriteString("INSERT ")
-	insert.Into.Write(buffer)
+	ctx.Write("INSERT ")
+	insert.Into.Write(ctx)
 
 	if len(insert.Columns) > 0 {
 		nbColumns := len(insert.Columns)
 		for i := range insert.Columns {
 			if i == 0 {
-				buffer.WriteString(" (")
+				ctx.Write(" (")
 			} else {
-				buffer.WriteString(", ")
+				ctx.Write(", ")
 			}
-			insert.Columns[i].Write(buffer)
+			insert.Columns[i].Write(ctx)
 			if i == nbColumns-1 {
-				buffer.WriteString(")")
+				ctx.Write(")")
 			}
 		}
 	}
 
 	if !insert.Values.IsEmpty() {
-		buffer.WriteString(" ")
-		insert.Values.Write(buffer)
+		ctx.Write(" ")
+		insert.Values.Write(ctx)
 	}
 
 	if !insert.Returning.IsEmpty() {
-		buffer.WriteString(" ")
-		insert.Returning.Write(buffer)
+		ctx.Write(" ")
+		insert.Returning.Write(ctx)
 	}
 }
 

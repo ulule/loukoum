@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"bytes"
+	"github.com/ulule/loukoum/types"
 )
 
 // Where is a WHERE clause.
@@ -18,13 +18,13 @@ func NewWhere(expression Expression) Where {
 }
 
 // Write writes WHERE clause into the given buffer.
-func (where Where) Write(buffer *bytes.Buffer) {
+func (where Where) Write(ctx *types.Context) {
 	if where.IsEmpty() {
 		panic("loukoum: a where clause expects at least one condition")
 	}
 
-	buffer.WriteString("WHERE ")
-	where.Condition.Write(buffer)
+	ctx.Write("WHERE ")
+	where.Condition.Write(ctx)
 }
 
 // IsEmpty return true if statement is undefined.

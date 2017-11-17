@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"bytes"
+	"github.com/ulule/loukoum/types"
 )
 
 // Statement is the interface of the component
@@ -12,5 +12,5 @@ type Statement interface {
 	// IsEmpty return true if statement is undefined.
 	IsEmpty() bool
 	// Write expose statement as a SQL query.
-	Write(buffer *bytes.Buffer)
+	Write(ctx *types.Context)
 }

@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"bytes"
+	"github.com/ulule/loukoum/types"
 )
 
 type InfixExpression struct {
@@ -19,18 +19,18 @@ func NewInfixExpression(left Expression, operator Operator, right Expression) In
 	}
 }
 
-func (expression InfixExpression) Write(buffer *bytes.Buffer) {
+func (expression InfixExpression) Write(ctx *types.Context) {
 	if expression.IsEmpty() {
 		panic("loukoum: expression is undefined")
 	}
 
-	buffer.WriteString("(")
-	expression.Left.Write(buffer)
-	buffer.WriteString(" ")
-	expression.Operator.Write(buffer)
-	buffer.WriteString(" ")
-	expression.Right.Write(buffer)
-	buffer.WriteString(")")
+	ctx.Write("(")
+	expression.Left.Write(ctx)
+	ctx.Write(" ")
+	expression.Operator.Write(ctx)
+	ctx.Write(" ")
+	expression.Right.Write(ctx)
+	ctx.Write(")")
 }
 
 // IsEmpty return true if statement is undefined.

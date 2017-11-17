@@ -1,8 +1,8 @@
 package loukoum
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/ulule/loukoum/parser"
 	"github.com/ulule/loukoum/stmt"
@@ -166,9 +166,26 @@ func (builder SelectBuilder) Or(condition stmt.Expression) SelectBuilder {
 }
 
 func (builder SelectBuilder) String() string {
-	buffer := &bytes.Buffer{}
-	builder.query.Write(buffer)
-	return buffer.String()
+	query, args := builder.Prepare()
+	for key, arg := range args {
+		switch value := arg.(type) {
+		case string:
+			query = strings.Replace(query, key, fmt.Sprint("'", value, "'"), 1)
+		default:
+			query = strings.Replace(query, key, fmt.Sprint(value), 1)
+		}
+	}
+	return query
+}
+
+func (builder SelectBuilder) Prepare() (string, map[string]interface{}) {
+	ctx := types.NewContext()
+	builder.query.Write(ctx)
+
+	query := ctx.Query()
+	args := ctx.Values()
+
+	return query, args
 }
 
 // Statement return underlying statement.
