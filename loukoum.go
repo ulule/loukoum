@@ -1,6 +1,7 @@
 package loukoum
 
 import (
+	"github.com/ulule/loukoum/builder"
 	"github.com/ulule/loukoum/stmt"
 	"github.com/ulule/loukoum/types"
 )
@@ -13,6 +14,16 @@ const (
 	// RightJoin is used for "RIGHT JOIN" in join statement.
 	RightJoin = types.RightJoin
 )
+
+// Select start a SelectBuilder using given columns.
+func Select(columns ...interface{}) builder.Select {
+	return builder.NewSelect().Columns(columns)
+}
+
+// SelectDistinct start a SelectBuilder using given columns and "DISTINCT" option.
+func SelectDistinct(columns ...interface{}) builder.Select {
+	return Select(columns...).Distinct()
+}
 
 // Column is a wrapper to create a new Column statement.
 func Column(name string) stmt.Column {
@@ -42,4 +53,9 @@ func And(left stmt.Expression, right stmt.Expression) stmt.InfixExpression {
 // Or is a wrapper to create a new InfixExpression statement.
 func Or(left stmt.Expression, right stmt.Expression) stmt.InfixExpression {
 	return stmt.NewInfixExpression(left, stmt.NewLogicalOperator(types.Or), right)
+}
+
+// Insert starts an InsertBuilder using the given table as into clause.
+func Insert(into string) builder.Insert {
+	return builder.NewInsert().Into(into)
 }

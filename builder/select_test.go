@@ -1,4 +1,4 @@
-package loukoum_test
+package builder_test
 
 import (
 	"fmt"
@@ -42,7 +42,7 @@ func TestSelect(t *testing.T) {
 	}
 }
 
-func TestFrom(t *testing.T) {
+func TestSelect_From(t *testing.T) {
 	is := require.New(t)
 
 	{
@@ -55,7 +55,7 @@ func TestFrom(t *testing.T) {
 	}
 }
 
-func TestJoin(t *testing.T) {
+func TestSelect_Join(t *testing.T) {
 	is := require.New(t)
 
 	{
@@ -137,7 +137,7 @@ func TestJoin(t *testing.T) {
 	}
 }
 
-func TestWhereOperatorOrder(t *testing.T) {
+func TestSelect_WhereOperatorOrder(t *testing.T) {
 	is := require.New(t)
 
 	{
@@ -252,7 +252,7 @@ func TestWhereOperatorOrder(t *testing.T) {
 	}
 }
 
-func TestWhereEqual(t *testing.T) {
+func TestSelect_WhereEqual(t *testing.T) {
 	is := require.New(t)
 
 	{
@@ -283,7 +283,7 @@ func TestWhereEqual(t *testing.T) {
 	}
 }
 
-func TestWhereIs(t *testing.T) {
+func TestSelect_WhereIs(t *testing.T) {
 	is := require.New(t)
 
 	{
@@ -313,7 +313,7 @@ func TestWhereIs(t *testing.T) {
 	}
 }
 
-func TestWhereGreaterThan(t *testing.T) {
+func TestSelect_WhereGreaterThan(t *testing.T) {
 	is := require.New(t)
 
 	{
@@ -344,7 +344,7 @@ func TestWhereGreaterThan(t *testing.T) {
 	}
 }
 
-func TestWhereLessThan(t *testing.T) {
+func TestSelect_WhereLessThan(t *testing.T) {
 	is := require.New(t)
 
 	{
@@ -375,7 +375,7 @@ func TestWhereLessThan(t *testing.T) {
 	}
 }
 
-func TestWhereLike(t *testing.T) {
+func TestSelect_WhereLike(t *testing.T) {
 	is := require.New(t)
 
 	{
@@ -432,7 +432,7 @@ func TestWhereLike(t *testing.T) {
 	}
 }
 
-func TestWhereBetween(t *testing.T) {
+func TestSelect_WhereBetween(t *testing.T) {
 	is := require.New(t)
 
 	{
@@ -465,7 +465,7 @@ func TestWhereBetween(t *testing.T) {
 	}
 }
 
-func TestWhereIn(t *testing.T) {
+func TestSelect_WhereIn(t *testing.T) {
 	is := require.New(t)
 
 	// Slice of integers
