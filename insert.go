@@ -51,10 +51,6 @@ func (builder InsertBuilder) Into(into interface{}) InsertBuilder {
 
 // Columns sets the insert columns.
 func (builder InsertBuilder) Columns(columns ...interface{}) InsertBuilder {
-	if len(builder.insert.Columns) != 0 {
-		panic("loukoum: insert builder has columns already defined")
-	}
-
 	if len(columns) == 0 {
 		return builder
 	}

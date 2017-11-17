@@ -482,16 +482,3 @@ func TestWhereIn(t *testing.T) {
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))", query.String())
 	}
 }
-
-func TestInsert(t *testing.T) {
-	is := require.New(t)
-
-	{
-		query := loukoum.
-			Insert("table").
-			Columns("a", "b", "c").
-			Values([]string{"va", "vb", "vc"})
-
-		is.Equal("INSERT INTO table (a, b, c) VALUES (va, vb, vc)", query.String())
-	}
-}

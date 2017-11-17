@@ -24,19 +24,18 @@ func (insert Insert) Write(buffer *bytes.Buffer) {
 	buffer.WriteString("INSERT ")
 	insert.Into.Write(buffer)
 
-	nbColumns := len(insert.Columns)
-
-	for i := range insert.Columns {
-		if i == 0 {
-			buffer.WriteString(" (")
-		} else {
-			buffer.WriteString(", ")
-		}
-
-		insert.Columns[i].Write(buffer)
-
-		if i == nbColumns-1 {
-			buffer.WriteString(")")
+	if len(insert.Columns) > 0 {
+		nbColumns := len(insert.Columns)
+		for i := range insert.Columns {
+			if i == 0 {
+				buffer.WriteString(" (")
+			} else {
+				buffer.WriteString(", ")
+			}
+			insert.Columns[i].Write(buffer)
+			if i == nbColumns-1 {
+				buffer.WriteString(")")
+			}
 		}
 	}
 
@@ -46,5 +45,5 @@ func (insert Insert) Write(buffer *bytes.Buffer) {
 
 // IsEmpty implements Statement interface.
 func (insert Insert) IsEmpty() bool {
-	return insert.Into.IsEmpty() || len(insert.Columns) == 0
+	return insert.Into.IsEmpty()
 }
