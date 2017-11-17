@@ -163,6 +163,7 @@ func (builder SelectBuilder) String() string {
 	return query
 }
 
+// Prepare returns the SQL query string and its arguments.
 func (builder SelectBuilder) Prepare() (string, map[string]interface{}) {
 	ctx := types.NewContext()
 	builder.query.Write(ctx)
