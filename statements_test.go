@@ -483,15 +483,15 @@ func TestWhereIn(t *testing.T) {
 	}
 }
 
-// func TestInsert(t *testing.T) {
-// 	is := require.New(t)
+func TestInsert(t *testing.T) {
+	is := require.New(t)
 
-// 	{
-// 		query := loukoum.
-// 			Insert("table").
-// 			Columns("a", "b", "c").
-// 			Values([]string{"va", "vb", "vc"})
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("a", "b", "c").
+			Values([]string{"va", "vb", "vc"})
 
-// 		is.Equal("INSERT INTO table (a, b, c) VALUES (va, vb, vc)", query.String())
-// 	}
-// }
+		is.Equal("INSERT INTO table (a, b, c) VALUES (va, vb, vc)", query.String())
+	}
+}

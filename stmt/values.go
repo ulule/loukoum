@@ -19,8 +19,9 @@ func NewValues(expr Expression) Values {
 
 // Write implements Statement interface.
 func (values Values) Write(buffer *bytes.Buffer) {
-	buffer.WriteString("VALUES ")
+	buffer.WriteString("VALUES (")
 	values.Expression.Write(buffer)
+	buffer.WriteString(")")
 }
 
 // IsEmpty implements Statement interface.
