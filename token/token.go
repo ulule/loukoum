@@ -76,7 +76,7 @@ var keywords = map[string]Type{
 	"RIGHT":     Right,
 	"JOIN":      Join,
 	"ON":        On,
-	"RETURNINg": Returning,
+	"RETURNING": Returning,
 	"VALUES":    Values,
 	"INTO":      Into,
 }
