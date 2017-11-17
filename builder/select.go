@@ -1,4 +1,4 @@
-package loukoum
+package builder
 
 import (
 	"fmt"
@@ -9,32 +9,32 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
-// SelectBuilder is a builder used for "SELECT" query.
-type SelectBuilder struct {
+// Select is a builder used for "SELECT" query.
+type Select struct {
 	query stmt.Select
 }
 
-// NewSelectBuilder creates a new SelectBuilder.
-func NewSelectBuilder() SelectBuilder {
-	return SelectBuilder{}
+// NewSelect creates a new Select.
+func NewSelect() Select {
+	return Select{}
 }
 
 // Distinct adds a DISTINCT clause to the query.
-func (builder SelectBuilder) Distinct() SelectBuilder {
-	builder.query.Distinct = true
-	return builder
+func (b Select) Distinct() Select {
+	b.query.Distinct = true
+	return b
 }
 
 // Columns adds result columns to the query.
-func (builder SelectBuilder) Columns(columns []interface{}) SelectBuilder {
-	if len(builder.query.Columns) != 0 {
+func (b Select) Columns(columns []interface{}) Select {
+	if len(b.query.Columns) != 0 {
 		panic("loukoum: select builder has columns already defined")
 	}
 	if len(columns) == 0 {
 		columns = []interface{}{"*"}
 	}
 
-	builder.query.Columns = make([]stmt.Column, 0, len(columns))
+	b.query.Columns = make([]stmt.Column, 0, len(columns))
 	for i := range columns {
 		column := stmt.Column{}
 		switch value := columns[i].(type) {
@@ -48,51 +48,51 @@ func (builder SelectBuilder) Columns(columns []interface{}) SelectBuilder {
 		if column.IsEmpty() {
 			panic("loukoum: a column was undefined")
 		}
-		builder.query.Columns = append(builder.query.Columns, column)
+		b.query.Columns = append(b.query.Columns, column)
 	}
 
-	return builder
+	return b
 }
 
 // From sets the FROM clause of the query.
-func (builder SelectBuilder) From(from interface{}) SelectBuilder {
-	if !builder.query.From.IsEmpty() {
+func (b Select) From(from interface{}) Select {
+	if !b.query.From.IsEmpty() {
 		panic("loukoum: select builder has from clause already defined")
 	}
 
 	switch value := from.(type) {
 	case string:
-		builder.query.From = stmt.NewFrom(stmt.NewTable(value))
+		b.query.From = stmt.NewFrom(stmt.NewTable(value))
 	case stmt.From:
-		builder.query.From = value
+		b.query.From = value
 	case stmt.Table:
-		builder.query.From = stmt.NewFrom(value)
+		b.query.From = stmt.NewFrom(value)
 	default:
 		panic(fmt.Sprintf("loukoum: cannot use %T as from clause", from))
 	}
 
-	if builder.query.From.IsEmpty() {
+	if b.query.From.IsEmpty() {
 		panic("loukoum: given from clause is undefined")
 	}
 
-	return builder
+	return b
 }
 
 // Join adds a JOIN clause to the query.
-func (builder SelectBuilder) Join(args ...interface{}) SelectBuilder {
+func (b Select) Join(args ...interface{}) Select {
 	switch len(args) {
 	case 1:
-		return builder.join1(args)
+		return b.join1(args)
 	case 2:
-		return builder.join2(args)
+		return b.join2(args)
 	case 3:
-		return builder.join3(args)
+		return b.join3(args)
 	default:
 		panic("loukoum: given join clause is invalid")
 	}
 }
 
-func (builder SelectBuilder) join1(args []interface{}) SelectBuilder {
+func (b Select) join1(args []interface{}) Select {
 	join := stmt.Join{}
 
 	switch value := args[0].(type) {
@@ -108,21 +108,21 @@ func (builder SelectBuilder) join1(args []interface{}) SelectBuilder {
 		panic("loukoum: given join clause is undefined")
 	}
 
-	builder.query.Joins = append(builder.query.Joins, join)
-	return builder
+	b.query.Joins = append(b.query.Joins, join)
+	return b
 }
 
-func (builder SelectBuilder) join2(args []interface{}) SelectBuilder {
+func (b Select) join2(args []interface{}) Select {
 	join := handleSelectJoin(args)
 	if join.IsEmpty() {
 		panic("loukoum: given join clause is undefined")
 	}
 
-	builder.query.Joins = append(builder.query.Joins, join)
-	return builder
+	b.query.Joins = append(b.query.Joins, join)
+	return b
 }
 
-func (builder SelectBuilder) join3(args []interface{}) SelectBuilder {
+func (b Select) join3(args []interface{}) Select {
 	join := handleSelectJoin(args)
 
 	switch value := args[2].(type) {
@@ -136,34 +136,34 @@ func (builder SelectBuilder) join3(args []interface{}) SelectBuilder {
 		panic("loukoum: given join clause is undefined")
 	}
 
-	builder.query.Joins = append(builder.query.Joins, join)
-	return builder
+	b.query.Joins = append(b.query.Joins, join)
+	return b
 }
 
 // Where adds WHERE clauses.
-func (builder SelectBuilder) Where(condition stmt.Expression) SelectBuilder {
-	if builder.query.Where.IsEmpty() {
-		builder.query.Where = stmt.NewWhere(condition)
-		return builder
+func (b Select) Where(condition stmt.Expression) Select {
+	if b.query.Where.IsEmpty() {
+		b.query.Where = stmt.NewWhere(condition)
+		return b
 	}
 
-	return builder.And(condition)
+	return b.And(condition)
 }
 
 // And adds AND WHERE conditions.
-func (builder SelectBuilder) And(condition stmt.Expression) SelectBuilder {
-	builder.query.Where = builder.query.Where.And(condition)
-	return builder
+func (b Select) And(condition stmt.Expression) Select {
+	b.query.Where = b.query.Where.And(condition)
+	return b
 }
 
 // Or adds OR WHERE conditions.
-func (builder SelectBuilder) Or(condition stmt.Expression) SelectBuilder {
-	builder.query.Where = builder.query.Where.Or(condition)
-	return builder
+func (b Select) Or(condition stmt.Expression) Select {
+	b.query.Where = b.query.Where.Or(condition)
+	return b
 }
 
-func (builder SelectBuilder) String() string {
-	query, args := builder.Prepare()
+func (b Select) String() string {
+	query, args := b.Prepare()
 	for key, arg := range args {
 		switch value := arg.(type) {
 		case string:
@@ -175,9 +175,9 @@ func (builder SelectBuilder) String() string {
 	return query
 }
 
-func (builder SelectBuilder) Prepare() (string, map[string]interface{}) {
+func (b Select) Prepare() (string, map[string]interface{}) {
 	ctx := types.NewContext()
-	builder.query.Write(ctx)
+	b.query.Write(ctx)
 
 	query := ctx.Query()
 	args := ctx.Values()
@@ -186,8 +186,8 @@ func (builder SelectBuilder) Prepare() (string, map[string]interface{}) {
 }
 
 // Statement return underlying statement.
-func (builder SelectBuilder) Statement() stmt.Statement {
-	return builder.query
+func (b Select) Statement() stmt.Statement {
+	return b.query
 }
 
 func handleSelectJoin(args []interface{}) stmt.Join {
