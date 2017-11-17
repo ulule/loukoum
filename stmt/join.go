@@ -1,8 +1,6 @@
 package stmt
 
 import (
-	"bytes"
-
 	"github.com/ulule/loukoum/types"
 )
 
@@ -33,12 +31,12 @@ func NewRightJoin(table Table, condition On) Join {
 	return NewJoin(types.RightJoin, table, condition)
 }
 
-func (join Join) Write(buffer *bytes.Buffer) {
-	buffer.WriteString(join.Type.String())
-	buffer.WriteString(" ")
-	join.Table.Write(buffer)
-	buffer.WriteString(" ")
-	join.Condition.Write(buffer)
+func (join Join) Write(ctx *types.Context) {
+	ctx.Write(join.Type.String())
+	ctx.Write(" ")
+	join.Table.Write(ctx)
+	ctx.Write(" ")
+	join.Condition.Write(ctx)
 }
 
 // IsEmpty return true if statement is undefined.

@@ -1,8 +1,6 @@
 package stmt
 
 import (
-	"bytes"
-
 	"github.com/ulule/loukoum/types"
 )
 
@@ -31,18 +29,18 @@ func NewNotIn(identifier Identifier, value Expression) In {
 
 func (In) expression() {}
 
-func (in In) Write(buffer *bytes.Buffer) {
+func (in In) Write(ctx *types.Context) {
 	if in.IsEmpty() {
 		panic("loukoum: expression is undefined")
 	}
 
-	buffer.WriteString("(")
-	in.Identifier.Write(buffer)
-	buffer.WriteString(" ")
-	in.Operator.Write(buffer)
-	buffer.WriteString(" (")
-	in.Value.Write(buffer)
-	buffer.WriteString("))")
+	ctx.Write("(")
+	in.Identifier.Write(ctx)
+	ctx.Write(" ")
+	in.Operator.Write(ctx)
+	ctx.Write(" (")
+	in.Value.Write(ctx)
+	ctx.Write("))")
 }
 
 // IsEmpty return true if statement is undefined.

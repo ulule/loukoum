@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"bytes"
+	"github.com/ulule/loukoum/types"
 )
 
 type Select struct {
@@ -16,41 +16,41 @@ func NewSelect() Select {
 	return Select{}
 }
 
-func (selekt Select) Write(buffer *bytes.Buffer) {
+func (selekt Select) Write(ctx *types.Context) {
 	if selekt.IsEmpty() {
 		panic("loukoum: select statements must have at least one column")
 	}
 
 	// TODO Add prefixes
 
-	buffer.WriteString("SELECT")
+	ctx.Write("SELECT")
 
 	if selekt.Distinct {
-		buffer.WriteString(" DISTINCT")
+		ctx.Write(" DISTINCT")
 	}
 
 	for i := range selekt.Columns {
 		if i == 0 {
-			buffer.WriteString(" ")
+			ctx.Write(" ")
 		} else {
-			buffer.WriteString(", ")
+			ctx.Write(", ")
 		}
-		selekt.Columns[i].Write(buffer)
+		selekt.Columns[i].Write(ctx)
 	}
 
 	if !selekt.From.IsEmpty() {
-		buffer.WriteString(" ")
-		selekt.From.Write(buffer)
+		ctx.Write(" ")
+		selekt.From.Write(ctx)
 	}
 
 	for i := range selekt.Joins {
-		buffer.WriteString(" ")
-		selekt.Joins[i].Write(buffer)
+		ctx.Write(" ")
+		selekt.Joins[i].Write(ctx)
 	}
 
 	if !selekt.Where.IsEmpty() {
-		buffer.WriteString(" ")
-		selekt.Where.Write(buffer)
+		ctx.Write(" ")
+		selekt.Where.Write(ctx)
 	}
 
 	// TODO GROUP BY

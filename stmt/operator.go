@@ -1,8 +1,6 @@
 package stmt
 
 import (
-	"bytes"
-
 	"github.com/ulule/loukoum/types"
 )
 
@@ -32,8 +30,8 @@ func NewLogicalOperator(operator types.LogicalOperator) LogicalOperator {
 
 func (LogicalOperator) operator() {}
 
-func (operator LogicalOperator) Write(buffer *bytes.Buffer) {
-	buffer.WriteString(operator.Operator.String())
+func (operator LogicalOperator) Write(ctx *types.Context) {
+	ctx.Write(operator.Operator.String())
 }
 
 // IsEmpty return true if statement is undefined.
@@ -54,8 +52,8 @@ func NewComparisonOperator(operator types.ComparisonOperator) ComparisonOperator
 
 func (ComparisonOperator) operator() {}
 
-func (operator ComparisonOperator) Write(buffer *bytes.Buffer) {
-	buffer.WriteString(operator.Operator.String())
+func (operator ComparisonOperator) Write(ctx *types.Context) {
+	ctx.Write(operator.Operator.String())
 }
 
 // IsEmpty return true if statement is undefined.

@@ -137,7 +137,7 @@ func TestJoin(t *testing.T) {
 	}
 }
 
-func TestWhere(t *testing.T) {
+func TestWhereOperatorOrder(t *testing.T) {
 	is := require.New(t)
 
 	{
@@ -153,7 +153,7 @@ func TestWhere(t *testing.T) {
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
-			And(loukoum.Condition("slug").Equal("'foo'"))
+			And(loukoum.Condition("slug").Equal("foo"))
 
 		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (slug = 'foo'))", query.String())
 	}
@@ -162,8 +162,8 @@ func TestWhere(t *testing.T) {
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
-			And(loukoum.Condition("slug").Equal("'foo'")).
-			And(loukoum.Condition("title").Equal("'hello'"))
+			And(loukoum.Condition("slug").Equal("foo")).
+			And(loukoum.Condition("title").Equal("hello"))
 
 		is.Equal("SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) AND (title = 'hello'))", query.String())
 	}
@@ -172,8 +172,8 @@ func TestWhere(t *testing.T) {
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
-			Or(loukoum.Condition("slug").Equal("'foo'")).
-			Or(loukoum.Condition("title").Equal("'hello'"))
+			Or(loukoum.Condition("slug").Equal("foo")).
+			Or(loukoum.Condition("title").Equal("hello"))
 
 		is.Equal("SELECT id FROM table WHERE (((id = 1) OR (slug = 'foo')) OR (title = 'hello'))", query.String())
 	}
@@ -182,20 +182,20 @@ func TestWhere(t *testing.T) {
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
-			Or(loukoum.Condition("slug").Equal("'foo'")).
-			Or(loukoum.Condition("title").Equal("'hello'"))
+			And(loukoum.Condition("slug").Equal("foo")).
+			Or(loukoum.Condition("title").Equal("hello"))
 
-		is.Equal(`SELECT id FROM table WHERE (((id = 1) OR (slug = 'foo')) OR (title = 'hello'))`, query.String())
+		is.Equal(`SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) OR (title = 'hello'))`, query.String())
 	}
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
 			Where(
-				loukoum.Or(loukoum.Condition("id").Equal(1), loukoum.Condition("title").Equal("'hello'")),
+				loukoum.Or(loukoum.Condition("id").Equal(1), loukoum.Condition("title").Equal("hello")),
 			).
 			Or(
-				loukoum.And(loukoum.Condition("slug").Equal("'foo'"), loukoum.Condition("active").Equal(true)),
+				loukoum.And(loukoum.Condition("slug").Equal("foo"), loukoum.Condition("active").Equal(true)),
 			)
 
 		is.Equal(fmt.Sprint("SELECT id FROM table WHERE (((id = 1) OR (title = 'hello')) OR ",
@@ -206,7 +206,7 @@ func TestWhere(t *testing.T) {
 			Select("id").
 			From("table").
 			Where(
-				loukoum.And(loukoum.Condition("id").Equal(1), loukoum.Condition("title").Equal("'hello'")),
+				loukoum.And(loukoum.Condition("id").Equal(1), loukoum.Condition("title").Equal("hello")),
 			)
 
 		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))", query.String())
@@ -216,7 +216,7 @@ func TestWhere(t *testing.T) {
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
-			Where(loukoum.Condition("title").Equal("'hello'"))
+			Where(loukoum.Condition("title").Equal("hello"))
 
 		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))", query.String())
 	}
@@ -225,9 +225,10 @@ func TestWhere(t *testing.T) {
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
-			Where(loukoum.Condition("title").Equal("'hello'"))
+			Where(loukoum.Condition("title").Equal("hello")).
+			Where(loukoum.Condition("disable").Equal(false))
 
-		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))", query.String())
+		is.Equal("SELECT id FROM table WHERE (((id = 1) AND (title = 'hello')) AND (disable = false))", query.String())
 	}
 	{
 		query := loukoum.
@@ -235,7 +236,7 @@ func TestWhere(t *testing.T) {
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
 			Or(
-				loukoum.Condition("slug").Equal("'foo'").And(loukoum.Condition("active").Equal(true)),
+				loukoum.Condition("slug").Equal("foo").And(loukoum.Condition("active").Equal(true)),
 			)
 
 		is.Equal("SELECT id FROM table WHERE ((id = 1) OR ((slug = 'foo') AND (active = true)))", query.String())
@@ -244,16 +245,26 @@ func TestWhere(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("id").Equal(1).And(loukoum.Condition("slug").Equal("'foo'"))).
+			Where(loukoum.Condition("id").Equal(1).And(loukoum.Condition("slug").Equal("foo"))).
 			Or(loukoum.Condition("active").Equal(true))
 
 		is.Equal("SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) OR (active = true))", query.String())
 	}
+}
+
+func TestWhereEqual(t *testing.T) {
+	is := require.New(t)
+
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("disabled").Equal(false))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (disabled = :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal(false, args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (disabled = false)", query.String())
 	}
@@ -263,13 +274,27 @@ func TestWhere(t *testing.T) {
 			From("table").
 			Where(loukoum.Condition("disabled").NotEqual(false))
 
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (disabled != :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal(false, args[":arg_1"])
+
 		is.Equal("SELECT id FROM table WHERE (disabled != false)", query.String())
 	}
+}
+
+func TestWhereIs(t *testing.T) {
+	is := require.New(t)
+
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("disabled").Is(nil))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (disabled IS NULL)", stmt)
+		is.Len(args, 0)
 
 		is.Equal("SELECT id FROM table WHERE (disabled IS NULL)", query.String())
 	}
@@ -279,13 +304,28 @@ func TestWhere(t *testing.T) {
 			From("table").
 			Where(loukoum.Condition("active").IsNot(true))
 
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (active IS NOT :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal(true, args[":arg_1"])
+
 		is.Equal("SELECT id FROM table WHERE (active IS NOT true)", query.String())
 	}
+}
+
+func TestWhereGreaterThan(t *testing.T) {
+	is := require.New(t)
+
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("count").GreaterThan(2))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (count > :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal(2, args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (count > 2)", query.String())
 	}
@@ -295,13 +335,28 @@ func TestWhere(t *testing.T) {
 			From("table").
 			Where(loukoum.Condition("count").GreaterThanOrEqual(4))
 
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (count >= :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal(4, args[":arg_1"])
+
 		is.Equal("SELECT id FROM table WHERE (count >= 4)", query.String())
 	}
+}
+
+func TestWhereLessThan(t *testing.T) {
+	is := require.New(t)
+
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("count").LessThan(3))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (count < :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal(3, args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (count < 3)", query.String())
 	}
@@ -311,13 +366,28 @@ func TestWhere(t *testing.T) {
 			From("table").
 			Where(loukoum.Condition("count").LessThanOrEqual(6))
 
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (count <= :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal(6, args[":arg_1"])
+
 		is.Equal("SELECT id FROM table WHERE (count <= 6)", query.String())
 	}
+}
+
+func TestWhereLike(t *testing.T) {
+	is := require.New(t)
+
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("title").Like("'foo%'"))
+			Where(loukoum.Condition("title").Like("foo%"))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (title LIKE :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal("foo%", args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (title LIKE 'foo%')", query.String())
 	}
@@ -325,7 +395,12 @@ func TestWhere(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("title").NotLike("'foo%'"))
+			Where(loukoum.Condition("title").NotLike("foo%"))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (title NOT LIKE :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal("foo%", args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (title NOT LIKE 'foo%')", query.String())
 	}
@@ -333,7 +408,12 @@ func TestWhere(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("title").ILike("'foo%'"))
+			Where(loukoum.Condition("title").ILike("foo%"))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (title ILIKE :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal("foo%", args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (title ILIKE 'foo%')", query.String())
 	}
@@ -341,15 +421,31 @@ func TestWhere(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("title").NotILike("'foo%'"))
+			Where(loukoum.Condition("title").NotILike("foo%"))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (title NOT ILIKE :arg_1)", stmt)
+		is.Len(args, 1)
+		is.Equal("foo%", args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (title NOT ILIKE 'foo%')", query.String())
 	}
+}
+
+func TestWhereBetween(t *testing.T) {
+	is := require.New(t)
+
 	{
 		query := loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("count").Between(10, 20))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (count BETWEEN :arg_1 AND :arg_2)", stmt)
+		is.Len(args, 2)
+		is.Equal(10, args[":arg_1"])
+		is.Equal(20, args[":arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (count BETWEEN 10 AND 20)", query.String())
 	}
@@ -357,9 +453,15 @@ func TestWhere(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").NotBetween(10, 20))
+			Where(loukoum.Condition("count").NotBetween(50, 70))
 
-		is.Equal("SELECT id FROM table WHERE (count NOT BETWEEN 10 AND 20)", query.String())
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (count NOT BETWEEN :arg_1 AND :arg_2)", stmt)
+		is.Len(args, 2)
+		is.Equal(50, args[":arg_1"])
+		is.Equal(70, args[":arg_2"])
+
+		is.Equal("SELECT id FROM table WHERE (count NOT BETWEEN 50 AND 70)", query.String())
 	}
 }
 
@@ -373,6 +475,13 @@ func TestWhereIn(t *testing.T) {
 			From("table").
 			Where(loukoum.Condition("id").In([]int64{1, 2, 3}))
 
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (id IN (:arg_1, :arg_2, :arg_3))", stmt)
+		is.Len(args, 3)
+		is.Equal(int64(1), args[":arg_1"])
+		is.Equal(int64(2), args[":arg_2"])
+		is.Equal(int64(3), args[":arg_3"])
+
 		is.Equal("SELECT id FROM table WHERE (id IN (1, 2, 3))", query.String())
 	}
 	{
@@ -380,6 +489,13 @@ func TestWhereIn(t *testing.T) {
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").NotIn([]int{1, 2, 3}))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (id NOT IN (:arg_1, :arg_2, :arg_3))", stmt)
+		is.Len(args, 3)
+		is.Equal(int(1), args[":arg_1"])
+		is.Equal(int(2), args[":arg_2"])
+		is.Equal(int(3), args[":arg_3"])
 
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (1, 2, 3))", query.String())
 	}
@@ -391,6 +507,13 @@ func TestWhereIn(t *testing.T) {
 			From("table").
 			Where(loukoum.Condition("id").In(1, 2, 3))
 
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (id IN (:arg_1, :arg_2, :arg_3))", stmt)
+		is.Len(args, 3)
+		is.Equal(int(1), args[":arg_1"])
+		is.Equal(int(2), args[":arg_2"])
+		is.Equal(int(3), args[":arg_3"])
+
 		is.Equal("SELECT id FROM table WHERE (id IN (1, 2, 3))", query.String())
 	}
 	{
@@ -398,6 +521,13 @@ func TestWhereIn(t *testing.T) {
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").NotIn(1, 2, 3))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (id NOT IN (:arg_1, :arg_2, :arg_3))", stmt)
+		is.Len(args, 3)
+		is.Equal(int(1), args[":arg_1"])
+		is.Equal(int(2), args[":arg_2"])
+		is.Equal(int(3), args[":arg_3"])
 
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (1, 2, 3))", query.String())
 	}
@@ -407,7 +537,13 @@ func TestWhereIn(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").In([]string{"'read'", "'unread'"}))
+			Where(loukoum.Condition("status").In([]string{"read", "unread"}))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1, :arg_2))", stmt)
+		is.Len(args, 2)
+		is.Equal("read", args[":arg_1"])
+		is.Equal("unread", args[":arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (status IN ('read', 'unread'))", query.String())
 	}
@@ -415,7 +551,13 @@ func TestWhereIn(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").NotIn([]string{"'read'", "'unread'"}))
+			Where(loukoum.Condition("status").NotIn([]string{"read", "unread"}))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1, :arg_2))", stmt)
+		is.Len(args, 2)
+		is.Equal("read", args[":arg_1"])
+		is.Equal("unread", args[":arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
 	}
@@ -425,7 +567,13 @@ func TestWhereIn(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").In("'read'", "'unread'"))
+			Where(loukoum.Condition("status").In("read", "unread"))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1, :arg_2))", stmt)
+		is.Len(args, 2)
+		is.Equal("read", args[":arg_1"])
+		is.Equal("unread", args[":arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (status IN ('read', 'unread'))", query.String())
 	}
@@ -433,7 +581,13 @@ func TestWhereIn(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").NotIn("'read'", "'unread'"))
+			Where(loukoum.Condition("status").NotIn("read", "unread"))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1, :arg_2))", stmt)
+		is.Len(args, 2)
+		is.Equal("read", args[":arg_1"])
+		is.Equal("unread", args[":arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
 	}
@@ -441,7 +595,12 @@ func TestWhereIn(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").In("'read'"))
+			Where(loukoum.Condition("status").In("read"))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1))", stmt)
+		is.Len(args, 1)
+		is.Equal("read", args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (status IN ('read'))", query.String())
 	}
@@ -449,7 +608,38 @@ func TestWhereIn(t *testing.T) {
 		query := loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").NotIn("'read'"))
+			Where(loukoum.Condition("status").NotIn("read"))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1))", stmt)
+		is.Len(args, 1)
+		is.Equal("read", args[":arg_1"])
+
+		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read'))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("status").In([]string{"read"}))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1))", stmt)
+		is.Len(args, 1)
+		is.Equal("read", args[":arg_1"])
+
+		is.Equal("SELECT id FROM table WHERE (status IN ('read'))", query.String())
+	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("status").NotIn([]string{"read"}))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1))", stmt)
+		is.Len(args, 1)
+		is.Equal("read", args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read'))", query.String())
 	}
@@ -466,6 +656,11 @@ func TestWhereIn(t *testing.T) {
 					Statement(),
 			))
 
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = :arg_1)))", stmt)
+		is.Len(args, 1)
+		is.Equal(1, args[":arg_1"])
+
 		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = 1)))", query.String())
 	}
 	{
@@ -478,6 +673,11 @@ func TestWhereIn(t *testing.T) {
 					Where(loukoum.Condition("id").Equal(1)).
 					Statement(),
 			))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = :arg_1)))", stmt)
+		is.Len(args, 1)
+		is.Equal(1, args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))", query.String())
 	}
