@@ -34,22 +34,7 @@ func (builder SelectBuilder) Columns(columns []interface{}) SelectBuilder {
 		columns = []interface{}{"*"}
 	}
 
-	builder.query.Columns = make([]stmt.Column, 0, len(columns))
-	for i := range columns {
-		column := stmt.Column{}
-		switch value := columns[i].(type) {
-		case string:
-			column = stmt.NewColumn(value)
-		case stmt.Column:
-			column = value
-		default:
-			panic(fmt.Sprintf("loukoum: cannot use %T as column", column))
-		}
-		if column.IsEmpty() {
-			panic("loukoum: a column was undefined")
-		}
-		builder.query.Columns = append(builder.query.Columns, column)
-	}
+	builder.query.Columns = ToColumns(columns)
 
 	return builder
 }

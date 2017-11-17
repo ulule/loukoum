@@ -55,23 +55,7 @@ func (builder InsertBuilder) Columns(columns ...interface{}) InsertBuilder {
 		return builder
 	}
 
-	builder.insert.Columns = make([]stmt.Column, 0, len(columns))
-
-	for i := range columns {
-		column := stmt.Column{}
-		switch value := columns[i].(type) {
-		case string:
-			column = stmt.NewColumn(value)
-		case stmt.Column:
-			column = value
-		default:
-			panic(fmt.Sprintf("loukoum: cannot use %T as column", column))
-		}
-		if column.IsEmpty() {
-			panic("loukoum: a column was undefined")
-		}
-		builder.insert.Columns = append(builder.insert.Columns, column)
-	}
+	builder.insert.Columns = ToColumns(columns)
 
 	return builder
 }
