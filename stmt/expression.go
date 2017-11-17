@@ -21,6 +21,8 @@ func NewExpression(arg interface{}) Expression {
 	}
 
 	switch value := arg.(type) {
+	case Expression:
+		return value
 	case string:
 		return NewValueString(value)
 	case int:
