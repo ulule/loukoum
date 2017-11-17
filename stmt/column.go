@@ -1,8 +1,6 @@
 package stmt
 
 import (
-	"fmt"
-
 	"github.com/ulule/loukoum/types"
 )
 
@@ -40,33 +38,4 @@ func (column Column) Write(ctx *types.Context) {
 // IsEmpty return true if statement is undefined.
 func (column Column) IsEmpty() bool {
 	return column.Name == ""
-}
-
-// ----------------------------------------------------------------------------
-// Helpers
-// ----------------------------------------------------------------------------
-
-// ToColumns takes a list of empty interfaces and returns a slice of Column instance.
-func ToColumns(values []interface{}) []Column {
-	columns := make([]Column, 0, len(values))
-
-	for i := range values {
-		column := Column{}
-
-		switch value := values[i].(type) {
-		case string:
-			column = NewColumn(value)
-		case Column:
-			column = value
-		default:
-			panic(fmt.Sprintf("loukoum: cannot use %T as column", column))
-		}
-		if column.IsEmpty() {
-			panic("loukoum: a column was undefined")
-		}
-
-		columns = append(columns, column)
-	}
-
-	return columns
 }

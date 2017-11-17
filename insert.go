@@ -93,7 +93,7 @@ func (builder InsertBuilder) Returning(values ...interface{}) InsertBuilder {
 		return builder
 	}
 
-	builder.insert.Returning = stmt.NewReturning(stmt.ToColumns(values))
+	builder.insert.Returning = stmt.NewReturning(ToColumns(values))
 
 	return builder
 }
