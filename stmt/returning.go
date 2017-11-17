@@ -1,6 +1,9 @@
 package stmt
 
-import "github.com/ulule/loukoum/types"
+import (
+	"github.com/ulule/loukoum/token"
+	"github.com/ulule/loukoum/types"
+)
 
 // Returning is the RETURNING clause.
 type Returning struct {
@@ -17,7 +20,8 @@ func NewReturning(columns []Column) Returning {
 
 // Write implements Statement interface.
 func (returning Returning) Write(ctx *types.Context) {
-	ctx.Write("RETURNING ")
+	ctx.Write(string(token.Returning))
+	ctx.Write(" ")
 
 	l := len(returning.Columns)
 	if l > 1 {

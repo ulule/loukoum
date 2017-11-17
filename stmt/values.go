@@ -1,6 +1,9 @@
 package stmt
 
-import "github.com/ulule/loukoum/types"
+import (
+	"github.com/ulule/loukoum/token"
+	"github.com/ulule/loukoum/types"
+)
 
 // Values is the VALUES clause.
 type Values struct {
@@ -21,7 +24,8 @@ func (values Values) Write(ctx *types.Context) {
 		return
 	}
 
-	ctx.Write("VALUES (")
+	ctx.Write(string(token.Values))
+	ctx.Write(" (")
 	values.Values.Write(ctx)
 	ctx.Write(")")
 }

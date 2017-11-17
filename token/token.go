@@ -27,23 +27,26 @@ const (
 	Asterisk = Type("*")
 
 	// Keywords
-	Select = Type("SELECT")
-	Update = Type("UPDATE")
-	Insert = Type("INSERT")
-	Delete = Type("DELETE")
-	From   = Type("FROM")
-	Where  = Type("WHERE")
-	And    = Type("AND")
-	Or     = Type("OR")
-	Limit  = Type("LIMIT")
-	Offset = Type("OFFSET")
-	Set    = Type("SET")
-	Inner  = Type("INNER")
-	Cross  = Type("CROSS")
-	Left   = Type("LEFT")
-	Right  = Type("RIGHT")
-	Join   = Type("JOIN")
-	On     = Type("ON")
+	Select    = Type("SELECT")
+	Update    = Type("UPDATE")
+	Insert    = Type("INSERT")
+	Delete    = Type("DELETE")
+	From      = Type("FROM")
+	Where     = Type("WHERE")
+	And       = Type("AND")
+	Or        = Type("OR")
+	Limit     = Type("LIMIT")
+	Offset    = Type("OFFSET")
+	Set       = Type("SET")
+	Inner     = Type("INNER")
+	Cross     = Type("CROSS")
+	Left      = Type("LEFT")
+	Right     = Type("RIGHT")
+	Join      = Type("JOIN")
+	On        = Type("ON")
+	Returning = Type("RETURNING")
+	Values    = Type("VALUES")
+	Into      = Type("INTO")
 )
 
 type Token struct {
@@ -56,23 +59,26 @@ func (t *Token) String() string {
 }
 
 var keywords = map[string]Type{
-	"SELECT": Select,
-	"UPDATE": Update,
-	"INSERT": Insert,
-	"DELETE": Delete,
-	"FROM":   From,
-	"WHERE":  Where,
-	"AND":    And,
-	"OR":     Or,
-	"LIMIT":  Limit,
-	"OFFSET": Offset,
-	"SET":    Set,
-	"INNER":  Inner,
-	"CROSS":  Cross,
-	"LEFT":   Left,
-	"RIGHT":  Right,
-	"JOIN":   Join,
-	"ON":     On,
+	"SELECT":    Select,
+	"UPDATE":    Update,
+	"INSERT":    Insert,
+	"DELETE":    Delete,
+	"FROM":      From,
+	"WHERE":     Where,
+	"AND":       And,
+	"OR":        Or,
+	"LIMIT":     Limit,
+	"OFFSET":    Offset,
+	"SET":       Set,
+	"INNER":     Inner,
+	"CROSS":     Cross,
+	"LEFT":      Left,
+	"RIGHT":     Right,
+	"JOIN":      Join,
+	"ON":        On,
+	"RETURNINg": Returning,
+	"VALUES":    Values,
+	"INTO":      Into,
 }
 
 func Lookup(e string) Type {

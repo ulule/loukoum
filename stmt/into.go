@@ -1,6 +1,9 @@
 package stmt
 
-import "github.com/ulule/loukoum/types"
+import (
+	"github.com/ulule/loukoum/token"
+	"github.com/ulule/loukoum/types"
+)
 
 // Into is the INTO clause.
 type Into struct {
@@ -17,7 +20,8 @@ func NewInto(table Table) Into {
 
 // Write implements Statement interface.
 func (into Into) Write(ctx *types.Context) {
-	ctx.Write("INTO ")
+	ctx.Write(string(token.Into))
+	ctx.Write(" ")
 	into.Table.Write(ctx)
 }
 
