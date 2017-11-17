@@ -40,9 +40,9 @@ func (in In) Write(buffer *bytes.Buffer) {
 	in.Identifier.Write(buffer)
 	buffer.WriteString(" ")
 	in.Operator.Write(buffer)
-	buffer.WriteString(" ")
+	buffer.WriteString(" (")
 	in.Value.Write(buffer)
-	buffer.WriteString(")")
+	buffer.WriteString("))")
 }
 
 // IsEmpty return true if statement is undefined.

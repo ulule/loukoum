@@ -70,3 +70,5 @@ func (selekt Select) Write(buffer *bytes.Buffer) {
 func (selekt Select) IsEmpty() bool {
 	return len(selekt.Columns) == 0
 }
+
+func (selek Select) expression() {}
