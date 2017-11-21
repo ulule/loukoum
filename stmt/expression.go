@@ -53,8 +53,11 @@ func NewExpression(arg interface{}) Expression {
 	}
 }
 
+// ----------------------------------------------------------------------------
+// Identifier
+// ----------------------------------------------------------------------------
+
 // Identifier is an identifier.
-// TODO Refacto ?
 type Identifier struct {
 	Identifier string
 }
@@ -169,8 +172,11 @@ func (identifier Identifier) NotBetween(from, to interface{}) Between {
 	return NewNotBetween(identifier, NewExpression(from), NewExpression(to))
 }
 
+// ----------------------------------------------------------------------------
+// Value
+// ----------------------------------------------------------------------------
+
 // Value is an expression value.
-// TODO Refacto ?
 type Value struct {
 	Value interface{}
 }
