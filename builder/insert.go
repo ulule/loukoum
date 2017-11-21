@@ -54,6 +54,9 @@ func (b Insert) Columns(columns ...interface{}) Insert {
 	if len(columns) == 0 {
 		return b
 	}
+	if len(b.insert.Columns) != 0 {
+		panic("loukoum: insert builder has columns clause already defined")
+	}
 
 	b.insert.Columns = ToColumns(columns)
 
@@ -63,7 +66,7 @@ func (b Insert) Columns(columns ...interface{}) Insert {
 // Values sets the INSERT values.
 func (b Insert) Values(values interface{}) Insert {
 	if !b.insert.Values.IsEmpty() {
-		return b
+		panic("loukoum: insert builder has values clause already defined")
 	}
 
 	b.insert.Values = stmt.NewValues(stmt.NewExpression(values))
@@ -74,7 +77,7 @@ func (b Insert) Values(values interface{}) Insert {
 // Returning builds the RETURNING clause.
 func (b Insert) Returning(values ...interface{}) Insert {
 	if !b.insert.Returning.IsEmpty() {
-		return b
+		panic("loukoum: insert builder has returning clause already defined")
 	}
 
 	b.insert.Returning = stmt.NewReturning(ToColumns(values))
