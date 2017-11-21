@@ -35,7 +35,7 @@ func TestInsert_Values(t *testing.T) {
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"})
 
-		is.Equal("INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3)", query.String())
+		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')", query.String())
 	}
 
 	// Without columns
@@ -44,7 +44,7 @@ func TestInsert_Values(t *testing.T) {
 			Insert("table").
 			Values([]string{"va", "vb", "vc"})
 
-		is.Equal("INSERT INTO table VALUES (:arg_1, :arg_2, :arg_3)", query.String())
+		is.Equal("INSERT INTO table VALUES ('va', 'vb', 'vc')", query.String())
 	}
 }
 
@@ -59,7 +59,7 @@ func TestInsert_Returning(t *testing.T) {
 			Values([]string{"va", "vb", "vc"}).
 			Returning("a")
 
-		is.Equal("INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING a", query.String())
+		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a", query.String())
 	}
 
 	// Many columns
@@ -70,7 +70,7 @@ func TestInsert_Returning(t *testing.T) {
 			Values([]string{"va", "vb", "vc"}).
 			Returning("a", "b")
 
-		is.Equal("INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING (a, b)", query.String())
+		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING (a, b)", query.String())
 	}
 
 	// AS
@@ -81,7 +81,7 @@ func TestInsert_Returning(t *testing.T) {
 			Values([]string{"va", "vb", "vc"}).
 			Returning(stmt.NewColumnAlias("a", "alias_a"))
 
-		is.Equal("INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING a AS alias_a", query.String())
+		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a AS alias_a", query.String())
 	}
 
 	// TODO: expression

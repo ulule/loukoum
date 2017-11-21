@@ -2,7 +2,6 @@ package builder
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/ulule/loukoum/parser"
 	"github.com/ulule/loukoum/stmt"
@@ -11,6 +10,7 @@ import (
 
 // Select is a builder used for "SELECT" query.
 type Select struct {
+	Builder
 	query stmt.Select
 }
 
@@ -150,19 +150,12 @@ func (b Select) Or(condition stmt.Expression) Select {
 	return b
 }
 
+// String returns the underlying query as a raw statement.
 func (b Select) String() string {
-	query, args := b.Prepare()
-	for key, arg := range args {
-		switch value := arg.(type) {
-		case string:
-			query = strings.Replace(query, key, fmt.Sprint("'", value, "'"), 1)
-		default:
-			query = strings.Replace(query, key, fmt.Sprint(value), 1)
-		}
-	}
-	return query
+	return rawify(b.Prepare())
 }
 
+// Prepare returns the underlying query as a named statement.
 func (b Select) Prepare() (string, map[string]interface{}) {
 	ctx := types.NewContext()
 	b.query.Write(ctx)

@@ -9,6 +9,7 @@ import (
 
 // Insert is a builder used for "INSERT" query.
 type Insert struct {
+	Builder
 	insert stmt.Insert
 }
 
@@ -17,12 +18,6 @@ func NewInsert() Insert {
 	return Insert{
 		insert: stmt.NewInsert(),
 	}
-}
-
-func (b Insert) String() string {
-	ctx := types.NewContext()
-	b.insert.Write(ctx)
-	return ctx.Query()
 }
 
 // Into sets the INTO clause of the query.
@@ -83,4 +78,25 @@ func (b Insert) Returning(values ...interface{}) Insert {
 	b.insert.Returning = stmt.NewReturning(ToColumns(values))
 
 	return b
+}
+
+// String returns the underlying query as a raw statement.
+func (b Insert) String() string {
+	return rawify(b.Prepare())
+}
+
+// Prepare returns the underlying query as a named statement.
+func (b Insert) Prepare() (string, map[string]interface{}) {
+	ctx := types.NewContext()
+	b.insert.Write(ctx)
+
+	query := ctx.Query()
+	args := ctx.Values()
+
+	return query, args
+}
+
+// Statement return underlying statement.
+func (b Insert) Statement() stmt.Statement {
+	return b.insert
 }
