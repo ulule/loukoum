@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"bytes"
+	"github.com/ulule/loukoum/types"
 )
 
 type From struct {
@@ -15,9 +15,9 @@ func NewFrom(table Table) From {
 	}
 }
 
-func (from From) Write(buffer *bytes.Buffer) {
-	buffer.WriteString("FROM ")
-	from.Table.Write(buffer)
+func (from From) Write(ctx *types.Context) {
+	ctx.Write("FROM ")
+	from.Table.Write(ctx)
 }
 
 // IsEmpty return true if statement is undefined.
