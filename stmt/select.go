@@ -10,6 +10,7 @@ type Select struct {
 	From     From
 	Joins    []Join
 	Where    Where
+	GroupBy  GroupBy
 }
 
 func NewSelect() Select {
@@ -53,7 +54,10 @@ func (selekt Select) Write(ctx *types.Context) {
 		selekt.Where.Write(ctx)
 	}
 
-	// TODO GROUP BY
+	if !selekt.GroupBy.IsEmpty() {
+		ctx.Write(" ")
+		selekt.GroupBy.Write(ctx)
+	}
 
 	// TODO HAVING
 

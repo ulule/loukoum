@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum"
+	"github.com/ulule/loukoum/stmt"
 )
 
 func TestSelect(t *testing.T) {
@@ -680,5 +681,28 @@ func TestSelect_WhereIn(t *testing.T) {
 		is.Equal(1, args[":arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))", query.String())
+	}
+}
+
+func TestSelect_GroupBy(t *testing.T) {
+	is := require.New(t)
+
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNot(nil)).
+			GroupBy("name")
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
+	}
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNot(nil)).
+			GroupBy([]stmt.Column{stmt.NewColumn("name"), stmt.NewColumn("email")})
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email", query.String())
 	}
 }
