@@ -167,6 +167,17 @@ func (b Select) GroupBy(args ...interface{}) Select {
 	return b
 }
 
+// Having adds HAVING clauses.
+func (b Select) Having(condition stmt.Expression) Select {
+	if !b.query.Having.IsEmpty() {
+		panic("loukoum: select builder has having clause already defined")
+	}
+
+	b.query.Having = stmt.NewHaving(condition)
+
+	return b
+}
+
 // String returns the underlying query as a raw statement.
 func (b Select) String() string {
 	return rawify(b.Prepare())

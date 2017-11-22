@@ -4,11 +4,13 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// GroupBy is a GROUP BY clause.
 type GroupBy struct {
 	Statement
 	Columns []Column
 }
 
+// NewGroupBy returns a new GroupBy instance.
 func NewGroupBy(columns []Column) GroupBy {
 	return GroupBy{
 		Columns: columns,

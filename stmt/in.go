@@ -4,6 +4,7 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// In is a IN expression.
 type In struct {
 	Expression
 	Identifier Identifier
@@ -11,6 +12,7 @@ type In struct {
 	Value      Expression
 }
 
+// NewIn returns a new In instance using an inclusive operator.
 func NewIn(identifier Identifier, value Expression) In {
 	return In{
 		Identifier: identifier,
@@ -19,6 +21,7 @@ func NewIn(identifier Identifier, value Expression) In {
 	}
 }
 
+// NewNotIn returns a new In instance using an exclusive operator.
 func NewNotIn(identifier Identifier, value Expression) In {
 	return In{
 		Identifier: identifier,

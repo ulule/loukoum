@@ -4,6 +4,7 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// Select is a SELECT statement.
 type Select struct {
 	Distinct bool
 	Columns  []Column
@@ -11,8 +12,10 @@ type Select struct {
 	Joins    []Join
 	Where    Where
 	GroupBy  GroupBy
+	Having   Having
 }
 
+// NewSelect returns a new Select instance.
 func NewSelect() Select {
 	return Select{}
 }
@@ -60,6 +63,11 @@ func (selekt Select) Write(ctx *types.Context) {
 		selekt.GroupBy.Write(ctx)
 	}
 
+	if !selekt.Having.IsEmpty() {
+		ctx.Write(" ")
+		selekt.Having.Write(ctx)
+	}
+
 	// TODO HAVING
 
 	// TODO ORDER BY
@@ -76,4 +84,4 @@ func (selekt Select) IsEmpty() bool {
 	return len(selekt.Columns) == 0
 }
 
-func (selek Select) expression() {}
+func (Select) expression() {}

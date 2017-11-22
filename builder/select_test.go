@@ -700,58 +700,94 @@ func TestSelect_GroupBy(t *testing.T) {
 	// One column
 	{
 		query := loukoum.
-			Select("COUNT(*)").
+			Select("name", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
 			GroupBy("name")
 
-		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
+		is.Equal("SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
 	}
 	{
 		query := loukoum.
-			Select("COUNT(*)").
+			Select("name", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
 			GroupBy(loukoum.Column("name"))
 
-		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
+		is.Equal("SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
 	}
 
 	// Many columns
 	{
 		query := loukoum.
-			Select("COUNT(*)").
+			Select("name", "locale", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
-			GroupBy("name", "email")
+			GroupBy("name", "locale")
 
-		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email", query.String())
+		is.Equal(fmt.Sprint("SELECT name, locale, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale"), query.String())
 	}
 	{
 		query := loukoum.
-			Select("COUNT(*)").
+			Select("name", "locale", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
-			GroupBy(loukoum.Column("name"), loukoum.Column("email"))
+			GroupBy(loukoum.Column("name"), loukoum.Column("locale"))
 
-		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email", query.String())
+		is.Equal(fmt.Sprint("SELECT name, locale, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale"), query.String())
 	}
 	{
 		query := loukoum.
-			Select("COUNT(*)").
+			Select("name", "locale", "country", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
-			GroupBy("name", "email", "user_id")
+			GroupBy("name", "locale", "country")
 
-		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email, user_id", query.String())
+		is.Equal(fmt.Sprint("SELECT name, locale, country, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country"), query.String())
 	}
 	{
 		query := loukoum.
-			Select("COUNT(*)").
+			Select("name", "locale", "country", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
-			GroupBy(loukoum.Column("name"), loukoum.Column("email"), loukoum.Column("user_id"))
+			GroupBy(loukoum.Column("name"), loukoum.Column("locale"), loukoum.Column("country"))
 
-		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email, user_id", query.String())
+		is.Equal(fmt.Sprint("SELECT name, locale, country, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country"), query.String())
+	}
+}
+
+func TestSelect_Having(t *testing.T) {
+	is := require.New(t)
+
+	// One condition
+	{
+		query := loukoum.
+			Select("name", "COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(false)).
+			GroupBy("name").
+			Having(loukoum.Condition("COUNT(*)").GreaterThan(10))
+
+		is.Equal(fmt.Sprint("SELECT name, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name HAVING (COUNT(*) > 10)"), query.String())
+	}
+
+	// Two conditions
+	{
+		query := loukoum.
+			Select("name", "COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(false)).
+			GroupBy("name").
+			Having(
+				loukoum.Condition("COUNT(*)").GreaterThan(10).And(loukoum.Condition("COUNT(*)").LessThan(500)),
+			)
+
+		is.Equal(fmt.Sprint("SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name ",
+			"HAVING ((COUNT(*) > 10) AND (COUNT(*) < 500))"), query.String())
 	}
 }

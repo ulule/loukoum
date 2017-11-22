@@ -10,7 +10,7 @@ type Where struct {
 	Condition Expression
 }
 
-// NewWhere returns a new WHERE clause.
+// NewWhere returns a new Where instance.
 func NewWhere(expression Expression) Where {
 	return Where{
 		Condition: expression,

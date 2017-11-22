@@ -4,6 +4,7 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// Between is a BETWEEN expression.
 type Between struct {
 	Expression
 	Identifier Identifier
@@ -13,6 +14,7 @@ type Between struct {
 	To         Expression
 }
 
+// NewBetween returns a new Between instance using an inclusive operator.
 func NewBetween(identifier Identifier, from, to Expression) Between {
 	return Between{
 		Identifier: identifier,
@@ -23,6 +25,7 @@ func NewBetween(identifier Identifier, from, to Expression) Between {
 	}
 }
 
+// NewNotBetween returns a new Between instance using an exclusive operator.
 func NewNotBetween(identifier Identifier, from, to Expression) Between {
 	return Between{
 		Identifier: identifier,
