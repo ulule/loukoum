@@ -55,6 +55,11 @@ func Or(left stmt.Expression, right stmt.Expression) stmt.InfixExpression {
 	return stmt.NewInfixExpression(left, stmt.NewLogicalOperator(types.Or), right)
 }
 
+// Raw is a wrapper to create a new Raw expression.
+func Raw(value string) stmt.Raw {
+	return stmt.NewRaw(value)
+}
+
 // Insert starts an InsertBuilder using the given table as into clause.
 func Insert(into interface{}) builder.Insert {
 	return builder.NewInsert().Into(into)

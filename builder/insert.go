@@ -59,12 +59,13 @@ func (b Insert) Columns(columns ...interface{}) Insert {
 }
 
 // Values sets the INSERT values.
-func (b Insert) Values(values interface{}) Insert {
+func (b Insert) Values(values ...interface{}) Insert {
 	if !b.insert.Values.IsEmpty() {
 		panic("loukoum: insert builder has values clause already defined")
 	}
 
-	b.insert.Values = stmt.NewValues(stmt.NewExpression(values))
+	expression := stmt.NewArrayExpression(values...)
+	b.insert.Values = stmt.NewValues(expression)
 
 	return b
 }

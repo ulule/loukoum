@@ -53,6 +53,65 @@ func NewExpression(arg interface{}) Expression {
 	}
 }
 
+// NewArrayExpression creates a new Expression using a list of values.
+func NewArrayExpression(values ...interface{}) Expression {
+	// We pass only one argument and it's a slice or an expression.
+	if len(values) == 1 {
+		value := values[0]
+		switch value.(type) {
+		case []string, []int, []uint, []int8, []uint8, []int16, []uint16,
+			[]int32, []uint32, []int64, []uint64, []bool:
+			return NewExpression(value)
+
+		case string, int, uint, int8, uint8, int16, uint16,
+			int32, uint32, int64, uint64, bool:
+			return NewExpression(value)
+
+		case Select:
+			return NewExpression(value)
+
+		default:
+			panic(fmt.Sprintf("cannot use {%+v}[%T] as loukoum Expression", value, value))
+		}
+	}
+
+	array := NewArray()
+	for i := range values {
+		switch value := values[i].(type) {
+		case string:
+			array.AddValue(NewValue(value))
+		case int:
+			array.AddValue(NewValue(value))
+		case int8:
+			array.AddValue(NewValue(value))
+		case int16:
+			array.AddValue(NewValue(value))
+		case int32:
+			array.AddValue(NewValue(value))
+		case int64:
+			array.AddValue(NewValue(value))
+		case uint:
+			array.AddValue(NewValue(value))
+		case uint8:
+			array.AddValue(NewValue(value))
+		case uint16:
+			array.AddValue(NewValue(value))
+		case uint32:
+			array.AddValue(NewValue(value))
+		case uint64:
+			array.AddValue(NewValue(value))
+		case bool:
+			array.AddValue(NewValue(value))
+		case Raw:
+			array.AddRaw(value)
+		default:
+			panic(fmt.Sprintf("cannot use {%+v}[%T] as loukoum Value", value, value))
+		}
+	}
+
+	return array
+}
+
 // ----------------------------------------------------------------------------
 // Identifier
 // ----------------------------------------------------------------------------
@@ -71,6 +130,7 @@ func NewIdentifier(identifier string) Identifier {
 
 func (Identifier) expression() {}
 
+// Write expose statement as a SQL query.
 func (identifier Identifier) Write(ctx *types.Context) {
 	ctx.Write(identifier.Identifier)
 }
@@ -138,12 +198,12 @@ func (identifier Identifier) LessThanOrEqual(value interface{}) InfixExpression 
 
 // In performs a "in" condition.
 func (identifier Identifier) In(value ...interface{}) In {
-	return NewIn(identifier, NewInExpression(value...))
+	return NewIn(identifier, NewArrayExpression(value...))
 }
 
 // NotIn performs a "not in" condition.
 func (identifier Identifier) NotIn(value ...interface{}) In {
-	return NewNotIn(identifier, NewInExpression(value...))
+	return NewNotIn(identifier, NewArrayExpression(value...))
 }
 
 // Like performs a "like" condition.
@@ -198,6 +258,7 @@ func NewValue(value interface{}) Value {
 
 func (Value) expression() {}
 
+// Write expose statement as a SQL query.
 func (value Value) Write(ctx *types.Context) {
 	if value.Value == nil {
 		ctx.Write("NULL")
@@ -208,7 +269,7 @@ func (value Value) Write(ctx *types.Context) {
 
 // IsEmpty return true if statement is undefined.
 func (value Value) IsEmpty() bool {
-	return value.Value == ""
+	return false
 }
 
 // ----------------------------------------------------------------------------
@@ -217,7 +278,7 @@ func (value Value) IsEmpty() bool {
 
 // Array contains a list of expression values.
 type Array struct {
-	Values []Value
+	Values []Expression
 }
 
 // NewArray returns a an expression array.
@@ -229,7 +290,7 @@ func NewArray() Array {
 func NewArrayString(values []string) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -238,7 +299,7 @@ func NewArrayString(values []string) Array {
 func NewArrayInt(values []int) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -247,7 +308,7 @@ func NewArrayInt(values []int) Array {
 func NewArrayInt8(values []int8) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -256,7 +317,7 @@ func NewArrayInt8(values []int8) Array {
 func NewArrayInt16(values []int16) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -265,7 +326,7 @@ func NewArrayInt16(values []int16) Array {
 func NewArrayInt32(values []int32) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -274,7 +335,7 @@ func NewArrayInt32(values []int32) Array {
 func NewArrayInt64(values []int64) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -283,7 +344,7 @@ func NewArrayInt64(values []int64) Array {
 func NewArrayUint(values []uint) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -292,7 +353,7 @@ func NewArrayUint(values []uint) Array {
 func NewArrayUint8(values []uint8) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -301,7 +362,7 @@ func NewArrayUint8(values []uint8) Array {
 func NewArrayUint16(values []uint16) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -310,7 +371,7 @@ func NewArrayUint16(values []uint16) Array {
 func NewArrayUint32(values []uint32) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -319,7 +380,7 @@ func NewArrayUint32(values []uint32) Array {
 func NewArrayUint64(values []uint64) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
@@ -328,13 +389,14 @@ func NewArrayUint64(values []uint64) Array {
 func NewArrayBool(values []bool) Array {
 	array := NewArray()
 	for i := range values {
-		array.Add(NewValue(values[i]))
+		array.AddValue(NewValue(values[i]))
 	}
 	return array
 }
 
 func (Array) expression() {}
 
+// Write expose statement as a SQL query.
 func (array Array) Write(ctx *types.Context) {
 	for i := range array.Values {
 		if i != 0 {
@@ -344,69 +406,45 @@ func (array Array) Write(ctx *types.Context) {
 	}
 }
 
-// Add append a value to given array.
-func (array *Array) Add(value Value) {
-	array.Values = append(array.Values, value)
-}
-
 // IsEmpty return true if statement is undefined.
 func (array Array) IsEmpty() bool {
 	return len(array.Values) == 0
 }
 
-// NewInExpression creates a new Expression for IN value.
-func NewInExpression(values ...interface{}) Expression {
-	// We pass only one argument and it's a slice or an expression.
-	if len(values) == 1 {
-		value := values[0]
-		switch value.(type) {
-		case []string, []int, []uint, []int8, []uint8, []int16, []uint16,
-			[]int32, []uint32, []int64, []uint64, []bool:
-			return NewExpression(value)
+// AddValue append a value to given array.
+func (array *Array) AddValue(value Value) {
+	array.Values = append(array.Values, value)
+}
 
-		case string, int, uint, int8, uint8, int16, uint16,
-			int32, uint32, int64, uint64, bool:
-			return NewExpression(value)
+// AddRaw append a raw value to given array.
+func (array *Array) AddRaw(value Raw) {
+	array.Values = append(array.Values, value)
+}
 
-		case Select:
-			return NewExpression(value)
+// ----------------------------------------------------------------------------
+// Raw
+// ----------------------------------------------------------------------------
 
-		default:
-			panic(fmt.Sprintf("cannot use {%+v}[%T] as loukoum Expression", value, value))
-		}
+// Raw is an raw expression value.
+type Raw struct {
+	Value string
+}
+
+// NewRaw returns an raw expression value.
+func NewRaw(value string) Raw {
+	return Raw{
+		Value: value,
 	}
+}
 
-	array := NewArray()
-	for i := range values {
-		switch value := values[i].(type) {
-		case string:
-			array.Add(NewValue(value))
-		case int:
-			array.Add(NewValue(value))
-		case int8:
-			array.Add(NewValue(value))
-		case int16:
-			array.Add(NewValue(value))
-		case int32:
-			array.Add(NewValue(value))
-		case int64:
-			array.Add(NewValue(value))
-		case uint:
-			array.Add(NewValue(value))
-		case uint8:
-			array.Add(NewValue(value))
-		case uint16:
-			array.Add(NewValue(value))
-		case uint32:
-			array.Add(NewValue(value))
-		case uint64:
-			array.Add(NewValue(value))
-		case bool:
-			array.Add(NewValue(value))
-		default:
-			panic(fmt.Sprintf("cannot use {%+v}[%T] as loukoum Value", value, value))
-		}
-	}
+func (Raw) expression() {}
 
-	return array
+// Write expose statement as a SQL query.
+func (raw Raw) Write(ctx *types.Context) {
+	ctx.Write(raw.Value)
+}
+
+// IsEmpty return true if statement is undefined.
+func (raw Raw) IsEmpty() bool {
+	return false
 }

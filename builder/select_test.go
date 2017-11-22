@@ -342,6 +342,17 @@ func TestSelect_WhereGreaterThan(t *testing.T) {
 
 		is.Equal("SELECT id FROM table WHERE (count >= 4)", query.String())
 	}
+	{
+		query := loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("updated_at").GreaterThanOrEqual(loukoum.Raw("NOW()")))
+
+		stmt, args := query.Prepare()
+		is.Equal("SELECT id FROM table WHERE (updated_at >= NOW())", stmt)
+		is.Len(args, 0)
+		is.Equal("SELECT id FROM table WHERE (updated_at >= NOW())", query.String())
+	}
 }
 
 func TestSelect_WhereLessThan(t *testing.T) {

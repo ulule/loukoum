@@ -36,6 +36,14 @@ func TestInsert_Values(t *testing.T) {
 
 		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')", query.String())
 	}
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("a", "b", "c").
+			Values("va", "vb", "vc")
+
+		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')", query.String())
+	}
 
 	// Without columns
 	{
@@ -44,6 +52,23 @@ func TestInsert_Values(t *testing.T) {
 			Values([]string{"va", "vb", "vc"})
 
 		is.Equal("INSERT INTO table VALUES ('va', 'vb', 'vc')", query.String())
+	}
+	{
+		query := loukoum.
+			Insert("table").
+			Values("va", "vb", "vc")
+
+		is.Equal("INSERT INTO table VALUES ('va', 'vb', 'vc')", query.String())
+	}
+
+	// With raw values
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("email", "enabled", "created_at").
+			Values("tech@ulule.com", true, loukoum.Raw("NOW()"))
+
+		is.Equal("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW())", query.String())
 	}
 }
 
