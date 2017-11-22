@@ -104,6 +104,14 @@ func (identifier Identifier) IsNot(value interface{}) InfixExpression {
 	return NewInfixExpression(identifier, operator, NewExpression(value))
 }
 
+// IsNull performs a "is null" comparison.
+func (identifier Identifier) IsNull(value bool) InfixExpression {
+	if value {
+		return identifier.Is(nil)
+	}
+	return identifier.IsNot(nil)
+}
+
 // GreaterThan performs a "greater than" comparison.
 func (identifier Identifier) GreaterThan(value interface{}) InfixExpression {
 	operator := NewComparisonOperator(types.GreaterThan)
