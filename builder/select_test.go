@@ -849,3 +849,29 @@ func TestSelect_Offset(t *testing.T) {
 		is.Equal("SELECT name FROM user OFFSET 700", query.String())
 	}
 }
+
+func TestSelect_Prefix(t *testing.T) {
+	is := require.New(t)
+
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			Prefix("EXPLAIN ANALYZE")
+
+		is.Equal("EXPLAIN ANALYZE SELECT name FROM user", query.String())
+	}
+}
+
+func TestSelect_Suffix(t *testing.T) {
+	is := require.New(t)
+
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			Suffix("FOR UPDATE")
+
+		is.Equal("SELECT name FROM user FOR UPDATE", query.String())
+	}
+}

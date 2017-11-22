@@ -210,6 +210,28 @@ func (b Select) Offset(value interface{}) Select {
 	return b
 }
 
+// Suffix add given clauses as suffixes.
+func (b Select) Suffix(suffix interface{}) Select {
+	if !b.query.Offset.IsEmpty() {
+		panic("loukoum: select builder has suffixes clauses already defined")
+	}
+
+	b.query.Suffix = ToSuffix(suffix)
+
+	return b
+}
+
+// Prefix add given clauses as prefixes.
+func (b Select) Prefix(prefix interface{}) Select {
+	if !b.query.Offset.IsEmpty() {
+		panic("loukoum: select builder has prefixes clauses already defined")
+	}
+
+	b.query.Prefix = ToPrefix(prefix)
+
+	return b
+}
+
 // String returns the underlying query as a raw statement.
 func (b Select) String() string {
 	return rawify(b.Prepare())

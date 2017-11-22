@@ -56,6 +56,46 @@ func ToColumns(values []interface{}) []stmt.Column {
 	return columns
 }
 
+// ToSuffix takes an empty interfaces and returns a Suffix instance.
+func ToSuffix(arg interface{}) stmt.Suffix {
+	suffix := stmt.Suffix{}
+
+	switch value := arg.(type) {
+	case string:
+		suffix = stmt.NewSuffix(value)
+	case stmt.Suffix:
+		suffix = value
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as suffix", value))
+	}
+
+	if suffix.IsEmpty() {
+		panic("loukoum: a suffix was undefined")
+	}
+
+	return suffix
+}
+
+// ToPrefix takes an empty interfaces and returns a Prefix instance.
+func ToPrefix(arg interface{}) stmt.Prefix {
+	prefix := stmt.Prefix{}
+
+	switch value := arg.(type) {
+	case string:
+		prefix = stmt.NewPrefix(value)
+	case stmt.Prefix:
+		prefix = value
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as prefix", value))
+	}
+
+	if prefix.IsEmpty() {
+		panic("loukoum: a prefix was undefined")
+	}
+
+	return prefix
+}
+
 // ToInt64 takes an empty interfaces and returns a int64.
 func ToInt64(value interface{}) (int64, bool) { // nolint: gocyclo
 	switch cast := value.(type) {

@@ -6,6 +6,7 @@ import (
 
 // Select is a SELECT statement.
 type Select struct {
+	Prefix   Prefix
 	Distinct bool
 	Columns  []Column
 	From     From
@@ -15,6 +16,7 @@ type Select struct {
 	Having   Having
 	Limit    Limit
 	Offset   Offset
+	Suffix   Suffix
 }
 
 // NewSelect returns a new Select instance.
@@ -34,7 +36,10 @@ func (selekt Select) Write(ctx *types.Context) {
 }
 
 func (selekt Select) writeHead(ctx *types.Context) {
-	// TODO Add prefixes
+	if !selekt.Prefix.IsEmpty() {
+		selekt.Prefix.Write(ctx)
+		ctx.Write(" ")
+	}
 
 	ctx.Write("SELECT")
 
@@ -93,7 +98,10 @@ func (selekt Select) writeTail(ctx *types.Context) {
 		selekt.Offset.Write(ctx)
 	}
 
-	// TODO Add suffixes
+	if !selekt.Suffix.IsEmpty() {
+		ctx.Write(" ")
+		selekt.Suffix.Write(ctx)
+	}
 }
 
 // IsEmpty return true if statement is undefined.
