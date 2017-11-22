@@ -27,6 +27,7 @@ func (table Table) As(alias string) Table {
 	return table
 }
 
+// Write expose statement as a SQL query.
 func (table Table) Write(ctx *types.Context) {
 	ctx.Write(table.Name)
 	if table.Alias != "" {

@@ -18,14 +18,14 @@ func NewInto(table Table) Into {
 	}
 }
 
-// Write implements Statement interface.
+// Write expose statement as a SQL query.
 func (into Into) Write(ctx *types.Context) {
 	ctx.Write(token.Into.String())
 	ctx.Write(" ")
 	into.Table.Write(ctx)
 }
 
-// IsEmpty implements Statement interface.
+// IsEmpty return true if statement is undefined.
 func (into Into) IsEmpty() bool {
 	return into.Table.IsEmpty()
 }

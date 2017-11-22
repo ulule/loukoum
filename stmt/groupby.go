@@ -15,6 +15,7 @@ func NewGroupBy(columns []Column) GroupBy {
 	}
 }
 
+// Write expose statement as a SQL query.
 func (group GroupBy) Write(ctx *types.Context) {
 	ctx.Write("GROUP BY ")
 	for i := range group.Columns {

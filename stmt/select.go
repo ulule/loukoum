@@ -17,6 +17,7 @@ func NewSelect() Select {
 	return Select{}
 }
 
+// Write expose statement as a SQL query.
 func (selekt Select) Write(ctx *types.Context) {
 	if selekt.IsEmpty() {
 		panic("loukoum: select statements must have at least one column")

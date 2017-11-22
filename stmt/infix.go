@@ -19,6 +19,7 @@ func NewInfixExpression(left Expression, operator Operator, right Expression) In
 	}
 }
 
+// Write expose statement as a SQL query.
 func (expression InfixExpression) Write(ctx *types.Context) {
 	if expression.IsEmpty() {
 		panic("loukoum: expression is undefined")

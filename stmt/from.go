@@ -15,6 +15,7 @@ func NewFrom(table Table) From {
 	}
 }
 
+// Write expose statement as a SQL query.
 func (from From) Write(ctx *types.Context) {
 	ctx.Write("FROM ")
 	from.Table.Write(ctx)

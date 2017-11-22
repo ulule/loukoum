@@ -29,6 +29,7 @@ func NewNotIn(identifier Identifier, value Expression) In {
 
 func (In) expression() {}
 
+// Write expose statement as a SQL query.
 func (in In) Write(ctx *types.Context) {
 	if in.IsEmpty() {
 		panic("loukoum: expression is undefined")

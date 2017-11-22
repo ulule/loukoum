@@ -16,6 +16,7 @@ func NewOn(left, right Column) On {
 	}
 }
 
+// Write expose statement as a SQL query.
 func (on On) Write(ctx *types.Context) {
 	ctx.Write("ON ")
 	ctx.Write(on.Left.Name)
