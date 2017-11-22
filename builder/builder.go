@@ -2,6 +2,8 @@ package builder
 
 import (
 	"fmt"
+	"math"
+	"strconv"
 	"strings"
 
 	"github.com/ulule/loukoum/stmt"
@@ -52,4 +54,36 @@ func ToColumns(values []interface{}) []stmt.Column {
 	}
 
 	return columns
+}
+
+// ToInt64 takes an empty interfaces and returns a int64.
+func ToInt64(value interface{}) (int64, bool) { // nolint: gocyclo
+	switch cast := value.(type) {
+	case int64:
+		return cast, true
+	case int:
+		return int64(cast), true
+	case int8:
+		return int64(cast), true
+	case int16:
+		return int64(cast), true
+	case int32:
+		return int64(cast), true
+	case uint8:
+		return int64(cast), true
+	case uint16:
+		return int64(cast), true
+	case uint32:
+		return int64(cast), true
+	case uint64:
+		if cast <= math.MaxInt64 {
+			return int64(cast), true
+		}
+	case string:
+		n, err := strconv.ParseInt(cast, 10, 64)
+		if err == nil {
+			return n, true
+		}
+	}
+	return 0, false
 }

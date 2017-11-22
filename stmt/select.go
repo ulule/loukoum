@@ -13,6 +13,7 @@ type Select struct {
 	Where    Where
 	GroupBy  GroupBy
 	Having   Having
+	Limit    Limit
 }
 
 // NewSelect returns a new Select instance.
@@ -26,6 +27,12 @@ func (selekt Select) Write(ctx *types.Context) {
 		panic("loukoum: select statements must have at least one column")
 	}
 
+	selekt.writeHead(ctx)
+	selekt.writeMiddle(ctx)
+	selekt.writeTail(ctx)
+}
+
+func (selekt Select) writeHead(ctx *types.Context) {
 	// TODO Add prefixes
 
 	ctx.Write("SELECT")
@@ -47,7 +54,9 @@ func (selekt Select) Write(ctx *types.Context) {
 		ctx.Write(" ")
 		selekt.From.Write(ctx)
 	}
+}
 
+func (selekt Select) writeMiddle(ctx *types.Context) {
 	for i := range selekt.Joins {
 		ctx.Write(" ")
 		selekt.Joins[i].Write(ctx)
@@ -67,10 +76,16 @@ func (selekt Select) Write(ctx *types.Context) {
 		ctx.Write(" ")
 		selekt.Having.Write(ctx)
 	}
+}
+
+func (selekt Select) writeTail(ctx *types.Context) {
 
 	// TODO ORDER BY
 
-	// TODO LIMIT
+	if !selekt.Limit.IsEmpty() {
+		ctx.Write(" ")
+		selekt.Limit.Write(ctx)
+	}
 
 	// TODO OFFSET
 

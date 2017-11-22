@@ -791,3 +791,32 @@ func TestSelect_Having(t *testing.T) {
 			"HAVING ((COUNT(*) > 10) AND (COUNT(*) < 500))"), query.String())
 	}
 }
+
+func TestSelect_Limit(t *testing.T) {
+	is := require.New(t)
+
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			Limit(10)
+
+		is.Equal("SELECT name FROM user LIMIT 10", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			Limit("50")
+
+		is.Equal("SELECT name FROM user LIMIT 50", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			Limit(uint64(700))
+
+		is.Equal("SELECT name FROM user LIMIT 700", query.String())
+	}
+}

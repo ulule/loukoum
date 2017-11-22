@@ -178,6 +178,22 @@ func (b Select) Having(condition stmt.Expression) Select {
 	return b
 }
 
+// Limit adds LIMIT clauses.
+func (b Select) Limit(value interface{}) Select {
+	if !b.query.Limit.IsEmpty() {
+		panic("loukoum: select builder has limit clause already defined")
+	}
+
+	limit, ok := ToInt64(value)
+	if !ok || limit <= 0 {
+		panic("loukoum: limit must be a positive integer")
+	}
+
+	b.query.Limit = stmt.NewLimit(limit)
+
+	return b
+}
+
 // String returns the underlying query as a raw statement.
 func (b Select) String() string {
 	return rawify(b.Prepare())
