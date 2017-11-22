@@ -4,16 +4,19 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// Table is a table identifier.
 type Table struct {
 	Statement
 	Name  string
 	Alias string
 }
 
+// NewTable returns a new Table instance.
 func NewTable(name string) Table {
 	return NewTableAlias(name, "")
 }
 
+// NewTableAlias returns a new Table instance with an alias.
 func NewTableAlias(name, alias string) Table {
 	return Table{
 		Name:  name,

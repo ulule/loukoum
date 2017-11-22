@@ -5,7 +5,7 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
-// Values is the VALUES clause.
+// Values is a VALUES clause.
 type Values struct {
 	Statement
 	Values Expression

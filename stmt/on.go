@@ -4,11 +4,13 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// On is a ON clause.
 type On struct {
 	Left  Column
 	Right Column
 }
 
+// NewOn returns a new On instance.
 func NewOn(left, right Column) On {
 	return On{
 		Left:  left,

@@ -4,16 +4,19 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// Column is a column identifier.
 type Column struct {
 	Statement
 	Name  string
 	Alias string
 }
 
+// NewColumn returns a new Column instance.
 func NewColumn(name string) Column {
 	return NewColumnAlias(name, "")
 }
 
+// NewColumnAlias returns a new Column instance with an alias.
 func NewColumnAlias(name, alias string) Column {
 	return Column{
 		Name:  name,

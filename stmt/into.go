@@ -5,7 +5,7 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
-// Into is the INTO clause.
+// Into is a INTO clause.
 type Into struct {
 	Statement
 	Table Table

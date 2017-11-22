@@ -4,11 +4,13 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// From is a FROM clause.
 type From struct {
 	Statement
 	Table Table
 }
 
+// NewFrom returns a new From instance.
 func NewFrom(table Table) From {
 	return From{
 		Table: table,

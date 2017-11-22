@@ -4,6 +4,7 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// Select is a SELECT statement.
 type Select struct {
 	Distinct bool
 	Columns  []Column
@@ -13,6 +14,7 @@ type Select struct {
 	GroupBy  GroupBy
 }
 
+// NewSelect returns a new Select instance.
 func NewSelect() Select {
 	return Select{}
 }
@@ -76,4 +78,4 @@ func (selekt Select) IsEmpty() bool {
 	return len(selekt.Columns) == 0
 }
 
-func (selek Select) expression() {}
+func (Select) expression() {}

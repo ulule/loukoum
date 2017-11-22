@@ -5,7 +5,7 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
-// Insert is the INSERT statement.
+// Insert is a INSERT statement.
 type Insert struct {
 	Statement
 	Into      Into

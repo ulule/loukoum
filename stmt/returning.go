@@ -5,7 +5,7 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
-// Returning is the RETURNING clause.
+// Returning is a RETURNING clause.
 type Returning struct {
 	Statement
 	Columns []Column

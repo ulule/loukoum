@@ -13,7 +13,7 @@ type Expression interface {
 }
 
 // NewExpression returns a new Expression instance from arg.
-func NewExpression(arg interface{}) Expression {
+func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 	if arg == nil {
 		return NewValue(nil)
 	}
@@ -54,7 +54,7 @@ func NewExpression(arg interface{}) Expression {
 }
 
 // NewArrayExpression creates a new Expression using a list of values.
-func NewArrayExpression(values ...interface{}) Expression {
+func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 	// We pass only one argument and it's a slice or an expression.
 	if len(values) == 1 {
 		value := values[0]

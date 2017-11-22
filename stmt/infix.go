@@ -4,6 +4,8 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// InfixExpression is an Expression that has a left and right operand with an operator.
+// For example, the expression 'id >= 30' is an infix expression.
 type InfixExpression struct {
 	Expression
 	Left     Expression
@@ -11,6 +13,7 @@ type InfixExpression struct {
 	Right    Expression
 }
 
+// NewInfixExpression returns a new InfixExpression instance.
 func NewInfixExpression(left Expression, operator Operator, right Expression) InfixExpression {
 	return InfixExpression{
 		Left:     left,

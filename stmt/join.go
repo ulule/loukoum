@@ -4,6 +4,7 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// Join is a JOIN clause.
 type Join struct {
 	Statement
 	Type      types.JoinType
@@ -11,6 +12,7 @@ type Join struct {
 	Condition On
 }
 
+// NewJoin returns a new Join instance.
 func NewJoin(kind types.JoinType, table Table, condition On) Join {
 	return Join{
 		Type:      kind,
@@ -19,14 +21,17 @@ func NewJoin(kind types.JoinType, table Table, condition On) Join {
 	}
 }
 
+// NewInnerJoin returns a new Join instance using an INNER JOIN.
 func NewInnerJoin(table Table, condition On) Join {
 	return NewJoin(types.InnerJoin, table, condition)
 }
 
+// NewLeftJoin returns a new Join instance using a LEFT JOIN.
 func NewLeftJoin(table Table, condition On) Join {
 	return NewJoin(types.LeftJoin, table, condition)
 }
 
+// NewRightJoin returns a new Join instance using a RIGHT JOIN.
 func NewRightJoin(table Table, condition On) Join {
 	return NewJoin(types.RightJoin, table, condition)
 }
