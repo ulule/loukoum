@@ -3,6 +3,7 @@ package stmt
 import (
 	"strconv"
 
+	"github.com/ulule/loukoum/token"
 	"github.com/ulule/loukoum/types"
 )
 
@@ -24,7 +25,8 @@ func (limit Limit) Write(ctx *types.Context) {
 	if limit.IsEmpty() {
 		return
 	}
-	ctx.Write("LIMIT ")
+	ctx.Write(token.Limit.String())
+	ctx.Write(" ")
 	ctx.Write(strconv.FormatInt(limit.Count, 10))
 }
 
