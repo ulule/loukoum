@@ -682,3 +682,65 @@ func TestSelect_WhereIn(t *testing.T) {
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))", query.String())
 	}
 }
+
+func TestSelect_GroupBy(t *testing.T) {
+	is := require.New(t)
+
+	// One column
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy("name")
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
+	}
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy(loukoum.Column("name"))
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
+	}
+
+	// Many columns
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy("name", "email")
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email", query.String())
+	}
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy(loukoum.Column("name"), loukoum.Column("email"))
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email", query.String())
+	}
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy("name", "email", "user_id")
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email, user_id", query.String())
+	}
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy(loukoum.Column("name"), loukoum.Column("email"), loukoum.Column("user_id"))
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email, user_id", query.String())
+	}
+}

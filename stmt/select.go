@@ -10,12 +10,14 @@ type Select struct {
 	From     From
 	Joins    []Join
 	Where    Where
+	GroupBy  GroupBy
 }
 
 func NewSelect() Select {
 	return Select{}
 }
 
+// Write expose statement as a SQL query.
 func (selekt Select) Write(ctx *types.Context) {
 	if selekt.IsEmpty() {
 		panic("loukoum: select statements must have at least one column")
@@ -53,7 +55,10 @@ func (selekt Select) Write(ctx *types.Context) {
 		selekt.Where.Write(ctx)
 	}
 
-	// TODO GROUP BY
+	if !selekt.GroupBy.IsEmpty() {
+		ctx.Write(" ")
+		selekt.GroupBy.Write(ctx)
+	}
 
 	// TODO HAVING
 

@@ -19,7 +19,7 @@ func NewInsert() Insert {
 	return Insert{}
 }
 
-// Write implements Statement interface.
+// Write expose statement as a SQL query.
 func (insert Insert) Write(ctx *types.Context) {
 	if insert.IsEmpty() {
 		panic("loukoum: an insert statement must have at least one column")
@@ -55,7 +55,7 @@ func (insert Insert) Write(ctx *types.Context) {
 	}
 }
 
-// IsEmpty implements Statement interface.
+// IsEmpty return true if statement is undefined.
 func (insert Insert) IsEmpty() bool {
 	return insert.Into.IsEmpty()
 }

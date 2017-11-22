@@ -18,7 +18,7 @@ func NewValues(values Expression) Values {
 	}
 }
 
-// Write implements Statement interface.
+// Write expose statement as a SQL query.
 func (values Values) Write(ctx *types.Context) {
 	if values.IsEmpty() {
 		return
@@ -30,7 +30,7 @@ func (values Values) Write(ctx *types.Context) {
 	ctx.Write(")")
 }
 
-// IsEmpty implements Statement interface.
+// IsEmpty return true if statement is undefined.
 func (values Values) IsEmpty() bool {
 	return values.Values == nil || (values.Values != nil && values.Values.IsEmpty())
 }

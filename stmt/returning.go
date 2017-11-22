@@ -18,7 +18,7 @@ func NewReturning(columns []Column) Returning {
 	}
 }
 
-// Write implements Statement interface.
+// Write expose statement as a SQL query.
 func (returning Returning) Write(ctx *types.Context) {
 	ctx.Write(token.Returning.String())
 	ctx.Write(" ")
@@ -40,7 +40,7 @@ func (returning Returning) Write(ctx *types.Context) {
 	}
 }
 
-// IsEmpty implements Statement interface.
+// IsEmpty return true if statement is undefined.
 func (returning Returning) IsEmpty() bool {
 	return len(returning.Columns) == 0
 }

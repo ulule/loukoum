@@ -31,6 +31,7 @@ func NewRightJoin(table Table, condition On) Join {
 	return NewJoin(types.RightJoin, table, condition)
 }
 
+// Write expose statement as a SQL query.
 func (join Join) Write(ctx *types.Context) {
 	ctx.Write(join.Type.String())
 	ctx.Write(" ")

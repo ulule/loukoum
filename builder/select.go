@@ -150,6 +150,23 @@ func (b Select) Or(condition stmt.Expression) Select {
 	return b
 }
 
+// GroupBy adds GROUP BY clauses.
+func (b Select) GroupBy(args ...interface{}) Select {
+	if !b.query.GroupBy.IsEmpty() {
+		panic("loukoum: select builder has group by clause already defined")
+	}
+
+	columns := ToColumns(args)
+	group := stmt.NewGroupBy(columns)
+	if group.IsEmpty() {
+		panic("loukoum: given join clause is undefined")
+	}
+
+	b.query.GroupBy = group
+
+	return b
+}
+
 // String returns the underlying query as a raw statement.
 func (b Select) String() string {
 	return rawify(b.Prepare())
