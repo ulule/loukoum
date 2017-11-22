@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum"
-	"github.com/ulule/loukoum/stmt"
 )
 
 func TestInsert_Columns(t *testing.T) {
@@ -79,7 +78,7 @@ func TestInsert_Returning(t *testing.T) {
 			Insert("table").
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
-			Returning(stmt.NewColumnAlias("a", "alias_a"))
+			Returning(loukoum.Column("a").As("alias_a"))
 
 		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a AS alias_a", query.String())
 	}
