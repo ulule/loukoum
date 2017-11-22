@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum"
-	"github.com/ulule/loukoum/stmt"
 )
 
 func TestSelect(t *testing.T) {
@@ -687,11 +686,12 @@ func TestSelect_WhereIn(t *testing.T) {
 func TestSelect_GroupBy(t *testing.T) {
 	is := require.New(t)
 
+	// One column
 	{
 		query := loukoum.
 			Select("COUNT(*)").
 			From("user").
-			Where(loukoum.Condition("disabled").IsNot(nil)).
+			Where(loukoum.Condition("disabled").IsNull(true)).
 			GroupBy("name")
 
 		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
@@ -700,9 +700,47 @@ func TestSelect_GroupBy(t *testing.T) {
 		query := loukoum.
 			Select("COUNT(*)").
 			From("user").
-			Where(loukoum.Condition("disabled").IsNot(nil)).
-			GroupBy([]stmt.Column{stmt.NewColumn("name"), stmt.NewColumn("email")})
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy(loukoum.Column("name"))
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
+	}
+
+	// Many columns
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy("name", "email")
 
 		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email", query.String())
+	}
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy(loukoum.Column("name"), loukoum.Column("email"))
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email", query.String())
+	}
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy("name", "email", "user_id")
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email, user_id", query.String())
+	}
+	{
+		query := loukoum.
+			Select("COUNT(*)").
+			From("user").
+			Where(loukoum.Condition("disabled").IsNull(true)).
+			GroupBy(loukoum.Column("name"), loukoum.Column("email"), loukoum.Column("user_id"))
+
+		is.Equal("SELECT COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name, email, user_id", query.String())
 	}
 }

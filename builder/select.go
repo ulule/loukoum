@@ -150,24 +150,14 @@ func (b Select) Or(condition stmt.Expression) Select {
 	return b
 }
 
-func (b Select) GroupBy(arg interface{}) Select {
+// GroupBy adds GROUP BY clauses.
+func (b Select) GroupBy(args ...interface{}) Select {
 	if !b.query.GroupBy.IsEmpty() {
 		panic("loukoum: select builder has group by clause already defined")
 	}
 
-	// TODO
-
-	group := stmt.GroupBy{}
-
-	switch value := arg.(type) {
-	case string:
-		group = stmt.NewGroupBy([]stmt.Column{stmt.NewColumn(value)})
-	case []stmt.Column:
-		group = stmt.NewGroupBy(value)
-	default:
-		panic(fmt.Sprintf("loukoum: cannot use %T as group by clause", arg))
-	}
-
+	columns := ToColumns(args)
+	group := stmt.NewGroupBy(columns)
 	if group.IsEmpty() {
 		panic("loukoum: given join clause is undefined")
 	}
