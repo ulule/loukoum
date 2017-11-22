@@ -14,7 +14,6 @@
     "deadcode",
     "gocyclo",
     "golint",
-    "goconst",
     "megacheck",
     "varcheck",
     "structcheck"
