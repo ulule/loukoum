@@ -178,7 +178,7 @@ func (b Select) Having(condition stmt.Expression) Select {
 	return b
 }
 
-// Limit adds LIMIT clauses.
+// Limit adds LIMIT clause.
 func (b Select) Limit(value interface{}) Select {
 	if !b.query.Limit.IsEmpty() {
 		panic("loukoum: select builder has limit clause already defined")
@@ -190,6 +190,22 @@ func (b Select) Limit(value interface{}) Select {
 	}
 
 	b.query.Limit = stmt.NewLimit(limit)
+
+	return b
+}
+
+// Offset adds OFFSET clause.
+func (b Select) Offset(value interface{}) Select {
+	if !b.query.Offset.IsEmpty() {
+		panic("loukoum: select builder has offset clause already defined")
+	}
+
+	offset, ok := ToInt64(value)
+	if !ok || offset <= 0 {
+		panic("loukoum: offset must be a positive integer")
+	}
+
+	b.query.Offset = stmt.NewOffset(offset)
 
 	return b
 }

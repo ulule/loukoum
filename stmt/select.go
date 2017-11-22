@@ -14,6 +14,7 @@ type Select struct {
 	GroupBy  GroupBy
 	Having   Having
 	Limit    Limit
+	Offset   Offset
 }
 
 // NewSelect returns a new Select instance.
@@ -87,7 +88,10 @@ func (selekt Select) writeTail(ctx *types.Context) {
 		selekt.Limit.Write(ctx)
 	}
 
-	// TODO OFFSET
+	if !selekt.Offset.IsEmpty() {
+		ctx.Write(" ")
+		selekt.Offset.Write(ctx)
+	}
 
 	// TODO Add suffixes
 }

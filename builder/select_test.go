@@ -820,3 +820,32 @@ func TestSelect_Limit(t *testing.T) {
 		is.Equal("SELECT name FROM user LIMIT 700", query.String())
 	}
 }
+
+func TestSelect_Offset(t *testing.T) {
+	is := require.New(t)
+
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			Offset(10)
+
+		is.Equal("SELECT name FROM user OFFSET 10", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			Offset("50")
+
+		is.Equal("SELECT name FROM user OFFSET 50", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			Offset(uint64(700))
+
+		is.Equal("SELECT name FROM user OFFSET 700", query.String())
+	}
+}
