@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"github.com/ulule/loukoum/token"
 	"github.com/ulule/loukoum/types"
 )
 
@@ -19,7 +20,10 @@ func NewGroupBy(columns []Column) GroupBy {
 
 // Write expose statement as a SQL query.
 func (group GroupBy) Write(ctx *types.Context) {
-	ctx.Write("GROUP BY ")
+	ctx.Write(token.Group.String())
+	ctx.Write(" ")
+	ctx.Write(token.By.String())
+	ctx.Write(" ")
 	for i := range group.Columns {
 		if i != 0 {
 			ctx.Write(", ")

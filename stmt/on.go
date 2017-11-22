@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"github.com/ulule/loukoum/token"
 	"github.com/ulule/loukoum/types"
 )
 
@@ -20,9 +21,12 @@ func NewOn(left, right Column) On {
 
 // Write expose statement as a SQL query.
 func (on On) Write(ctx *types.Context) {
-	ctx.Write("ON ")
+	ctx.Write(token.On.String())
+	ctx.Write(" ")
 	ctx.Write(on.Left.Name)
-	ctx.Write(" = ")
+	ctx.Write(" ")
+	ctx.Write(token.Equals.String())
+	ctx.Write(" ")
 	ctx.Write(on.Right.Name)
 }
 

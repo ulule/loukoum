@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"github.com/ulule/loukoum/token"
 	"github.com/ulule/loukoum/types"
 )
 
@@ -23,7 +24,8 @@ func (where Where) Write(ctx *types.Context) {
 		panic("loukoum: a where clause expects at least one condition")
 	}
 
-	ctx.Write("WHERE ")
+	ctx.Write(token.Where.String())
+	ctx.Write(" ")
 	where.Condition.Write(ctx)
 }
 

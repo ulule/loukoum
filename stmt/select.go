@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"github.com/ulule/loukoum/token"
 	"github.com/ulule/loukoum/types"
 )
 
@@ -41,10 +42,11 @@ func (selekt Select) writeHead(ctx *types.Context) {
 		ctx.Write(" ")
 	}
 
-	ctx.Write("SELECT")
+	ctx.Write(token.Select.String())
 
 	if selekt.Distinct {
-		ctx.Write(" DISTINCT")
+		ctx.Write(" ")
+		ctx.Write(token.Distinct.String())
 	}
 
 	for i := range selekt.Columns {

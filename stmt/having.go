@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"github.com/ulule/loukoum/token"
 	"github.com/ulule/loukoum/types"
 )
 
@@ -23,7 +24,8 @@ func (having Having) Write(ctx *types.Context) {
 		panic("loukoum: a having clause expects at least one condition")
 	}
 
-	ctx.Write("HAVING ")
+	ctx.Write(token.Having.String())
+	ctx.Write(" ")
 	having.Condition.Write(ctx)
 }
 

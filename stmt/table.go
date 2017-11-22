@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"github.com/ulule/loukoum/token"
 	"github.com/ulule/loukoum/types"
 )
 
@@ -34,7 +35,9 @@ func (table Table) As(alias string) Table {
 func (table Table) Write(ctx *types.Context) {
 	ctx.Write(table.Name)
 	if table.Alias != "" {
-		ctx.Write(" AS ")
+		ctx.Write(" ")
+		ctx.Write(token.As.String())
+		ctx.Write(" ")
 		ctx.Write(table.Alias)
 	}
 }

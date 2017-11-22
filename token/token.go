@@ -42,12 +42,17 @@ const (
 	Limit     = Type("LIMIT")
 	Offset    = Type("OFFSET")
 	Set       = Type("SET")
+	As        = Type("AS")
 	Inner     = Type("INNER")
 	Cross     = Type("CROSS")
 	Left      = Type("LEFT")
 	Right     = Type("RIGHT")
 	Join      = Type("JOIN")
 	On        = Type("ON")
+	Group     = Type("GROUP")
+	By        = Type("BY")
+	Having    = Type("HAVING")
+	Distinct  = Type("DISTINCT")
 	Returning = Type("RETURNING")
 	Values    = Type("VALUES")
 	Into      = Type("INTO")
@@ -74,12 +79,17 @@ var keywords = map[string]Type{
 	"LIMIT":     Limit,
 	"OFFSET":    Offset,
 	"SET":       Set,
+	"AS":        As,
 	"INNER":     Inner,
 	"CROSS":     Cross,
 	"LEFT":      Left,
 	"RIGHT":     Right,
 	"JOIN":      Join,
 	"ON":        On,
+	"GROUP":     Group,
+	"BY":        By,
+	"HAVING":    Having,
+	"DISTINCT":  Distinct,
 	"RETURNING": Returning,
 	"VALUES":    Values,
 	"INTO":      Into,

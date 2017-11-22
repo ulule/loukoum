@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"github.com/ulule/loukoum/token"
 	"github.com/ulule/loukoum/types"
 )
 
@@ -19,7 +20,8 @@ func NewFrom(table Table) From {
 
 // Write expose statement as a SQL query.
 func (from From) Write(ctx *types.Context) {
-	ctx.Write("FROM ")
+	ctx.Write(token.From.String())
+	ctx.Write(" ")
 	from.Table.Write(ctx)
 }
 
