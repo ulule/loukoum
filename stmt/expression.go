@@ -211,6 +211,10 @@ func (value Value) IsEmpty() bool {
 	return value.Value == ""
 }
 
+// ----------------------------------------------------------------------------
+// Array
+// ----------------------------------------------------------------------------
+
 // Array contains a list of expression values.
 type Array struct {
 	Values []Value
