@@ -68,8 +68,6 @@ func (selekt Select) Write(ctx *types.Context) {
 		selekt.Having.Write(ctx)
 	}
 
-	// TODO HAVING
-
 	// TODO ORDER BY
 
 	// TODO LIMIT
