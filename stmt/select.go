@@ -12,6 +12,7 @@ type Select struct {
 	Joins    []Join
 	Where    Where
 	GroupBy  GroupBy
+	Having   Having
 }
 
 // NewSelect returns a new Select instance.
@@ -60,6 +61,11 @@ func (selekt Select) Write(ctx *types.Context) {
 	if !selekt.GroupBy.IsEmpty() {
 		ctx.Write(" ")
 		selekt.GroupBy.Write(ctx)
+	}
+
+	if !selekt.Having.IsEmpty() {
+		ctx.Write(" ")
+		selekt.Having.Write(ctx)
 	}
 
 	// TODO HAVING
