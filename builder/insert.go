@@ -64,8 +64,7 @@ func (b Insert) Values(values ...interface{}) Insert {
 		panic("loukoum: insert builder has values clause already defined")
 	}
 
-	expression := stmt.NewArrayExpression(values...)
-	b.insert.Values = stmt.NewValues(expression)
+	b.insert.Values = stmt.NewValues(stmt.NewArrayExpression(values...))
 
 	return b
 }
