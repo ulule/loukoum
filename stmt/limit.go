@@ -21,6 +21,9 @@ func NewLimit(count int64) Limit {
 
 // Write expose statement as a SQL query.
 func (limit Limit) Write(ctx *types.Context) {
+	if limit.IsEmpty() {
+		return
+	}
 	ctx.Write("LIMIT ")
 	ctx.Write(strconv.FormatInt(limit.Count, 10))
 }
