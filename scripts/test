@@ -3,4 +3,4 @@
 SOURCE_DIRECTORY=$(dirname "${BASH_SOURCE[0]}")
 cd "${SOURCE_DIRECTORY}/.."
 
-go test -race -v $(go list ./... | grep -v -E '\/(vendor|examples)\/')
+go test -v $(go list ./... | grep -v -E '\/(vendor|examples)\/')
