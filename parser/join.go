@@ -27,41 +27,63 @@ func ParseJoin(subquery string) (stmt.Join, error) {
 	for it.HasNext() {
 		e := it.Next()
 
+		switch e.Type {
 		// Parse join type
-		if e.Type == token.Inner && it.Is(token.Join) {
-			join.Type = types.InnerJoin
-		}
-		if e.Type == token.Left && it.Is(token.Join) {
-			join.Type = types.LeftJoin
-		}
-		if e.Type == token.Right && it.Is(token.Join) {
-			join.Type = types.RightJoin
-		}
-
-		// Parse join table
-		if e.Type == token.Literal && it.Is(token.On) {
-			join.Table = stmt.NewTable(e.Value)
-		}
-
-		// Parse join condition
-		if e.Type == token.Literal && it.Is(token.Equals) {
-
-			// Left condition
-			left := stmt.NewColumn(e.Value)
-
-			// Check that we have a right condition
-			e = it.Next()
-			if e.Type != token.Equals && !it.Is(token.Literal) {
-				err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
-				return stmt.Join{}, err
+		case token.Join:
+			continue
+		case token.Inner:
+			if it.Is(token.Join) {
+				it.Next()
+				join.Type = types.InnerJoin
+				continue
+			}
+		case token.Left:
+			if it.Is(token.Join) {
+				it.Next()
+				join.Type = types.LeftJoin
+				continue
+			}
+		case token.Right:
+			if it.Is(token.Join) {
+				it.Next()
+				join.Type = types.RightJoin
+				continue
+			}
+		case token.Literal:
+			// Parse join table
+			if it.Is(token.On) {
+				it.Next()
+				join.Table = stmt.NewTable(e.Value)
+				continue
 			}
 
-			// Right condition
-			e = it.Next()
-			right := stmt.NewColumn(e.Value)
+			// Parse join condition
+			if it.Is(token.Equals) {
 
-			join.Condition = stmt.NewOn(left, right)
+				// Left condition
+				left := stmt.NewColumn(e.Value)
+
+				// Check that we have a right condition
+				e = it.Next()
+				if e.Type != token.Equals || !it.Is(token.Literal) {
+					err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
+					return stmt.Join{}, err
+				}
+
+				// Right condition
+				e = it.Next()
+				right := stmt.NewColumn(e.Value)
+
+				join.Condition = stmt.NewOn(left, right)
+				continue
+			}
+
+		case token.On, token.LParen, token.RParen:
+			continue
 		}
+
+		// Ignore invalid token and stop iterating.
+		break
 	}
 
 	return join, nil
