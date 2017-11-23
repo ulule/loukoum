@@ -16,7 +16,6 @@ func (ctx *Context) Write(query string) {
 
 func (ctx *Context) Bind(value interface{}) {
 	idx := len(ctx.values) + 1
-	// TODO Benchmark and optimization
 	key := fmt.Sprintf("arg_%d", idx)
 	ctx.values[key] = value
 	ctx.Write(":")
