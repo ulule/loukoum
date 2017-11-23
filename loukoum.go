@@ -72,3 +72,8 @@ func Raw(value string) stmt.Raw {
 func Insert(into interface{}) builder.Insert {
 	return builder.NewInsert().Into(into)
 }
+
+// Delete starts a DeleteBuilder using the given table as from clause.
+func Delete(from interface{}) builder.Delete {
+	return builder.NewDelete().From(from)
+}
