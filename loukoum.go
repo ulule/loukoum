@@ -21,7 +21,7 @@ const (
 
 // Select starts a SelectBuilder using the given columns.
 func Select(columns ...interface{}) builder.Select {
-	return builder.NewSelect().Columns(columns)
+	return builder.NewSelect().Columns(columns...)
 }
 
 // SelectDistinct starts a SelectBuilder using the given columns and "DISTINCT" option.

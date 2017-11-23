@@ -25,39 +25,26 @@ func (b Select) Distinct() Select {
 }
 
 // Columns adds result columns to the query.
-func (b Select) Columns(columns []interface{}) Select {
+func (b Select) Columns(args ...interface{}) Select {
 	if len(b.query.Columns) != 0 {
 		panic("loukoum: select builder has columns already defined")
 	}
-	if len(columns) == 0 {
-		columns = []interface{}{"*"}
+	if len(args) == 0 {
+		args = []interface{}{"*"}
 	}
 
-	b.query.Columns = ToColumns(columns)
+	b.query.Columns = ToColumns(args)
 
 	return b
 }
 
 // From sets the FROM clause of the query.
-func (b Select) From(from interface{}) Select {
+func (b Select) From(arg interface{}) Select {
 	if !b.query.From.IsEmpty() {
 		panic("loukoum: select builder has from clause already defined")
 	}
 
-	switch value := from.(type) {
-	case string:
-		b.query.From = stmt.NewFrom(stmt.NewTable(value))
-	case stmt.From:
-		b.query.From = value
-	case stmt.Table:
-		b.query.From = stmt.NewFrom(value)
-	default:
-		panic(fmt.Sprintf("loukoum: cannot use %T as from clause", from))
-	}
-
-	if b.query.From.IsEmpty() {
-		panic("loukoum: given from clause is undefined")
-	}
+	b.query.From = ToFrom(arg)
 
 	return b
 }

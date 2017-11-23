@@ -264,7 +264,7 @@ func TestSelect_WhereEqual(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (disabled = :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal(false, args[":arg_1"])
+		is.Equal(false, args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (disabled = false)", query.String())
 	}
@@ -277,7 +277,7 @@ func TestSelect_WhereEqual(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (disabled != :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal(false, args[":arg_1"])
+		is.Equal(false, args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (disabled != false)", query.String())
 	}
@@ -307,7 +307,7 @@ func TestSelect_WhereIs(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (active IS NOT :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal(true, args[":arg_1"])
+		is.Equal(true, args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (active IS NOT true)", query.String())
 	}
@@ -325,7 +325,7 @@ func TestSelect_WhereGreaterThan(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (count > :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal(2, args[":arg_1"])
+		is.Equal(2, args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (count > 2)", query.String())
 	}
@@ -338,7 +338,7 @@ func TestSelect_WhereGreaterThan(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (count >= :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal(4, args[":arg_1"])
+		is.Equal(4, args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (count >= 4)", query.String())
 	}
@@ -367,7 +367,7 @@ func TestSelect_WhereLessThan(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (count < :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal(3, args[":arg_1"])
+		is.Equal(3, args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (count < 3)", query.String())
 	}
@@ -380,7 +380,7 @@ func TestSelect_WhereLessThan(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (count <= :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal(6, args[":arg_1"])
+		is.Equal(6, args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (count <= 6)", query.String())
 	}
@@ -398,7 +398,7 @@ func TestSelect_WhereLike(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (title LIKE :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal("foo%", args[":arg_1"])
+		is.Equal("foo%", args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (title LIKE 'foo%')", query.String())
 	}
@@ -411,7 +411,7 @@ func TestSelect_WhereLike(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (title NOT LIKE :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal("foo%", args[":arg_1"])
+		is.Equal("foo%", args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (title NOT LIKE 'foo%')", query.String())
 	}
@@ -424,7 +424,7 @@ func TestSelect_WhereLike(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (title ILIKE :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal("foo%", args[":arg_1"])
+		is.Equal("foo%", args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (title ILIKE 'foo%')", query.String())
 	}
@@ -437,7 +437,7 @@ func TestSelect_WhereLike(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (title NOT ILIKE :arg_1)", stmt)
 		is.Len(args, 1)
-		is.Equal("foo%", args[":arg_1"])
+		is.Equal("foo%", args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (title NOT ILIKE 'foo%')", query.String())
 	}
@@ -455,8 +455,8 @@ func TestSelect_WhereBetween(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (count BETWEEN :arg_1 AND :arg_2)", stmt)
 		is.Len(args, 2)
-		is.Equal(10, args[":arg_1"])
-		is.Equal(20, args[":arg_2"])
+		is.Equal(10, args["arg_1"])
+		is.Equal(20, args["arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (count BETWEEN 10 AND 20)", query.String())
 	}
@@ -469,8 +469,8 @@ func TestSelect_WhereBetween(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (count NOT BETWEEN :arg_1 AND :arg_2)", stmt)
 		is.Len(args, 2)
-		is.Equal(50, args[":arg_1"])
-		is.Equal(70, args[":arg_2"])
+		is.Equal(50, args["arg_1"])
+		is.Equal(70, args["arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (count NOT BETWEEN 50 AND 70)", query.String())
 	}
@@ -489,9 +489,9 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (id IN (:arg_1, :arg_2, :arg_3))", stmt)
 		is.Len(args, 3)
-		is.Equal(int64(1), args[":arg_1"])
-		is.Equal(int64(2), args[":arg_2"])
-		is.Equal(int64(3), args[":arg_3"])
+		is.Equal(int64(1), args["arg_1"])
+		is.Equal(int64(2), args["arg_2"])
+		is.Equal(int64(3), args["arg_3"])
 
 		is.Equal("SELECT id FROM table WHERE (id IN (1, 2, 3))", query.String())
 	}
@@ -504,9 +504,9 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (:arg_1, :arg_2, :arg_3))", stmt)
 		is.Len(args, 3)
-		is.Equal(int(1), args[":arg_1"])
-		is.Equal(int(2), args[":arg_2"])
-		is.Equal(int(3), args[":arg_3"])
+		is.Equal(int(1), args["arg_1"])
+		is.Equal(int(2), args["arg_2"])
+		is.Equal(int(3), args["arg_3"])
 
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (1, 2, 3))", query.String())
 	}
@@ -521,9 +521,9 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (id IN (:arg_1, :arg_2, :arg_3))", stmt)
 		is.Len(args, 3)
-		is.Equal(int(1), args[":arg_1"])
-		is.Equal(int(2), args[":arg_2"])
-		is.Equal(int(3), args[":arg_3"])
+		is.Equal(int(1), args["arg_1"])
+		is.Equal(int(2), args["arg_2"])
+		is.Equal(int(3), args["arg_3"])
 
 		is.Equal("SELECT id FROM table WHERE (id IN (1, 2, 3))", query.String())
 	}
@@ -536,9 +536,9 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (:arg_1, :arg_2, :arg_3))", stmt)
 		is.Len(args, 3)
-		is.Equal(int(1), args[":arg_1"])
-		is.Equal(int(2), args[":arg_2"])
-		is.Equal(int(3), args[":arg_3"])
+		is.Equal(int(1), args["arg_1"])
+		is.Equal(int(2), args["arg_2"])
+		is.Equal(int(3), args["arg_3"])
 
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (1, 2, 3))", query.String())
 	}
@@ -553,8 +553,8 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1, :arg_2))", stmt)
 		is.Len(args, 2)
-		is.Equal("read", args[":arg_1"])
-		is.Equal("unread", args[":arg_2"])
+		is.Equal("read", args["arg_1"])
+		is.Equal("unread", args["arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (status IN ('read', 'unread'))", query.String())
 	}
@@ -567,8 +567,8 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1, :arg_2))", stmt)
 		is.Len(args, 2)
-		is.Equal("read", args[":arg_1"])
-		is.Equal("unread", args[":arg_2"])
+		is.Equal("read", args["arg_1"])
+		is.Equal("unread", args["arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
 	}
@@ -583,8 +583,8 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1, :arg_2))", stmt)
 		is.Len(args, 2)
-		is.Equal("read", args[":arg_1"])
-		is.Equal("unread", args[":arg_2"])
+		is.Equal("read", args["arg_1"])
+		is.Equal("unread", args["arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (status IN ('read', 'unread'))", query.String())
 	}
@@ -597,8 +597,8 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1, :arg_2))", stmt)
 		is.Len(args, 2)
-		is.Equal("read", args[":arg_1"])
-		is.Equal("unread", args[":arg_2"])
+		is.Equal("read", args["arg_1"])
+		is.Equal("unread", args["arg_2"])
 
 		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
 	}
@@ -611,7 +611,7 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1))", stmt)
 		is.Len(args, 1)
-		is.Equal("read", args[":arg_1"])
+		is.Equal("read", args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (status IN ('read'))", query.String())
 	}
@@ -624,7 +624,7 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1))", stmt)
 		is.Len(args, 1)
-		is.Equal("read", args[":arg_1"])
+		is.Equal("read", args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read'))", query.String())
 	}
@@ -637,7 +637,7 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1))", stmt)
 		is.Len(args, 1)
-		is.Equal("read", args[":arg_1"])
+		is.Equal("read", args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (status IN ('read'))", query.String())
 	}
@@ -650,7 +650,7 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1))", stmt)
 		is.Len(args, 1)
-		is.Equal("read", args[":arg_1"])
+		is.Equal("read", args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read'))", query.String())
 	}
@@ -670,7 +670,7 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = :arg_1)))", stmt)
 		is.Len(args, 1)
-		is.Equal(1, args[":arg_1"])
+		is.Equal(1, args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = 1)))", query.String())
 	}
@@ -688,7 +688,7 @@ func TestSelect_WhereIn(t *testing.T) {
 		stmt, args := query.Prepare()
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = :arg_1)))", stmt)
 		is.Len(args, 1)
-		is.Equal(1, args[":arg_1"])
+		is.Equal(1, args["arg_1"])
 
 		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))", query.String())
 	}

@@ -19,8 +19,11 @@ type Builder interface {
 	Statement() stmt.Statement
 }
 
+// rawify will replace given arguments in query to obtain a human readable statement.
+// Be advised, this function is not optimized, use with caution.
 func rawify(query string, args map[string]interface{}) string {
 	for key, arg := range args {
+		key = fmt.Sprint(":", key)
 		switch value := arg.(type) {
 		case string:
 			query = strings.Replace(query, key, fmt.Sprint("'", value, "'"), 1)
@@ -47,13 +50,35 @@ func ToColumns(values []interface{}) []stmt.Column {
 			panic(fmt.Sprintf("loukoum: cannot use %T as column", column))
 		}
 		if column.IsEmpty() {
-			panic("loukoum: a column was undefined")
+			panic("loukoum: given column is undefined")
 		}
 
 		columns = append(columns, column)
 	}
 
 	return columns
+}
+
+// ToFrom takes an empty interfaces and returns a From instance.
+func ToFrom(arg interface{}) stmt.From {
+	from := stmt.From{}
+
+	switch value := arg.(type) {
+	case string:
+		from = stmt.NewFrom(stmt.NewTable(value), false)
+	case stmt.From:
+		from = value
+	case stmt.Table:
+		from = stmt.NewFrom(value, false)
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as from clause", arg))
+	}
+
+	if from.IsEmpty() {
+		panic("loukoum: given from clause is undefined")
+	}
+
+	return from
 }
 
 // ToSuffix takes an empty interfaces and returns a Suffix instance.
@@ -70,7 +95,7 @@ func ToSuffix(arg interface{}) stmt.Suffix {
 	}
 
 	if suffix.IsEmpty() {
-		panic("loukoum: a suffix was undefined")
+		panic("loukoum: given suffix is undefined")
 	}
 
 	return suffix
@@ -90,7 +115,7 @@ func ToPrefix(arg interface{}) stmt.Prefix {
 	}
 
 	if prefix.IsEmpty() {
-		panic("loukoum: a prefix was undefined")
+		panic("loukoum: given prefix is undefined")
 	}
 
 	return prefix
