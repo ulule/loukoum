@@ -6,7 +6,6 @@ import (
 
 // In is a IN expression.
 type In struct {
-	Expression
 	Identifier Identifier
 	Operator   ComparisonOperator
 	Value      Expression
@@ -51,3 +50,6 @@ func (in In) Write(ctx *types.Context) {
 func (in In) IsEmpty() bool {
 	return in.Identifier.IsEmpty() || in.Operator.IsEmpty() || in.Value == nil || in.Value.IsEmpty()
 }
+
+// Ensure that In is an Expression
+var _ Expression = In{}

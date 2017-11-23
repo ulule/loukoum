@@ -34,3 +34,6 @@ func (on On) Write(ctx *types.Context) {
 func (on On) IsEmpty() bool {
 	return on.Left.IsEmpty() || on.Right.IsEmpty()
 }
+
+// Ensure that On is a Statement
+var _ Statement = On{}

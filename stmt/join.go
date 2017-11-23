@@ -6,7 +6,6 @@ import (
 
 // Join is a JOIN clause.
 type Join struct {
-	Statement
 	Type      types.JoinType
 	Table     Table
 	Condition On
@@ -49,3 +48,6 @@ func (join Join) Write(ctx *types.Context) {
 func (join Join) IsEmpty() bool {
 	return join.Type == "" || join.Table.IsEmpty() || join.Condition.IsEmpty()
 }
+
+// Ensure that Join is a Statement
+var _ Statement = Join{}

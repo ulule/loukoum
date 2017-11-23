@@ -7,7 +7,6 @@ import (
 
 // Table is a table identifier.
 type Table struct {
-	Statement
 	Name  string
 	Alias string
 }
@@ -46,3 +45,6 @@ func (table Table) Write(ctx *types.Context) {
 func (table Table) IsEmpty() bool {
 	return table.Name == ""
 }
+
+// Ensure that Table is a Statement
+var _ Statement = Table{}

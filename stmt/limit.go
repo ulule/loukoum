@@ -9,7 +9,6 @@ import (
 
 // Limit is a LIMIT clause.
 type Limit struct {
-	Statement
 	Count int64
 }
 
@@ -34,3 +33,6 @@ func (limit Limit) Write(ctx *types.Context) {
 func (limit Limit) IsEmpty() bool {
 	return limit.Count == 0
 }
+
+// Ensure that Limit is a Statement
+var _ Statement = Limit{}

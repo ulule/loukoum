@@ -7,7 +7,6 @@ import (
 
 // From is a FROM clause.
 type From struct {
-	Statement
 	Table Table
 }
 
@@ -29,3 +28,6 @@ func (from From) Write(ctx *types.Context) {
 func (from From) IsEmpty() bool {
 	return from.Table.IsEmpty()
 }
+
+// Ensure that From is a Statement
+var _ Statement = From{}

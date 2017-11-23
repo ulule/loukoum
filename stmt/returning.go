@@ -7,7 +7,6 @@ import (
 
 // Returning is a RETURNING clause.
 type Returning struct {
-	Statement
 	Columns []Column
 }
 
@@ -44,3 +43,6 @@ func (returning Returning) Write(ctx *types.Context) {
 func (returning Returning) IsEmpty() bool {
 	return len(returning.Columns) == 0
 }
+
+// Ensure that Returning is a Statement
+var _ Statement = Returning{}

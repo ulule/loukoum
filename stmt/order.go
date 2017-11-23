@@ -32,3 +32,6 @@ func (order Order) Write(ctx *types.Context) {
 func (order Order) IsEmpty() bool {
 	return order.Expression == ""
 }
+
+// Ensure that Order is a Statement
+var _ Statement = Order{}

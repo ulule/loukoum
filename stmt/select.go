@@ -115,3 +115,6 @@ func (selekt Select) IsEmpty() bool {
 }
 
 func (Select) expression() {}
+
+// Ensure that Select is an Expression
+var _ Expression = Select{}

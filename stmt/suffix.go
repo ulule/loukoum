@@ -6,7 +6,6 @@ import (
 
 // Suffix is a suffix expression.
 type Suffix struct {
-	Statement
 	Suffix string
 }
 
@@ -29,3 +28,6 @@ func (suffix Suffix) Write(ctx *types.Context) {
 func (suffix Suffix) IsEmpty() bool {
 	return suffix.Suffix == ""
 }
+
+// Ensure that Suffix is a Statement
+var _ Statement = Suffix{}

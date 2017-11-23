@@ -240,6 +240,9 @@ func (identifier Identifier) NotBetween(from, to interface{}) Between {
 	return NewNotBetween(identifier, NewExpression(from), NewExpression(to))
 }
 
+// Ensure that Identifier is an Expression
+var _ Expression = Identifier{}
+
 // ----------------------------------------------------------------------------
 // Value
 // ----------------------------------------------------------------------------
@@ -271,6 +274,9 @@ func (value Value) Write(ctx *types.Context) {
 func (value Value) IsEmpty() bool {
 	return false
 }
+
+// Ensure that Value is an Expression
+var _ Expression = Value{}
 
 // ----------------------------------------------------------------------------
 // Array
@@ -421,6 +427,9 @@ func (array *Array) AddRaw(value Raw) {
 	array.Values = append(array.Values, value)
 }
 
+// Ensure that Array is an Expression
+var _ Expression = Array{}
+
 // ----------------------------------------------------------------------------
 // Raw
 // ----------------------------------------------------------------------------
@@ -448,3 +457,6 @@ func (raw Raw) Write(ctx *types.Context) {
 func (raw Raw) IsEmpty() bool {
 	return false
 }
+
+// Ensure that Raw is an Expression
+var _ Expression = Raw{}

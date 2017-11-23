@@ -38,3 +38,6 @@ func (order OrderBy) Write(ctx *types.Context) {
 func (order OrderBy) IsEmpty() bool {
 	return len(order.Orders) == 0
 }
+
+// Ensure that OrderBy is a Statement
+var _ Statement = OrderBy{}

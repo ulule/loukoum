@@ -12,7 +12,6 @@ type Operator interface {
 
 // LogicalOperator are used to evaluate two expressions using a logical operator.
 type LogicalOperator struct {
-	Statement
 	Operator types.LogicalOperator
 }
 
@@ -45,9 +44,11 @@ func (operator LogicalOperator) IsEmpty() bool {
 	return operator.Operator == ""
 }
 
+// Ensure that LogicalOperator is an Operator
+var _ Operator = LogicalOperator{}
+
 // ComparisonOperator are used to evaluate two expressions using a comparison operator.
 type ComparisonOperator struct {
-	Statement
 	Operator types.ComparisonOperator
 }
 
@@ -69,3 +70,6 @@ func (operator ComparisonOperator) Write(ctx *types.Context) {
 func (operator ComparisonOperator) IsEmpty() bool {
 	return operator.Operator == ""
 }
+
+// Ensure that ComparisonOperator is an Operator
+var _ Operator = ComparisonOperator{}

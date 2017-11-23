@@ -6,7 +6,6 @@ import (
 
 // Between is a BETWEEN expression.
 type Between struct {
-	Expression
 	Identifier Identifier
 	Operator   ComparisonOperator
 	From       Expression
@@ -62,3 +61,6 @@ func (between Between) IsEmpty() bool {
 	return between.Identifier.IsEmpty() || between.Operator.IsEmpty() || between.And.IsEmpty() ||
 		between.From == nil || between.To == nil || between.From.IsEmpty() || between.To.IsEmpty()
 }
+
+// Ensure that Between is an Expression
+var _ Expression = Between{}

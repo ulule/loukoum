@@ -7,7 +7,6 @@ import (
 
 // Into is a INTO clause.
 type Into struct {
-	Statement
 	Table Table
 }
 
@@ -29,3 +28,6 @@ func (into Into) Write(ctx *types.Context) {
 func (into Into) IsEmpty() bool {
 	return into.Table.IsEmpty()
 }
+
+// Ensure that Into is a Statement
+var _ Statement = Into{}

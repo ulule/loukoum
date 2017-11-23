@@ -57,3 +57,6 @@ func (having Having) Or(right Expression) Having {
 	having.Condition = NewInfixExpression(left, operator, right)
 	return having
 }
+
+// Ensure that Having is a Statement
+var _ Statement = Having{}

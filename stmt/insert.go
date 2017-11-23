@@ -7,7 +7,6 @@ import (
 
 // Insert is a INSERT statement.
 type Insert struct {
-	Statement
 	Into      Into
 	Columns   []Column
 	Values    Values
@@ -59,3 +58,6 @@ func (insert Insert) Write(ctx *types.Context) {
 func (insert Insert) IsEmpty() bool {
 	return insert.Into.IsEmpty()
 }
+
+// Ensure that Insert is a Statement
+var _ Statement = Insert{}

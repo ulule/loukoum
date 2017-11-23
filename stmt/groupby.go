@@ -7,7 +7,6 @@ import (
 
 // GroupBy is a GROUP BY clause.
 type GroupBy struct {
-	Statement
 	Columns []Column
 }
 
@@ -36,3 +35,6 @@ func (group GroupBy) Write(ctx *types.Context) {
 func (group GroupBy) IsEmpty() bool {
 	return len(group.Columns) == 0
 }
+
+// Ensure that GroupBy is a Statement
+var _ Statement = GroupBy{}

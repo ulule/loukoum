@@ -7,7 +7,6 @@ import (
 
 // Where is a WHERE clause.
 type Where struct {
-	Statement
 	Condition Expression
 }
 
@@ -57,3 +56,6 @@ func (where Where) Or(right Expression) Where {
 	where.Condition = NewInfixExpression(left, operator, right)
 	return where
 }
+
+// Ensure that Where is a Statement
+var _ Statement = Where{}

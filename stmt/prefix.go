@@ -6,7 +6,6 @@ import (
 
 // Prefix is a prefix expression.
 type Prefix struct {
-	Statement
 	Prefix string
 }
 
@@ -29,3 +28,6 @@ func (prefix Prefix) Write(ctx *types.Context) {
 func (prefix Prefix) IsEmpty() bool {
 	return prefix.Prefix == ""
 }
+
+// Ensure that Prefix is a Statement
+var _ Statement = Prefix{}

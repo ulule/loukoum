@@ -7,7 +7,6 @@ import (
 // InfixExpression is an Expression that has a left and right operand with an operator.
 // For example, the expression 'id >= 30' is an infix expression.
 type InfixExpression struct {
-	Expression
 	Left     Expression
 	Operator Operator
 	Right    Expression
@@ -21,6 +20,8 @@ func NewInfixExpression(left Expression, operator Operator, right Expression) In
 		Right:    right,
 	}
 }
+
+func (InfixExpression) expression() {}
 
 // Write exposes statement as a SQL query.
 func (expression InfixExpression) Write(ctx *types.Context) {
@@ -54,3 +55,6 @@ func (expression InfixExpression) Or(value Expression) InfixExpression {
 	operator := NewOrOperator()
 	return NewInfixExpression(expression, operator, value)
 }
+
+// Ensure that InfixExpression is an Expression
+var _ Expression = InfixExpression{}

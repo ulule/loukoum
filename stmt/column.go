@@ -7,7 +7,6 @@ import (
 
 // Column is a column identifier.
 type Column struct {
-	Statement
 	Name  string
 	Alias string
 }
@@ -66,3 +65,6 @@ func (column Column) Write(ctx *types.Context) {
 func (column Column) IsEmpty() bool {
 	return column.Name == ""
 }
+
+// Ensure that Column is a Statement
+var _ Statement = Column{}

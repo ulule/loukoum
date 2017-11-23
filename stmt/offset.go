@@ -9,7 +9,6 @@ import (
 
 // Offset is a OFFSET clause.
 type Offset struct {
-	Statement
 	Start int64
 }
 
@@ -34,3 +33,6 @@ func (offset Offset) Write(ctx *types.Context) {
 func (offset Offset) IsEmpty() bool {
 	return offset.Start == 0
 }
+
+// Ensure that Offset is a Statement
+var _ Statement = Offset{}
