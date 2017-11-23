@@ -10,7 +10,6 @@ import (
 
 // Select is a builder used for "SELECT" query.
 type Select struct {
-	Builder
 	query stmt.Select
 }
 
@@ -285,3 +284,6 @@ func handleSelectJoin(args []interface{}) stmt.Join {
 
 	return join
 }
+
+// Ensure that Select is a Builder
+var _ Builder = Select{}

@@ -9,7 +9,6 @@ import (
 
 // Insert is a builder used for "INSERT" query.
 type Insert struct {
-	Builder
 	insert stmt.Insert
 }
 
@@ -100,3 +99,6 @@ func (b Insert) Prepare() (string, map[string]interface{}) {
 func (b Insert) Statement() stmt.Statement {
 	return b.insert
 }
+
+// Ensure that Insert is a Builder
+var _ Builder = Insert{}
