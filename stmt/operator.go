@@ -35,12 +35,12 @@ func NewLogicalOperator(operator types.LogicalOperator) LogicalOperator {
 
 func (LogicalOperator) operator() {}
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (operator LogicalOperator) Write(ctx *types.Context) {
 	ctx.Write(operator.Operator.String())
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (operator LogicalOperator) IsEmpty() bool {
 	return operator.Operator == ""
 }
@@ -60,12 +60,12 @@ func NewComparisonOperator(operator types.ComparisonOperator) ComparisonOperator
 
 func (ComparisonOperator) operator() {}
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (operator ComparisonOperator) Write(ctx *types.Context) {
 	ctx.Write(operator.Operator.String())
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (operator ComparisonOperator) IsEmpty() bool {
 	return operator.Operator == ""
 }

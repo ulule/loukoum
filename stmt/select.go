@@ -26,7 +26,7 @@ func NewSelect() Select {
 	return Select{}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (selekt Select) Write(ctx *types.Context) {
 	if selekt.IsEmpty() {
 		panic("loukoum: select statements must have at least one column")
@@ -109,7 +109,7 @@ func (selekt Select) writeTail(ctx *types.Context) {
 	}
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (selekt Select) IsEmpty() bool {
 	return len(selekt.Columns) == 0
 }

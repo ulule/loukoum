@@ -18,14 +18,14 @@ func NewFrom(table Table) From {
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (from From) Write(ctx *types.Context) {
 	ctx.Write(token.From.String())
 	ctx.Write(" ")
 	from.Table.Write(ctx)
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (from From) IsEmpty() bool {
 	return from.Table.IsEmpty()
 }

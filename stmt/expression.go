@@ -130,12 +130,12 @@ func NewIdentifier(identifier string) Identifier {
 
 func (Identifier) expression() {}
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (identifier Identifier) Write(ctx *types.Context) {
 	ctx.Write(identifier.Identifier)
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (identifier Identifier) IsEmpty() bool {
 	return identifier.Identifier == ""
 }
@@ -258,7 +258,7 @@ func NewValue(value interface{}) Value {
 
 func (Value) expression() {}
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (value Value) Write(ctx *types.Context) {
 	if value.Value == nil {
 		ctx.Write("NULL")
@@ -267,7 +267,7 @@ func (value Value) Write(ctx *types.Context) {
 	}
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (value Value) IsEmpty() bool {
 	return false
 }
@@ -396,7 +396,7 @@ func NewArrayBool(values []bool) Array {
 
 func (Array) expression() {}
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (array Array) Write(ctx *types.Context) {
 	for i := range array.Values {
 		if i != 0 {
@@ -406,17 +406,17 @@ func (array Array) Write(ctx *types.Context) {
 	}
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (array Array) IsEmpty() bool {
 	return len(array.Values) == 0
 }
 
-// AddValue append a value to given array.
+// AddValue appends a value to given array.
 func (array *Array) AddValue(value Value) {
 	array.Values = append(array.Values, value)
 }
 
-// AddRaw append a raw value to given array.
+// AddRaw appends a raw value to given array.
 func (array *Array) AddRaw(value Raw) {
 	array.Values = append(array.Values, value)
 }
@@ -439,12 +439,12 @@ func NewRaw(value string) Raw {
 
 func (Raw) expression() {}
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (raw Raw) Write(ctx *types.Context) {
 	ctx.Write(raw.Value)
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (raw Raw) IsEmpty() bool {
 	return false
 }

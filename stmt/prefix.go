@@ -17,7 +17,7 @@ func NewPrefix(prefix string) Prefix {
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (prefix Prefix) Write(ctx *types.Context) {
 	if prefix.IsEmpty() {
 		return
@@ -25,7 +25,7 @@ func (prefix Prefix) Write(ctx *types.Context) {
 	ctx.Write(prefix.Prefix)
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (prefix Prefix) IsEmpty() bool {
 	return prefix.Prefix == ""
 }

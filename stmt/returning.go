@@ -18,7 +18,7 @@ func NewReturning(columns []Column) Returning {
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (returning Returning) Write(ctx *types.Context) {
 	ctx.Write(token.Returning.String())
 	ctx.Write(" ")
@@ -40,7 +40,7 @@ func (returning Returning) Write(ctx *types.Context) {
 	}
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (returning Returning) IsEmpty() bool {
 	return len(returning.Columns) == 0
 }

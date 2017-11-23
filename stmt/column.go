@@ -51,7 +51,7 @@ func (column Column) Desc() Order {
 	return NewOrder(expression, types.Desc)
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (column Column) Write(ctx *types.Context) {
 	ctx.Write(column.Name)
 	if column.Alias != "" {
@@ -62,7 +62,7 @@ func (column Column) Write(ctx *types.Context) {
 	}
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (column Column) IsEmpty() bool {
 	return column.Name == ""
 }

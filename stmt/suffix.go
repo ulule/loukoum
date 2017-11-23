@@ -17,7 +17,7 @@ func NewSuffix(suffix string) Suffix {
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (suffix Suffix) Write(ctx *types.Context) {
 	if suffix.IsEmpty() {
 		return
@@ -25,7 +25,7 @@ func (suffix Suffix) Write(ctx *types.Context) {
 	ctx.Write(suffix.Suffix)
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (suffix Suffix) IsEmpty() bool {
 	return suffix.Suffix == ""
 }

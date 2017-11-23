@@ -20,7 +20,7 @@ func NewLimit(count int64) Limit {
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (limit Limit) Write(ctx *types.Context) {
 	if limit.IsEmpty() {
 		return
@@ -30,7 +30,7 @@ func (limit Limit) Write(ctx *types.Context) {
 	ctx.Write(strconv.FormatInt(limit.Count, 10))
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (limit Limit) IsEmpty() bool {
 	return limit.Count == 0
 }

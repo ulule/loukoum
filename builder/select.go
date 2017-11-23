@@ -216,7 +216,7 @@ func (b Select) Offset(value interface{}) Select {
 	return b
 }
 
-// Suffix add given clauses as suffixes.
+// Suffix adds given clauses as suffixes.
 func (b Select) Suffix(suffix interface{}) Select {
 	if !b.query.Offset.IsEmpty() {
 		panic("loukoum: select builder has suffixes clauses already defined")
@@ -227,7 +227,7 @@ func (b Select) Suffix(suffix interface{}) Select {
 	return b
 }
 
-// Prefix add given clauses as prefixes.
+// Prefix adds given clauses as prefixes.
 func (b Select) Prefix(prefix interface{}) Select {
 	if !b.query.Offset.IsEmpty() {
 		panic("loukoum: select builder has prefixes clauses already defined")
@@ -254,7 +254,7 @@ func (b Select) Prepare() (string, map[string]interface{}) {
 	return query, args
 }
 
-// Statement return underlying statement.
+// Statement returns underlying statement.
 func (b Select) Statement() stmt.Statement {
 	return b.query
 }
