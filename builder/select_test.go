@@ -819,6 +819,11 @@ func TestSelect_Limit(t *testing.T) {
 
 		is.Equal("SELECT name FROM user LIMIT 700", query.String())
 	}
+	{
+		is.Panics(func() { loukoum.Select("name").From("user").Limit(700.2) })
+		is.Panics(func() { loukoum.Select("name").From("user").Limit(float32(700.2)) })
+		is.Panics(func() { loukoum.Select("name").From("user").Limit(-700) })
+	}
 }
 
 func TestSelect_Offset(t *testing.T) {
@@ -847,6 +852,11 @@ func TestSelect_Offset(t *testing.T) {
 			Offset(uint64(700))
 
 		is.Equal("SELECT name FROM user OFFSET 700", query.String())
+	}
+	{
+		is.Panics(func() { loukoum.Select("name").From("user").Offset(700.2) })
+		is.Panics(func() { loukoum.Select("name").From("user").Offset(float32(700.2)) })
+		is.Panics(func() { loukoum.Select("name").From("user").Offset(-700) })
 	}
 }
 
