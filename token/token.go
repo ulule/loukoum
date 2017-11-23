@@ -52,6 +52,7 @@ const (
 	Group     = Type("GROUP")
 	By        = Type("BY")
 	Having    = Type("HAVING")
+	Order     = Type("ORDER")
 	Distinct  = Type("DISTINCT")
 	Returning = Type("RETURNING")
 	Values    = Type("VALUES")
@@ -89,6 +90,7 @@ var keywords = map[string]Type{
 	"GROUP":     Group,
 	"BY":        By,
 	"HAVING":    Having,
+	"ORDER":     Order,
 	"DISTINCT":  Distinct,
 	"RETURNING": Returning,
 	"VALUES":    Values,

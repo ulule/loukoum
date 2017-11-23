@@ -13,6 +13,10 @@ const (
 	LeftJoin = types.LeftJoin
 	// RightJoin is used for "RIGHT JOIN" in join statement.
 	RightJoin = types.RightJoin
+	// Asc is used for "ORDER BY" statement.
+	Asc = types.Asc
+	// Desc is used for "ORDER BY" statement.
+	Desc = types.Desc
 )
 
 // Select starts a SelectBuilder using the given columns.
@@ -43,6 +47,15 @@ func On(left string, right string) stmt.On {
 // Condition is a wrapper to create a new Identifier statement.
 func Condition(column string) stmt.Identifier {
 	return stmt.NewIdentifier(column)
+}
+
+// Order is a wrapper to create a new Order statement.
+func Order(column string, option ...types.OrderType) stmt.Order {
+	order := types.Asc
+	if len(option) > 0 {
+		order = option[0]
+	}
+	return stmt.NewOrder(column, order)
 }
 
 // And is a wrapper to create a new InfixExpression statement.

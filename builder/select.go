@@ -178,6 +178,12 @@ func (b Select) Having(condition stmt.Expression) Select {
 	return b
 }
 
+// OrderBy adds ORDER BY clauses.
+func (b Select) OrderBy(orders ...stmt.Order) Select {
+	b.query.OrderBy.Orders = append(b.query.OrderBy.Orders, orders...)
+	return b
+}
+
 // Limit adds LIMIT clause.
 func (b Select) Limit(value interface{}) Select {
 	if !b.query.Limit.IsEmpty() {
