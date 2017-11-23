@@ -2,6 +2,7 @@ package stmt
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ulule/loukoum/types"
 )
@@ -24,6 +25,10 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 	case string, bool, int, int8, int16, int32, int64,
 		uint, uint8, uint16, uint32, uint64:
 		return NewValue(value)
+	case time.Time:
+		return NewValue(value)
+	case *time.Time:
+		return NewValue(*value)
 	case []string:
 		return NewArrayString(value)
 	case []int:
@@ -65,6 +70,9 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 
 		case string, int, uint, int8, uint8, int16, uint16,
 			int32, uint32, int64, uint64, bool:
+			return NewExpression(value)
+
+		case time.Time, *time.Time:
 			return NewExpression(value)
 
 		case Select:

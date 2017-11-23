@@ -57,6 +57,7 @@ const (
 	Order     = Type("ORDER")
 	Distinct  = Type("DISTINCT")
 	Only      = Type("ONLY")
+	Using     = Type("USING")
 	Returning = Type("RETURNING")
 	Values    = Type("VALUES")
 	Into      = Type("INTO")
@@ -96,6 +97,7 @@ var keywords = map[string]Type{
 	"ORDER":     Order,
 	"DISTINCT":  Distinct,
 	"ONLY":      Only,
+	"USING":     Using,
 	"RETURNING": Returning,
 	"VALUES":    Values,
 	"INTO":      Into,
