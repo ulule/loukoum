@@ -16,10 +16,10 @@ func (ctx *Context) Write(query string) {
 
 func (ctx *Context) Bind(value interface{}) {
 	idx := len(ctx.values) + 1
-	key1 := fmt.Sprintf("arg_%d", idx)
-	key2 := fmt.Sprint(":", key1)
-	ctx.values[key1] = value
-	ctx.Write(key2)
+	key := fmt.Sprintf("arg_%d", idx)
+	ctx.values[key] = value
+	ctx.Write(":")
+	ctx.Write(key)
 }
 
 func (ctx *Context) Query() string {
