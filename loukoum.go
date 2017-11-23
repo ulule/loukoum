@@ -24,11 +24,6 @@ func Select(columns ...interface{}) builder.Select {
 	return builder.NewSelect().Columns(columns...)
 }
 
-// SelectDistinct starts a SelectBuilder using the given columns and "DISTINCT" option.
-func SelectDistinct(columns ...interface{}) builder.Select {
-	return Select(columns...).Distinct()
-}
-
 // Column is a wrapper to create a new Column statement.
 func Column(name string) stmt.Column {
 	return stmt.NewColumn(name)

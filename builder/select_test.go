@@ -17,7 +17,7 @@ func TestSelect(t *testing.T) {
 		is.Equal("SELECT test", query.String())
 	}
 	{
-		query := loukoum.SelectDistinct("test")
+		query := loukoum.Select("test").Distinct()
 		is.Equal("SELECT DISTINCT test", query.String())
 	}
 	{
