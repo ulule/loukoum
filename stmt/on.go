@@ -19,7 +19,7 @@ func NewOn(left, right Column) On {
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (on On) Write(ctx *types.Context) {
 	ctx.Write(token.On.String())
 	ctx.Write(" ")
@@ -30,7 +30,7 @@ func (on On) Write(ctx *types.Context) {
 	ctx.Write(on.Right.Name)
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (on On) IsEmpty() bool {
 	return on.Left.IsEmpty() || on.Right.IsEmpty()
 }

@@ -18,7 +18,7 @@ func NewWhere(expression Expression) Where {
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (where Where) Write(ctx *types.Context) {
 	if where.IsEmpty() {
 		panic("loukoum: a where clause expects at least one condition")
@@ -29,7 +29,7 @@ func (where Where) Write(ctx *types.Context) {
 	where.Condition.Write(ctx)
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (where Where) IsEmpty() bool {
 	return where.Condition == nil || where.Condition.IsEmpty()
 }

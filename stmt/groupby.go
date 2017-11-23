@@ -18,7 +18,7 @@ func NewGroupBy(columns []Column) GroupBy {
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (group GroupBy) Write(ctx *types.Context) {
 	ctx.Write(token.Group.String())
 	ctx.Write(" ")
@@ -32,7 +32,7 @@ func (group GroupBy) Write(ctx *types.Context) {
 	}
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (group GroupBy) IsEmpty() bool {
 	return len(group.Columns) == 0
 }

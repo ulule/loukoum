@@ -20,7 +20,7 @@ func NewOffset(start int64) Offset {
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (offset Offset) Write(ctx *types.Context) {
 	if offset.IsEmpty() {
 		return
@@ -30,7 +30,7 @@ func (offset Offset) Write(ctx *types.Context) {
 	ctx.Write(strconv.FormatInt(offset.Start, 10))
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (offset Offset) IsEmpty() bool {
 	return offset.Start == 0
 }

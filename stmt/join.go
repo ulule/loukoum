@@ -36,7 +36,7 @@ func NewRightJoin(table Table, condition On) Join {
 	return NewJoin(types.RightJoin, table, condition)
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (join Join) Write(ctx *types.Context) {
 	ctx.Write(join.Type.String())
 	ctx.Write(" ")
@@ -45,7 +45,7 @@ func (join Join) Write(ctx *types.Context) {
 	join.Condition.Write(ctx)
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (join Join) IsEmpty() bool {
 	return join.Type == "" || join.Table.IsEmpty() || join.Condition.IsEmpty()
 }
