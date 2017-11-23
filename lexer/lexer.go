@@ -134,6 +134,10 @@ func (l *Lexer) getDelimiterToken() (token.Token, bool) {
 		return l.getToken(token.Comma), true
 	case ':':
 		return l.getToken(token.Colon), true
+	case '(':
+		return l.getToken(token.LParen), true
+	case ')':
+		return l.getToken(token.RParen), true
 	default:
 		return token.Token{}, false
 	}

@@ -26,6 +26,8 @@ const (
 	Comma     = Type(",")
 	Semicolon = Type(";")
 	Colon     = Type(":")
+	LParen    = Type("(")
+	RParen    = Type(")")
 
 	Equals   = Type("=")
 	Asterisk = Type("*")
