@@ -792,6 +792,88 @@ func TestSelect_Having(t *testing.T) {
 	}
 }
 
+func TestSelect_OrderBy(t *testing.T) {
+	is := require.New(t)
+
+	// With Order
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			OrderBy(loukoum.Order("id"))
+
+		is.Equal("SELECT name FROM user ORDER BY id ASC", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			OrderBy(loukoum.Order("id", loukoum.Asc))
+
+		is.Equal("SELECT name FROM user ORDER BY id ASC", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			OrderBy(loukoum.Order("id", loukoum.Desc))
+
+		is.Equal("SELECT name FROM user ORDER BY id DESC", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			OrderBy(loukoum.Order("locale"), loukoum.Order("id", loukoum.Desc))
+
+		is.Equal("SELECT name FROM user ORDER BY locale ASC, id DESC", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			OrderBy(loukoum.Order("locale")).
+			OrderBy(loukoum.Order("id", loukoum.Desc))
+
+		is.Equal("SELECT name FROM user ORDER BY locale ASC, id DESC", query.String())
+	}
+
+	// With Column
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			OrderBy(loukoum.Column("id").Asc())
+
+		is.Equal("SELECT name FROM user ORDER BY id ASC", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			OrderBy(loukoum.Column("id").Desc())
+
+		is.Equal("SELECT name FROM user ORDER BY id DESC", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			OrderBy(loukoum.Column("locale").Asc(), loukoum.Column("id").Desc())
+
+		is.Equal("SELECT name FROM user ORDER BY locale ASC, id DESC", query.String())
+	}
+	{
+		query := loukoum.
+			Select("name").
+			From("user").
+			OrderBy(loukoum.Column("locale").Asc()).
+			OrderBy(loukoum.Column("id").Desc())
+
+		is.Equal("SELECT name FROM user ORDER BY locale ASC, id DESC", query.String())
+	}
+}
+
 func TestSelect_Limit(t *testing.T) {
 	is := require.New(t)
 

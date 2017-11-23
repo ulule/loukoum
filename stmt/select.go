@@ -15,6 +15,7 @@ type Select struct {
 	Where    Where
 	GroupBy  GroupBy
 	Having   Having
+	OrderBy  OrderBy
 	Limit    Limit
 	Offset   Offset
 	Suffix   Suffix
@@ -87,8 +88,10 @@ func (selekt Select) writeMiddle(ctx *types.Context) {
 }
 
 func (selekt Select) writeTail(ctx *types.Context) {
-
-	// TODO ORDER BY
+	if !selekt.OrderBy.IsEmpty() {
+		ctx.Write(" ")
+		selekt.OrderBy.Write(ctx)
+	}
 
 	if !selekt.Limit.IsEmpty() {
 		ctx.Write(" ")

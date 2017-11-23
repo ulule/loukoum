@@ -31,6 +31,26 @@ func (column Column) As(alias string) Column {
 	return column
 }
 
+// Asc is used to transform a column to an order expression.
+func (column Column) Asc() Order {
+	expression := column.Name
+	if column.Alias != "" {
+		expression = column.Alias
+	}
+
+	return NewOrder(expression, types.Asc)
+}
+
+// Desc is used to transform a column to an order expression.
+func (column Column) Desc() Order {
+	expression := column.Name
+	if column.Alias != "" {
+		expression = column.Alias
+	}
+
+	return NewOrder(expression, types.Desc)
+}
+
 // Write expose statement as a SQL query.
 func (column Column) Write(ctx *types.Context) {
 	ctx.Write(column.Name)
