@@ -32,7 +32,7 @@ func NewNotIn(identifier Identifier, value Expression) In {
 
 func (In) expression() {}
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (in In) Write(ctx *types.Context) {
 	if in.IsEmpty() {
 		panic("loukoum: expression is undefined")
@@ -47,7 +47,7 @@ func (in In) Write(ctx *types.Context) {
 	ctx.Write("))")
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (in In) IsEmpty() bool {
 	return in.Identifier.IsEmpty() || in.Operator.IsEmpty() || in.Value == nil || in.Value.IsEmpty()
 }

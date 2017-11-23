@@ -15,7 +15,7 @@ type Builder interface {
 	String()
 	// Prepare returns the underlying query as a named statement.
 	Prepare() (string, map[string]interface{})
-	// Statement return underlying statement.
+	// Statement returns underlying statement.
 	Statement() stmt.Statement
 }
 

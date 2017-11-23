@@ -18,7 +18,7 @@ func NewHaving(expression Expression) Having {
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (having Having) Write(ctx *types.Context) {
 	if having.IsEmpty() {
 		panic("loukoum: a having clause expects at least one condition")
@@ -29,7 +29,7 @@ func (having Having) Write(ctx *types.Context) {
 	having.Condition.Write(ctx)
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (having Having) IsEmpty() bool {
 	return having.Condition == nil || having.Condition.IsEmpty()
 }

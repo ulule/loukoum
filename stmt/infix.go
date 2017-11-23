@@ -22,7 +22,7 @@ func NewInfixExpression(left Expression, operator Operator, right Expression) In
 	}
 }
 
-// Write expose statement as a SQL query.
+// Write exposes statement as a SQL query.
 func (expression InfixExpression) Write(ctx *types.Context) {
 	if expression.IsEmpty() {
 		panic("loukoum: expression is undefined")
@@ -37,7 +37,7 @@ func (expression InfixExpression) Write(ctx *types.Context) {
 	ctx.Write(")")
 }
 
-// IsEmpty return true if statement is undefined.
+// IsEmpty returns true if statement is undefined.
 func (expression InfixExpression) IsEmpty() bool {
 	return expression.Left == nil || expression.Operator == nil || expression.Right == nil ||
 		expression.Left.IsEmpty() || expression.Operator.IsEmpty() || expression.Right.IsEmpty()

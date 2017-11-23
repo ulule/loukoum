@@ -96,7 +96,7 @@ func (b Insert) Prepare() (string, map[string]interface{}) {
 	return query, args
 }
 
-// Statement return underlying statement.
+// Statement returns underlying statement.
 func (b Insert) Statement() stmt.Statement {
 	return b.insert
 }
