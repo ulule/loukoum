@@ -12,7 +12,7 @@ import (
 // Builder defines a generic methods available for Select, Insert, Update and Delete builders.
 type Builder interface {
 	// String returns the underlying query as a raw statement.
-	String()
+	String() string
 	// Prepare returns the underlying query as a named statement.
 	Prepare() (string, map[string]interface{})
 	// Statement returns underlying statement.
