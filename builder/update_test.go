@@ -25,6 +25,18 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
+func TestUpdate_OnlyTable(t *testing.T) {
+	is := require.New(t)
+
+	{
+		table := loukoum.Table("table")
+		table.Only = true
+
+		query := loukoum.Update(table).Set(loukoum.Map{"a": 1})
+		is.Equal("UPDATE ONLY table SET a = 1", query.String())
+	}
+}
+
 func TestUpdate_Where(t *testing.T) {
 	is := require.New(t)
 
