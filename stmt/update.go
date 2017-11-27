@@ -8,6 +8,7 @@ import (
 // Update is the UPDATE statement.
 type Update struct {
 	Table     Table
+	From      From
 	Set       Set
 	Where     Where
 	Returning Returning
@@ -33,6 +34,11 @@ func (update Update) Write(ctx *types.Context) {
 
 	ctx.Write(" ")
 	update.Set.Write(ctx)
+
+	if !update.From.IsEmpty() {
+		ctx.Write(" ")
+		update.From.Write(ctx)
+	}
 
 	if !update.Where.IsEmpty() {
 		ctx.Write(" ")

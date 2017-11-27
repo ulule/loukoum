@@ -50,6 +50,17 @@ func (b Update) Or(condition stmt.Expression) Update {
 	return b
 }
 
+// From sets the FROM clause of the query.
+func (b Update) From(arg interface{}) Update {
+	if !b.query.From.IsEmpty() {
+		panic("loukoum: update builder has from clause already defined")
+	}
+
+	b.query.From = ToFrom(arg)
+
+	return b
+}
+
 // Returning adds a RETURNING clause.
 func (b Update) Returning(values ...interface{}) Update {
 	if !b.query.Returning.IsEmpty() {

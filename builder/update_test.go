@@ -52,6 +52,19 @@ func TestUpdate_Where(t *testing.T) {
 	}
 }
 
+func TestUpdate_From(t *testing.T) {
+	is := require.New(t)
+
+	{
+		query := loukoum.Update("table1").
+			Set(loukoum.Map{"a": 1}).
+			From("table2").
+			Where(loukoum.Condition("table2.id").Equal(loukoum.Raw("table1.id")))
+
+		is.Equal("UPDATE table1 SET a = 1 FROM table2 WHERE (table2.id = table1.id)", query.String())
+	}
+}
+
 func TestUpdate_Returning(t *testing.T) {
 	is := require.New(t)
 
