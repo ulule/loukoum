@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ulule/loukoum/stmt"
+	"github.com/ulule/loukoum/types"
 )
 
 // Builder defines a generic methods available for Select, Insert, Update and Delete builders.
@@ -195,4 +196,16 @@ func ToInt64(value interface{}) (int64, bool) { // nolint: gocyclo
 		}
 	}
 	return 0, false
+}
+
+// ToSet takes a map of column and values and returns a Set instance.
+func ToSet(m types.Map) stmt.Set {
+	set := stmt.NewSet()
+
+	set.Values = map[stmt.Column]stmt.Expression{}
+	for k, v := range m {
+		set.Values[ToColumn(k)] = stmt.NewExpression(v)
+	}
+
+	return set
 }
