@@ -17,6 +17,12 @@ func NewUpdate(arg interface{}) Update {
 	}
 }
 
+// Only sets the ONLY clause.
+func (b Update) Only() Update {
+	b.query.Only = true
+	return b
+}
+
 // Set adds a SET clause.
 func (b Update) Set(m types.Map) Update {
 	if !b.query.Set.IsEmpty() {

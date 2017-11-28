@@ -8,6 +8,7 @@ import (
 // Update is the UPDATE statement.
 type Update struct {
 	Table     Table
+	Only      bool
 	From      From
 	Set       Set
 	Where     Where
@@ -28,6 +29,11 @@ func (update Update) Write(ctx *types.Context) {
 	}
 
 	ctx.Write(token.Update.String())
+
+	if update.Only {
+		ctx.Write(" ")
+		ctx.Write(token.Only.String())
+	}
 
 	ctx.Write(" ")
 	update.Table.Write(ctx)

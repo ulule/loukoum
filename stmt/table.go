@@ -9,7 +9,6 @@ import (
 type Table struct {
 	Name  string
 	Alias string
-	Only  bool
 }
 
 // NewTable returns a new Table instance.
@@ -33,11 +32,6 @@ func (table Table) As(alias string) Table {
 
 // Write exposes statement as a SQL query.
 func (table Table) Write(ctx *types.Context) {
-	if table.Only {
-		ctx.Write(token.Only.String())
-		ctx.Write(" ")
-	}
-
 	ctx.Write(table.Name)
 	if table.Alias != "" {
 		ctx.Write(" ")
