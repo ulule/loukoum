@@ -7,50 +7,52 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// SetPair is a set pair.
+type SetPair struct {
+	Column     Column
+	Expression Expression
+}
+
+// NewSetPair returns a new SetPair instance.
+func NewSetPair(column Column, expression Expression) SetPair {
+	return SetPair{
+		Column:     column,
+		Expression: expression,
+	}
+}
+
 // Set is a SET clause.
 type Set struct {
-	Values map[Column]Expression
+	Pairs []SetPair
 }
 
 // NewSet returns a new Set instance.
 func NewSet() Set {
-	return Set{
-		Values: map[Column]Expression{},
-	}
+	return Set{}
 }
 
 // Write exposes statement as a SQL query.
 func (set Set) Write(ctx *types.Context) {
 	ctx.Write(token.Set.String())
 
-	type pair struct {
-		k Column
-		v Expression
-	}
+	sort.Slice(set.Pairs[:], func(i, j int) bool { return set.Pairs[i].Column.Name < set.Pairs[j].Column.Name })
 
-	pairs := make([]pair, 0, len(set.Values))
-	for k, v := range set.Values {
-		pairs = append(pairs, pair{k: k, v: v})
-	}
-
-	sort.Slice(pairs[:], func(i, j int) bool { return pairs[i].k.Name < pairs[j].k.Name })
-
-	for i, pair := range pairs {
+	for i, pair := range set.Pairs {
 		if i == 0 {
 			ctx.Write(" ")
 		} else {
 			ctx.Write(", ")
 		}
 
-		pair.k.Write(ctx)
+		pair.Column.Write(ctx)
 		ctx.Write(" = ")
-		pair.v.Write(ctx)
+		pair.Expression.Write(ctx)
 	}
 }
 
 // IsEmpty returns true if statement is undefined.
 func (set Set) IsEmpty() bool {
-	return len(set.Values) == 0
+	return len(set.Pairs) == 0
 }
 
 // Ensure that Set is a Statement.
