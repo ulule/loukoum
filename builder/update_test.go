@@ -16,48 +16,52 @@ func TestUpdate_Set_Undefined(t *testing.T) {
 func TestUpdate_Set_Map(t *testing.T) {
 	is := require.New(t)
 
-	m := loukoum.Map{"a": 1, "b": 2}
-	p := loukoum.Pair("b", 2)
-
-	// Simple map
 	{
-		query := loukoum.Update("table").Set(m)
-		is.Equal("UPDATE table SET a = 1, b = 2", query.String())
-	}
+		query := loukoum.Update("table").Set(
+			loukoum.Map{"a": 1, "b": 2},
+			loukoum.Map{"c": 3, "d": 4})
 
-	// Map with Column instance
+		is.Equal("UPDATE table SET a = 1, b = 2, c = 3, d = 4", query.String())
+	}
 	{
 		query := loukoum.Update("table").Set(loukoum.Map{loukoum.Column("foo"): 2, "a": 1})
 		is.Equal("UPDATE table SET a = 1, foo = 2", query.String())
 	}
-
-	// Two maps -> panic
-	is.Panics(func() { loukoum.Update("table").Set(m, m) })
-
-	// Map and pair -> panic
-	is.Panics(func() { loukoum.Update("table").Set(m, p) })
 }
 
 func TestUpdate_Set_Pair(t *testing.T) {
 	is := require.New(t)
 
-	p1 := loukoum.Pair("a", 1)
-	p2 := loukoum.Pair("b", 2)
-
-	// Variadic pairs
 	{
-		query := loukoum.Update("table").Set(p1, p2)
+		query := loukoum.Update("table").Set(loukoum.Pair("a", 1))
+		is.Equal("UPDATE table SET a = 1", query.String())
+	}
+	{
+		query := loukoum.Update("table").Set(loukoum.Pair("a", 1), loukoum.Pair("b", 2))
 		is.Equal("UPDATE table SET a = 1, b = 2", query.String())
 	}
-
-	// Pairs with Column instance
 	{
-		query := loukoum.Update("table").Set(loukoum.Pair(loukoum.Column("a"), 1), p2)
+		query := loukoum.Update("table").Set(loukoum.Pair(loukoum.Column("a"), 1), loukoum.Pair("b", 2))
 		is.Equal("UPDATE table SET a = 1, b = 2", query.String())
 	}
+}
 
-	// Pair and map -> panic
-	is.Panics(func() { loukoum.Update("table").Set(loukoum.Pair("b", 2), loukoum.Map{"a": 1}) })
+func TestUpdate_Set_MapAndPair(t *testing.T) {
+	is := require.New(t)
+
+	{
+		query := loukoum.Update("table").Set(
+			loukoum.Map{"a": 1, "b": 2},
+			loukoum.Pair("d", 4),
+			loukoum.Map{"c": 3},
+			loukoum.Pair("e", 5))
+
+		is.Equal("UPDATE table SET a = 1, b = 2, c = 3, d = 4, e = 5", query.String())
+	}
+	{
+		query := loukoum.Update("table").Set(loukoum.Map{loukoum.Column("foo"): 2, "a": 1})
+		is.Equal("UPDATE table SET a = 1, foo = 2", query.String())
+	}
 }
 
 func TestUpdate_OnlyTable(t *testing.T) {
