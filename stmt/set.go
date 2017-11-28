@@ -22,13 +22,6 @@ func NewSet() Set {
 	}
 }
 
-// Merge merges the given SetPair map to the existing one.
-func (set Set) Merge(pairs SetPairs) {
-	for k, v := range pairs {
-		set.Pairs[k] = v
-	}
-}
-
 // Write exposes statement as a SQL query.
 func (set Set) Write(ctx *types.Context) {
 	ctx.Write(token.Set.String())
