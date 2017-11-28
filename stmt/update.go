@@ -19,6 +19,7 @@ type Update struct {
 func NewUpdate(table Table) Update {
 	return Update{
 		Table: table,
+		Set:   NewSet(),
 	}
 }
 

@@ -25,14 +25,7 @@ func (b Update) Only() Update {
 
 // Set adds a SET clause.
 func (b Update) Set(args ...interface{}) Update {
-	pairs := ToSetPairs(args)
-
-	for _, pair := range pairs {
-		if !inSetPairs(b.query.Set.Pairs, pair) {
-			b.query.Set.Pairs = append(b.query.Set.Pairs, pair)
-		}
-	}
-
+	b.query.Set.Merge(ToSetPairs(args))
 	return b
 }
 

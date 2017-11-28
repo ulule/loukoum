@@ -200,34 +200,19 @@ func ToInt64(value interface{}) (int64, bool) { // nolint: gocyclo
 
 // ToSetPairs takes either a types.Map or slice of types.Pair and returns
 // a slice of stmt.SetPair instances.
-func ToSetPairs(args []interface{}) []stmt.SetPair {
-	var pairs []stmt.SetPair
+func ToSetPairs(args []interface{}) stmt.SetPairs {
+	pairs := stmt.SetPairs{}
 
 	for i := range args {
 		switch value := args[i].(type) {
 		case types.Map:
 			for k, v := range value {
-				pair := stmt.NewSetPair(ToColumn(k), stmt.NewExpression(v))
-				if !inSetPairs(pairs, pair) {
-					pairs = append(pairs, pair)
-				}
+				pairs[ToColumn(k)] = stmt.NewExpression(v)
 			}
 		case types.Pair:
-			pair := stmt.NewSetPair(ToColumn(value.Key), stmt.NewExpression(value.Value))
-			if !inSetPairs(pairs, pair) {
-				pairs = append(pairs, pair)
-			}
+			pairs[ToColumn(value.Key)] = stmt.NewExpression(value.Value)
 		}
 	}
 
 	return pairs
-}
-
-func inSetPairs(pairs []stmt.SetPair, pair stmt.SetPair) bool {
-	for _, p := range pairs {
-		if p.Column.Name == pair.Column.Name {
-			return true
-		}
-	}
-	return false
 }

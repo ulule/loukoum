@@ -7,46 +7,54 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
-// SetPair is a set pair.
-type SetPair struct {
-	Column     Column
-	Expression Expression
-}
-
-// NewSetPair returns a new SetPair instance.
-func NewSetPair(column Column, expression Expression) SetPair {
-	return SetPair{
-		Column:     column,
-		Expression: expression,
-	}
-}
+// SetPairs is a map of column and expressions.
+type SetPairs map[Column]Expression
 
 // Set is a SET clause.
 type Set struct {
-	Pairs []SetPair
+	Pairs SetPairs
 }
 
 // NewSet returns a new Set instance.
 func NewSet() Set {
-	return Set{}
+	return Set{
+		Pairs: SetPairs{},
+	}
+}
+
+// Merge merges the given SetPair map to the existing one.
+func (set Set) Merge(pairs SetPairs) {
+	for k, v := range pairs {
+		set.Pairs[k] = v
+	}
 }
 
 // Write exposes statement as a SQL query.
 func (set Set) Write(ctx *types.Context) {
 	ctx.Write(token.Set.String())
 
-	sort.Slice(set.Pairs[:], func(i, j int) bool { return set.Pairs[i].Column.Name < set.Pairs[j].Column.Name })
+	type pair struct {
+		k Column
+		v Expression
+	}
 
-	for i, pair := range set.Pairs {
+	pairs := make([]pair, 0, len(set.Pairs))
+	for k, v := range set.Pairs {
+		pairs = append(pairs, pair{k: k, v: v})
+	}
+
+	sort.Slice(pairs[:], func(i, j int) bool { return pairs[i].k.Name < pairs[j].k.Name })
+
+	for i, pair := range pairs {
 		if i == 0 {
 			ctx.Write(" ")
 		} else {
 			ctx.Write(", ")
 		}
 
-		pair.Column.Write(ctx)
+		pair.k.Write(ctx)
 		ctx.Write(" = ")
-		pair.Expression.Write(ctx)
+		pair.v.Write(ctx)
 	}
 }
 
