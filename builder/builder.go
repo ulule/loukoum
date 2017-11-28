@@ -205,6 +205,10 @@ func ToSetPairs(args []interface{}) stmt.SetPairs {
 
 	for i := range args {
 		switch value := args[i].(type) {
+		case map[string]interface{}:
+			for k, v := range value {
+				pairs[ToColumn(k)] = stmt.NewExpression(v)
+			}
 		case types.Map:
 			for k, v := range value {
 				pairs[ToColumn(k)] = stmt.NewExpression(v)

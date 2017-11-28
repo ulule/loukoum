@@ -16,11 +16,20 @@ func TestUpdate_Set_Undefined(t *testing.T) {
 func TestUpdate_Set_Map(t *testing.T) {
 	is := require.New(t)
 
-	// Variadic
+	// Variadic with built-in Map type
 	{
 		query := loukoum.Update("table").Set(
 			loukoum.Map{"a": 1, "b": 2},
 			loukoum.Map{"c": 3, "d": 4})
+
+		is.Equal("UPDATE table SET a = 1, b = 2, c = 3, d = 4", query.String())
+	}
+
+	// Variadic with string / interface map
+	{
+		query := loukoum.Update("table").Set(
+			map[string]interface{}{"a": 1, "b": 2},
+			map[string]interface{}{"c": 3, "d": 4})
 
 		is.Equal("UPDATE table SET a = 1, b = 2, c = 3, d = 4", query.String())
 	}
@@ -33,7 +42,7 @@ func TestUpdate_Set_Map(t *testing.T) {
 		is.Equal("UPDATE table SET a = 1, foo = 2", query.String())
 	}
 
-	// Multiple Set() calls
+	// Multiple Set() calls with built-in Map type
 	{
 		query := loukoum.Update("table").
 			Set(loukoum.Map{"a": 1}).
@@ -43,12 +52,23 @@ func TestUpdate_Set_Map(t *testing.T) {
 
 		is.Equal("UPDATE table SET a = 1, b = 2, c = 3, d = 4, e = 5", query.String())
 	}
+
+	// Multiple Set() calls with string / interface map.
+	{
+		query := loukoum.Update("table").
+			Set(map[string]interface{}{"a": 1}).
+			Set(map[string]interface{}{"b": 2}).
+			Set(map[string]interface{}{"c": 3}).
+			Set(map[string]interface{}{"d": 4, "e": 5})
+
+		is.Equal("UPDATE table SET a = 1, b = 2, c = 3, d = 4, e = 5", query.String())
+	}
 }
 
 func TestUpdate_Set_Map_Uniqueness(t *testing.T) {
 	is := require.New(t)
 
-	// Variadic
+	// Variadic with built-in Map type
 	{
 		query := loukoum.Update("table").Set(
 			loukoum.Map{"a": 1, "b": 2},
@@ -57,11 +77,29 @@ func TestUpdate_Set_Map_Uniqueness(t *testing.T) {
 		is.Equal("UPDATE table SET a = 1, b = 2", query.String())
 	}
 
-	// Multiple Set() calls
+	// Variadic with string / interface map
+	{
+		query := loukoum.Update("table").Set(
+			map[string]interface{}{"a": 1, "b": 2},
+			map[string]interface{}{"b": 2})
+
+		is.Equal("UPDATE table SET a = 1, b = 2", query.String())
+	}
+
+	// Multiple Set() calls with built-in Map type
 	{
 		query := loukoum.Update("table").
 			Set(loukoum.Map{"a": 1, "b": 2}).
 			Set(loukoum.Map{"b": 2})
+
+		is.Equal("UPDATE table SET a = 1, b = 2", query.String())
+	}
+
+	// Multiple Set() calls with string / interface map
+	{
+		query := loukoum.Update("table").
+			Set(map[string]interface{}{"a": 1, "b": 2}).
+			Set(map[string]interface{}{"b": 2})
 
 		is.Equal("UPDATE table SET a = 1, b = 2", query.String())
 	}
@@ -70,7 +108,7 @@ func TestUpdate_Set_Map_Uniqueness(t *testing.T) {
 func TestUpdate_Set_Map_LastWriteWins(t *testing.T) {
 	is := require.New(t)
 
-	// Variadic
+	// Variadic with built-in Map type
 	{
 		query := loukoum.Update("table").Set(
 			loukoum.Map{"a": 1, "b": 2},
@@ -79,11 +117,29 @@ func TestUpdate_Set_Map_LastWriteWins(t *testing.T) {
 		is.Equal("UPDATE table SET a = 3, b = 2", query.String())
 	}
 
-	// Multiple Set() calls
+	// Variadic with string / interface map
+	{
+		query := loukoum.Update("table").Set(
+			map[string]interface{}{"a": 1, "b": 2},
+			map[string]interface{}{"a": 3})
+
+		is.Equal("UPDATE table SET a = 3, b = 2", query.String())
+	}
+
+	// Multiple Set() calls with built-in Map type
 	{
 		query := loukoum.Update("table").
 			Set(loukoum.Map{"a": 1, "b": 2}).
 			Set(loukoum.Map{"a": 3})
+
+		is.Equal("UPDATE table SET a = 3, b = 2", query.String())
+	}
+
+	// Multiple Set() calls with string / interface map
+	{
+		query := loukoum.Update("table").
+			Set(map[string]interface{}{"a": 1, "b": 2}).
+			Set(map[string]interface{}{"a": 3})
 
 		is.Equal("UPDATE table SET a = 3, b = 2", query.String())
 	}
