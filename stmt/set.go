@@ -14,7 +14,9 @@ type Set struct {
 
 // NewSet returns a new Set instance.
 func NewSet() Set {
-	return Set{}
+	return Set{
+		Values: map[Column]Expression{},
+	}
 }
 
 // Write exposes statement as a SQL query.

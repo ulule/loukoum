@@ -198,13 +198,38 @@ func ToInt64(value interface{}) (int64, bool) { // nolint: gocyclo
 	return 0, false
 }
 
-// ToSet takes a map of column and values and returns a Set instance.
-func ToSet(m types.Map) stmt.Set {
+// ToSet takes either a types.Map or slice of types.Pair and returns a Set instance.
+func ToSet(args []interface{}) stmt.Set {
 	set := stmt.NewSet()
+	nargs := len(args)
+	errmsg := "loukoum: Set requires a single one loukoum.Map or variadic loukoum.Pair"
 
-	set.Values = map[stmt.Column]stmt.Expression{}
-	for k, v := range m {
-		set.Values[ToColumn(k)] = stmt.NewExpression(v)
+	if nargs == 0 {
+		panic(errmsg)
+	}
+
+	m, ok := args[0].(types.Map)
+	if ok {
+		// We cannot pass two maps
+		if nargs > 1 {
+			panic(errmsg)
+		}
+
+		// Set the values
+		for k, v := range m {
+			set.Values[ToColumn(k)] = stmt.NewExpression(v)
+		}
+
+		return set
+	}
+
+	for i := range args {
+		p, ok := args[i].(types.Pair)
+		if !ok {
+			panic(errmsg)
+		}
+
+		set.Values[ToColumn(p.Key)] = stmt.NewExpression(p.Value)
 	}
 
 	return set

@@ -24,12 +24,12 @@ func (b Update) Only() Update {
 }
 
 // Set adds a SET clause.
-func (b Update) Set(m types.Map) Update {
+func (b Update) Set(args ...interface{}) Update {
 	if !b.query.Set.IsEmpty() {
 		panic("loukoum: update builder has set clause already defined")
 	}
 
-	b.query.Set = ToSet(m)
+	b.query.Set = ToSet(args)
 
 	return b
 }
