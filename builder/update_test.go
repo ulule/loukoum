@@ -109,6 +109,13 @@ func TestUpdate_Set_MapAndPair(t *testing.T) {
 		is.Equal("UPDATE table SET a = 1, b = 2, c = 3, d = 4, e = 5", query.String())
 	}
 	{
+		query := loukoum.Update("table").
+			Set(loukoum.Map{"a": 1, "b": 2}, loukoum.Pair("d", 4)).
+			Set(loukoum.Map{"c": 3}, loukoum.Pair("e", 5))
+
+		is.Equal("UPDATE table SET a = 1, b = 2, c = 3, d = 4, e = 5", query.String())
+	}
+	{
 		query := loukoum.Update("table").Set(loukoum.Map{loukoum.Column("foo"): 2, "a": 1})
 		is.Equal("UPDATE table SET a = 1, foo = 2", query.String())
 	}
@@ -123,6 +130,13 @@ func TestUpdate_Set_MapAndPair_Duplicates(t *testing.T) {
 			loukoum.Pair("a", 4),
 			loukoum.Map{"b": 2},
 			loukoum.Pair("c", 3))
+
+		is.Equal("UPDATE table SET a = 1, b = 2, c = 3", query.String())
+	}
+	{
+		query := loukoum.Update("table").
+			Set(loukoum.Map{"a": 1, "b": 2}, loukoum.Pair("a", 4)).
+			Set(loukoum.Map{"b": 2}, loukoum.Pair("c", 3))
 
 		is.Equal("UPDATE table SET a = 1, b = 2, c = 3", query.String())
 	}
