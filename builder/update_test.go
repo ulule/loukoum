@@ -15,7 +15,9 @@ import (
 
 func TestUpdate_Set_Undefined(t *testing.T) {
 	is := require.New(t)
+
 	is.Panics(func() { _ = loukoum.Update("table").String() })
+	is.Panics(func() { _ = loukoum.Update("table").Set("").String() })
 }
 
 func TestUpdate_Set_Map(t *testing.T) {
@@ -369,6 +371,39 @@ func TestUpdate_Set_Valuer(t *testing.T) {
 
 		query = loukoum.Update("table").Set(loukoum.Map{"count": sql.NullInt64{Int64: 30, Valid: false}})
 		is.Equal("UPDATE table SET count = NULL", query.String())
+	}
+}
+
+func TestUpdate_Set_Using(t *testing.T) {
+	is := require.New(t)
+
+	// Invoking Using() without any argument must panic
+	is.Panics(func() { _ = loukoum.Update("table").Set("a", "b", "c").Using() })
+
+	// Invoking Using() without any columns must panic
+	is.Panics(func() { _ = loukoum.Update("table").Set(loukoum.Pair("a", 30)).Using() })
+
+	// Multi-values
+	{
+		query := loukoum.Update("table").Set("a", "b", "c").Using("d", "e", "f")
+		is.Equal("UPDATE table SET (a, b, c) = ('d', 'e', 'f')", query.String())
+	}
+
+	// Columns to columns
+	{
+		query := loukoum.Update("table").Set("a", "b", "c").Using(loukoum.Raw("d+1"), loukoum.Raw("e+1"), loukoum.Raw("f+1"))
+		is.Equal("UPDATE table SET (a, b, c) = (d+1, e+1, f+1)", query.String())
+	}
+
+	// Sub-select
+	{
+		query := loukoum.Update("table").
+			Set("a", "b", "c").
+			Using(loukoum.Select("a", "b", "c").
+				From("table").
+				Where(loukoum.Condition("disabled").Equal(false)).Statement())
+
+		is.Equal("UPDATE table SET (a, b, c) = (SELECT a, b, c FROM table WHERE (disabled = false))", query.String())
 	}
 }
 
