@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/format"
 )
 
 func TestUpdate_Set_Undefined(t *testing.T) {
@@ -343,7 +343,7 @@ func TestUpdate_Set_Valuer(t *testing.T) {
 	// pq.NullTime
 	{
 		now := time.Now()
-		fnow := types.FormatTime(now)
+		fnow := format.Time(now)
 
 		query := loukoum.Update("table").Set(loukoum.Map{"created_at": pq.NullTime{Time: now, Valid: true}})
 		is.Equal(fmt.Sprintf("UPDATE table SET created_at = %s", fnow), query.String())

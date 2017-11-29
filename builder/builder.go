@@ -5,8 +5,8 @@ import (
 	"math"
 	"strconv"
 	"strings"
-	"time"
 
+	"github.com/ulule/loukoum/format"
 	"github.com/ulule/loukoum/stmt"
 	"github.com/ulule/loukoum/types"
 )
@@ -24,20 +24,10 @@ type Builder interface {
 // rawify will replace given arguments in query to obtain a human readable statement.
 // Be advised, this function is not optimized, use with caution.
 func rawify(query string, args map[string]interface{}) string {
-	var nvalue string
 	for key, arg := range args {
 		key = fmt.Sprint(":", key)
-
-		switch value := arg.(type) {
-		case string:
-			nvalue = fmt.Sprint("'", value, "'")
-		case time.Time:
-			nvalue = types.FormatTime(value)
-		default:
-			nvalue = fmt.Sprint(value)
-		}
-
-		query = strings.Replace(query, key, nvalue, 1)
+		value := format.Value(arg)
+		query = strings.Replace(query, key, value, 1)
 	}
 	return query
 }
