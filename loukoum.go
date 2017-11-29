@@ -19,6 +19,14 @@ const (
 	Desc = types.Desc
 )
 
+// Map is a key/value map.
+type Map = types.Map
+
+// Pair takes a key and its related value and returns a Pair.
+func Pair(key, value interface{}) types.Pair {
+	return types.Pair{Key: key, Value: value}
+}
+
 // Select starts a SelectBuilder using the given columns.
 func Select(columns ...interface{}) builder.Select {
 	return builder.NewSelect().Columns(columns...)
@@ -76,4 +84,9 @@ func Insert(into interface{}) builder.Insert {
 // Delete starts a DeleteBuilder using the given table as from clause.
 func Delete(from interface{}) builder.Delete {
 	return builder.NewDelete().From(from)
+}
+
+// Update starts an Update builder using the given table.
+func Update(table interface{}) builder.Update {
+	return builder.NewUpdate(table)
 }

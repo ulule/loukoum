@@ -2,7 +2,8 @@
 
 ignored = [
   "github.com/stretchr/testify/require",
-  "github.com/davecgh/go-spew"
+  "github.com/davecgh/go-spew",
+  "github.com/lib/pq"
 ]
 
 [[constraint]]

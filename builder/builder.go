@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ulule/loukoum/stmt"
+	"github.com/ulule/loukoum/types"
 )
 
 // Builder defines a generic methods available for Select, Insert, Update and Delete builders.
@@ -31,7 +32,7 @@ func rawify(query string, args map[string]interface{}) string {
 		case string:
 			nvalue = fmt.Sprint("'", value, "'")
 		case time.Time:
-			nvalue = fmt.Sprint("'", value.UTC().Format("2006-01-02 15:04:05.999999"), "+00'")
+			nvalue = types.FormatTime(value)
 		default:
 			nvalue = fmt.Sprint(value)
 		}
@@ -195,4 +196,27 @@ func ToInt64(value interface{}) (int64, bool) { // nolint: gocyclo
 		}
 	}
 	return 0, false
+}
+
+// ToSetPairs takes either a types.Map or slice of types.Pair and returns
+// a slice of stmt.SetPair instances.
+func ToSetPairs(args []interface{}) stmt.SetPairs {
+	pairs := stmt.SetPairs{}
+
+	for i := range args {
+		switch value := args[i].(type) {
+		case map[string]interface{}:
+			for k, v := range value {
+				pairs[ToColumn(k)] = stmt.NewExpression(v)
+			}
+		case types.Map:
+			for k, v := range value {
+				pairs[ToColumn(k)] = stmt.NewExpression(v)
+			}
+		case types.Pair:
+			pairs[ToColumn(value.Key)] = stmt.NewExpression(value.Value)
+		}
+	}
+
+	return pairs
 }
