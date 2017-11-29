@@ -1,11 +1,16 @@
 package builder_test
 
 import (
+	"database/sql"
+	"fmt"
 	"testing"
+	"time"
 
+	"github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum"
+	"github.com/ulule/loukoum/types"
 )
 
 func TestUpdate_Set_Undefined(t *testing.T) {
@@ -329,6 +334,41 @@ func TestUpdate_Set_MapAndPair_LastWriteWins(t *testing.T) {
 			Set(loukoum.Map{"c": 3}, loukoum.Pair("c", 4))
 
 		is.Equal("UPDATE table SET a = 2, b = 3, c = 4", query.String())
+	}
+}
+
+func TestUpdate_Set_Valuer(t *testing.T) {
+	is := require.New(t)
+
+	// pq.NullTime
+	{
+		now := time.Now()
+		fnow := types.FormatTime(now)
+
+		query := loukoum.Update("table").Set(loukoum.Map{"created_at": pq.NullTime{Time: now, Valid: true}})
+		is.Equal(fmt.Sprintf("UPDATE table SET created_at = %s", fnow), query.String())
+
+		query = loukoum.Update("table").Set(loukoum.Map{"created_at": pq.NullTime{Time: now, Valid: false}})
+		is.Equal("UPDATE table SET created_at = NULL", query.String())
+	}
+
+	// sql.NullString
+	{
+		query := loukoum.Update("table").Set(loukoum.Map{"message": sql.NullString{String: "ok", Valid: true}})
+		is.Equal("UPDATE table SET message = 'ok'", query.String())
+
+		query = loukoum.Update("table").Set(loukoum.Map{"message": sql.NullString{String: "ok", Valid: false}})
+		is.Equal("UPDATE table SET message = NULL", query.String())
+
+	}
+
+	// sql.NullInt
+	{
+		query := loukoum.Update("table").Set(loukoum.Map{"count": sql.NullInt64{Int64: 30, Valid: true}})
+		is.Equal("UPDATE table SET count = 30", query.String())
+
+		query = loukoum.Update("table").Set(loukoum.Map{"count": sql.NullInt64{Int64: 30, Valid: false}})
+		is.Equal("UPDATE table SET count = NULL", query.String())
 	}
 }
 

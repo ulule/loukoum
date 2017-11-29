@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"time"
 
@@ -29,6 +30,8 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 		return NewValue(value)
 	case *time.Time:
 		return NewValue(*value)
+	case driver.Valuer:
+		return NewValueFromValuer(value)
 	case []string:
 		return NewArrayString(value)
 	case []int:
@@ -75,6 +78,9 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 		case time.Time, *time.Time:
 			return NewExpression(value)
 
+		case driver.Valuer:
+			return NewExpression(value)
+
 		case Select:
 			return NewExpression(value)
 
@@ -110,6 +116,12 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 			array.AddValue(NewValue(value))
 		case bool:
 			array.AddValue(NewValue(value))
+		case time.Time:
+			array.AddValue(NewValue(value))
+		case *time.Time:
+			array.AddValue(NewValue(*value))
+		case driver.Valuer:
+			array.AddValue(NewValueFromValuer(value))
 		case Raw:
 			array.AddRaw(value)
 		default:
@@ -265,6 +277,20 @@ func NewValue(value interface{}) Value {
 	return Value{
 		Value: value,
 	}
+}
+
+// NewValueFromValuer returns the underlying valuer value.
+func NewValueFromValuer(valuer driver.Valuer) Value {
+	v, err := valuer.Value()
+	if err != nil {
+		panic("loukoum: was not able to retrieve valuer value")
+	}
+
+	if v == nil {
+		return NewValue(nil)
+	}
+
+	return NewValue(v)
 }
 
 func (Value) expression() {}
