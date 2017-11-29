@@ -7,7 +7,7 @@ import (
 )
 
 // Value formats the given value.
-func Value(arg interface{}) string {
+func Value(arg interface{}) string { // nolint: gocyclo
 	switch value := arg.(type) {
 	case string:
 		return String(value)
