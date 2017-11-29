@@ -32,7 +32,7 @@ func rawify(query string, args map[string]interface{}) string {
 		case string:
 			nvalue = fmt.Sprint("'", value, "'")
 		case time.Time:
-			nvalue = fmt.Sprint("'", value.UTC().Format("2006-01-02 15:04:05.999999"), "+00'")
+			nvalue = types.FormatTime(value)
 		default:
 			nvalue = fmt.Sprint(value)
 		}
