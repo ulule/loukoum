@@ -24,7 +24,7 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 	case Expression:
 		return value
 	case string, bool, int, int8, int16, int32, int64,
-		uint, uint8, uint16, uint32, uint64:
+		uint, uint8, uint16, uint32, uint64, float32, float64:
 		return NewValue(value)
 	case time.Time:
 		return NewValue(value)
@@ -56,6 +56,10 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 		return NewArrayUint64(value)
 	case []bool:
 		return NewArrayBool(value)
+	case []float32:
+		return NewArrayFloat32(value)
+	case []float64:
+		return NewArrayFloat64(value)
 	default:
 		panic(fmt.Sprintf("cannot use {%+v}[%T] as loukoum Expression", value, value))
 	}
@@ -68,11 +72,11 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 		value := values[0]
 		switch value.(type) {
 		case []string, []int, []uint, []int8, []uint8, []int16, []uint16,
-			[]int32, []uint32, []int64, []uint64, []bool:
+			[]int32, []uint32, []int64, []uint64, []bool, []float32, []float64:
 			return NewExpression(value)
 
 		case string, int, uint, int8, uint8, int16, uint16,
-			int32, uint32, int64, uint64, bool:
+			int32, uint32, int64, uint64, bool, float32, float64:
 			return NewExpression(value)
 
 		case time.Time, *time.Time:
@@ -115,6 +119,10 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 		case uint64:
 			array.AddValue(NewValue(value))
 		case bool:
+			array.AddValue(NewValue(value))
+		case float32:
+			array.AddValue(NewValue(value))
+		case float64:
 			array.AddValue(NewValue(value))
 		case time.Time:
 			array.AddValue(NewValue(value))
@@ -427,6 +435,24 @@ func NewArrayUint64(values []uint64) Array {
 
 // NewArrayBool returns an expression array for "bool" type.
 func NewArrayBool(values []bool) Array {
+	array := NewArray()
+	for i := range values {
+		array.AddValue(NewValue(values[i]))
+	}
+	return array
+}
+
+// NewArrayFloat32 returns an expression array for "float32" type.
+func NewArrayFloat32(values []float32) Array {
+	array := NewArray()
+	for i := range values {
+		array.AddValue(NewValue(values[i]))
+	}
+	return array
+}
+
+// NewArrayFloat64 returns an expression array for "float64" type.
+func NewArrayFloat64(values []float64) Array {
 	array := NewArray()
 	for i := range values {
 		array.AddValue(NewValue(values[i]))
