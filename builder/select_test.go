@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum"
+	"github.com/ulule/loukoum/stmt"
 )
 
 func TestSelect(t *testing.T) {
@@ -39,6 +40,14 @@ func TestSelect(t *testing.T) {
 	{
 		query := loukoum.Select("a", loukoum.Column("b"), loukoum.Column("c").As("x"))
 		is.Equal("SELECT a, b, c AS x", query.String())
+	}
+	{
+		query := loukoum.Select([]string{"a", "b", "c"})
+		is.Equal("SELECT a, b, c", query.String())
+	}
+	{
+		query := loukoum.Select([]stmt.Column{loukoum.Column("a"), loukoum.Column("b"), loukoum.Column("c")})
+		is.Equal("SELECT a, b, c", query.String())
 	}
 }
 
