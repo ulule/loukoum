@@ -54,6 +54,13 @@ func ToColumn(arg interface{}) stmt.Column {
 
 // ToColumns takes a list of empty interfaces and returns a slice of Column instance.
 func ToColumns(values []interface{}) []stmt.Column {
+	if len(values) == 1 {
+		columns, ok := values[0].([]interface{})
+		if ok {
+			return ToColumns(columns)
+		}
+	}
+
 	columns := make([]stmt.Column, 0, len(values))
 
 	for i := range values {
