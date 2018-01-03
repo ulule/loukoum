@@ -39,4 +39,6 @@ const (
 	NotILike           = ComparisonOperator("NOT ILIKE")
 	Between            = ComparisonOperator("BETWEEN")
 	NotBetween         = ComparisonOperator("NOT BETWEEN")
+	IsDistinctFrom     = ComparisonOperator("IS DISTINCT FROM")
+	IsNotDistinctFrom  = ComparisonOperator("IS NOT DISTINCT FROM")
 )

@@ -268,6 +268,18 @@ func (identifier Identifier) NotBetween(from, to interface{}) Between {
 	return NewNotBetween(identifier, NewExpression(from), NewExpression(to))
 }
 
+// IsDistinctFrom performs an "is distinct from" comparison.
+func (identifier Identifier) IsDistinctFrom(value interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.IsDistinctFrom)
+	return NewInfixExpression(identifier, operator, NewExpression(value))
+}
+
+// IsNotDistinctFrom performs an "is not distinct from" comparison.
+func (identifier Identifier) IsNotDistinctFrom(value interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.IsNotDistinctFrom)
+	return NewInfixExpression(identifier, operator, NewExpression(value))
+}
+
 // Ensure that Identifier is an Expression
 var _ Expression = Identifier{}
 
