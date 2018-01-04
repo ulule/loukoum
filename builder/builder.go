@@ -54,6 +54,20 @@ func ToColumn(arg interface{}) stmt.Column {
 
 // ToColumns takes a list of empty interfaces and returns a slice of Column instance.
 func ToColumns(values []interface{}) []stmt.Column {
+	// If values is a slice, we try to use recursion to obtain a slice of Column.
+	if len(values) == 1 {
+		switch array := values[0].(type) {
+		case []stmt.Column:
+			return array
+		case []string:
+			list := make([]interface{}, len(array))
+			for i := range array {
+				list[i] = array[i]
+			}
+			return ToColumns(list)
+		}
+	}
+
 	columns := make([]stmt.Column, 0, len(values))
 
 	for i := range values {
