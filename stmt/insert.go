@@ -30,18 +30,14 @@ func (insert Insert) Write(ctx *types.Context) {
 	insert.Into.Write(ctx)
 
 	if len(insert.Columns) > 0 {
-		nbColumns := len(insert.Columns)
+		ctx.Write(" (")
 		for i := range insert.Columns {
-			if i == 0 {
-				ctx.Write(" (")
-			} else {
+			if i != 0 {
 				ctx.Write(", ")
 			}
 			insert.Columns[i].Write(ctx)
-			if i == nbColumns-1 {
-				ctx.Write(")")
-			}
 		}
+		ctx.Write(")")
 	}
 
 	if !insert.Values.IsEmpty() {
