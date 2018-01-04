@@ -7,10 +7,11 @@ import (
 
 // Insert is a INSERT statement.
 type Insert struct {
-	Into      Into
-	Columns   []Column
-	Values    Values
-	Returning Returning
+	Into       Into
+	Columns    []Column
+	Values     Values
+	OnConflict OnConflict
+	Returning  Returning
 }
 
 // NewInsert returns a new Insert instance.
@@ -46,6 +47,11 @@ func (insert Insert) Write(ctx *types.Context) {
 	if !insert.Values.IsEmpty() {
 		ctx.Write(" ")
 		insert.Values.Write(ctx)
+	}
+
+	if !insert.OnConflict.IsEmpty() {
+		ctx.Write(" ")
+		insert.OnConflict.Write(ctx)
 	}
 
 	if !insert.Returning.IsEmpty() {

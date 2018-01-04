@@ -224,3 +224,13 @@ func ToSetPairs(args []interface{}) stmt.SetPairs {
 
 	return pairs
 }
+
+// ToSet takes either a types.Map or slice of types.Pair and returns a stmt.Set instance.
+func ToSet(args []interface{}) stmt.Set {
+	set := stmt.NewSet()
+	pairs := ToSetPairs(args)
+	for k, v := range pairs {
+		set.Pairs[k] = v
+	}
+	return set
+}

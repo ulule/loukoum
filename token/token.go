@@ -61,6 +61,9 @@ const (
 	Returning = Type("RETURNING")
 	Values    = Type("VALUES")
 	Into      = Type("INTO")
+	Conflict  = Type("CONFLICT")
+	Do        = Type("DO")
+	Nothing   = Type("NOTHING")
 )
 
 type Token struct {
@@ -101,6 +104,9 @@ var keywords = map[string]Type{
 	"RETURNING": Returning,
 	"VALUES":    Values,
 	"INTO":      Into,
+	"CONFLICT":  Conflict,
+	"DO":        Do,
+	"NOTHING":   Nothing,
 }
 
 func Lookup(e string) Type {
