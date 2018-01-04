@@ -228,9 +228,14 @@ func ToSetPairs(args []interface{}) map[stmt.Column]stmt.Expression {
 // ToSet takes either a types.Map or slice of types.Pair and returns a stmt.Set instance.
 func ToSet(args []interface{}) stmt.Set {
 	set := stmt.NewSet()
-	pairs := ToSetPairs(args)
-	for k, v := range pairs {
-		set.Pairs[k] = v
-	}
+	set.Pairs = MergeSetPairs(set.Pairs, ToSetPairs(args))
 	return set
+}
+
+// MergeSetPairs merges new pairs into existing ones (last write wins).
+func MergeSetPairs(source stmt.SetPairs, update map[stmt.Column]stmt.Expression) stmt.SetPairs {
+	for key, value := range update {
+		source.Pairs[key] = value
+	}
+	return source
 }

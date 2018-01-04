@@ -484,13 +484,31 @@ func TestUpdate_Set_Using(t *testing.T) {
 
 	// Multi-values
 	{
-		query := loukoum.Update("table").Set("a", "b", "c").Using("d", "e", "f")
+		query := loukoum.
+			Update("table").
+			Set("a", "b", "c").
+			Using("d", "e", "f")
+
+		is.Equal("UPDATE table SET (a, b, c) = ('d', 'e', 'f')", query.String())
+	}
+	{
+		query := loukoum.
+			Update("table").
+			Set("a").
+			Set("b").
+			Set("c").
+			Using("d", "e", "f")
+
 		is.Equal("UPDATE table SET (a, b, c) = ('d', 'e', 'f')", query.String())
 	}
 
 	// Columns to columns
 	{
-		query := loukoum.Update("table").Set("a", "b", "c").Using(loukoum.Raw("d+1"), loukoum.Raw("e+1"), loukoum.Raw("f+1"))
+		query := loukoum.
+			Update("table").
+			Set("a", "b", "c").
+			Using(loukoum.Raw("d+1"), loukoum.Raw("e+1"), loukoum.Raw("f+1"))
+
 		is.Equal("UPDATE table SET (a, b, c) = (d+1, e+1, f+1)", query.String())
 	}
 

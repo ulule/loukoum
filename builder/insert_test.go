@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum"
+	"github.com/ulule/loukoum/builder"
 )
 
 func TestInsert_Columns(t *testing.T) {
@@ -186,8 +187,8 @@ func TestInsert_OnConflict(t *testing.T) {
 
 	// Corner cases...
 	{
-		is.Panics(func() {
-			loukoum.
+		Failure(is, func() builder.Builder {
+			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
@@ -195,8 +196,8 @@ func TestInsert_OnConflict(t *testing.T) {
 		})
 	}
 	{
-		is.Panics(func() {
-			loukoum.
+		Failure(is, func() builder.Builder {
+			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
@@ -204,8 +205,8 @@ func TestInsert_OnConflict(t *testing.T) {
 		})
 	}
 	{
-		is.Panics(func() {
-			loukoum.
+		Failure(is, func() builder.Builder {
+			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
@@ -216,8 +217,8 @@ func TestInsert_OnConflict(t *testing.T) {
 		})
 	}
 	{
-		is.Panics(func() {
-			loukoum.
+		Failure(is, func() builder.Builder {
+			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
@@ -225,8 +226,8 @@ func TestInsert_OnConflict(t *testing.T) {
 		})
 	}
 	{
-		is.Panics(func() {
-			loukoum.
+		Failure(is, func() builder.Builder {
+			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
@@ -234,8 +235,8 @@ func TestInsert_OnConflict(t *testing.T) {
 		})
 	}
 	{
-		is.Panics(func() {
-			loukoum.
+		Failure(is, func() builder.Builder {
+			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
@@ -243,8 +244,8 @@ func TestInsert_OnConflict(t *testing.T) {
 		})
 	}
 	{
-		is.Panics(func() {
-			loukoum.
+		Failure(is, func() builder.Builder {
+			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
