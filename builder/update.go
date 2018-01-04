@@ -36,11 +36,10 @@ func (b Update) Set(args ...interface{}) Update {
 	}
 
 	if b.query.Set.IsList {
-		b.query.Set.List.Columns = ToColumns(args)
-		return b
+		b.query.Set.List.Columns = append(b.query.Set.List.Columns, ToColumns(args)...)
+	} else {
+		b.query.Set.Pairs = MergeSetPairs(b.query.Set.Pairs, ToSetPairs(args))
 	}
-
-	b.query.Set.Pairs.Merge(ToSetPairs(args))
 
 	return b
 }

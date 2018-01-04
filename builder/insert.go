@@ -79,6 +79,37 @@ func (b Insert) Returning(values ...interface{}) Insert {
 	return b
 }
 
+// OnConflict builds the ON CONFLICT clause.
+func (b Insert) OnConflict(args ...interface{}) Insert {
+	if !b.insert.OnConflict.IsEmpty() {
+		panic("loukoum: insert builder has on conflict clause already defined")
+	}
+
+	if len(args) == 0 {
+		panic("loukoum: on conflict clause requires arguments")
+	}
+
+	for i := range args {
+		switch value := args[i].(type) {
+		case string, stmt.Column:
+			b.insert.OnConflict.Target.Columns = append(b.insert.OnConflict.Target.Columns, ToColumn(value))
+		case stmt.ConflictNoAction:
+			b.insert.OnConflict.Action = value
+			return b
+		case stmt.ConflictUpdateAction:
+			if b.insert.OnConflict.Target.IsEmpty() {
+				panic("loukoum: on conflict update clause requires at least one target")
+			}
+			b.insert.OnConflict.Action = value
+			return b
+		default:
+			panic(fmt.Sprintf("loukoum: cannot use %T as on conflict clause", args[i]))
+		}
+	}
+
+	panic("loukoum: on conflict clause requires an action")
+}
+
 // String returns the underlying query as a raw statement.
 func (b Insert) String() string {
 	return rawify(b.Prepare())

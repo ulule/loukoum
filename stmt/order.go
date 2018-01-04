@@ -4,7 +4,7 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
-// Order is an expression of a "ORDER BY" clause.
+// Order is an expression of a ORDER BY clause.
 type Order struct {
 	Expression string
 	Type       types.OrderType

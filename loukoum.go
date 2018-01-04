@@ -90,3 +90,13 @@ func Delete(from interface{}) builder.Delete {
 func Update(table interface{}) builder.Update {
 	return builder.NewUpdate(table)
 }
+
+// DoNothing is a wrapper to create a new ConflictNoAction statement.
+func DoNothing() stmt.ConflictNoAction {
+	return stmt.NewConflictNoAction()
+}
+
+// DoUpdate is a wrapper to create a new ConflictUpdateAction statement.
+func DoUpdate(args ...interface{}) stmt.ConflictUpdateAction {
+	return stmt.NewConflictUpdateAction(builder.ToSet(args))
+}

@@ -17,7 +17,9 @@ type Set struct {
 // NewSet returns a new Set instance.
 func NewSet() Set {
 	return Set{
-		Pairs: NewSetPairs(),
+		Pairs:  NewSetPairs(),
+		List:   NewSetList(),
+		IsList: false,
 	}
 }
 
@@ -26,12 +28,12 @@ func (set Set) Write(ctx *types.Context) {
 	ctx.Write(token.Set.String())
 	ctx.Write(" ")
 
-	if !set.Pairs.IsEmpty() {
+	if !set.IsList && !set.Pairs.IsEmpty() {
 		set.Pairs.Write(ctx)
 		return
 	}
 
-	if !set.List.IsEmpty() {
+	if set.IsList && !set.List.IsEmpty() {
 		set.List.Write(ctx)
 		return
 	}
@@ -41,8 +43,7 @@ func (set Set) Write(ctx *types.Context) {
 
 // IsEmpty returns true if statement is undefined.
 func (set Set) IsEmpty() bool {
-	return (!set.IsList && set.Pairs.IsEmpty()) ||
-		(set.IsList && set.List.IsEmpty())
+	return (!set.IsList && set.Pairs.IsEmpty()) || (set.IsList && set.List.IsEmpty())
 }
 
 // Ensure that Set is a Statement.
@@ -52,7 +53,12 @@ var _ Statement = Set{}
 // Pair syntax
 // ----------------------------------------------------------------------------
 
-// SetPairs is the "standard" SET key/value syntax.
+// SetPairs is the key-value syntax (a.k.a "standard" or "default").
+//
+// Example:
+//
+//   * SET foo = 1, bar = 2, baz = 3
+//
 type SetPairs struct {
 	Pairs map[Column]Expression
 }
@@ -64,41 +70,36 @@ func NewSetPairs() SetPairs {
 	}
 }
 
-// Merge merges new pairs into existing ones (last write wins).
-func (s SetPairs) Merge(pairs map[Column]Expression) {
-	for k, v := range pairs {
-		s.Pairs[k] = v
-	}
-}
-
 // Write exposes statement as a SQL query.
-func (s SetPairs) Write(ctx *types.Context) {
-	type pair struct {
+func (pairs SetPairs) Write(ctx *types.Context) {
+	type item struct {
 		k Column
 		v Expression
 	}
 
-	pairs := make([]pair, 0, len(s.Pairs))
-	for k, v := range s.Pairs {
-		pairs = append(pairs, pair{k: k, v: v})
+	list := make([]item, 0, len(pairs.Pairs))
+	for k, v := range pairs.Pairs {
+		list = append(list, item{k: k, v: v})
 	}
 
-	sort.Slice(pairs[:], func(i, j int) bool { return pairs[i].k.Name < pairs[j].k.Name })
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].k.Name < list[j].k.Name
+	})
 
-	for i, pair := range pairs {
+	for i := range list {
 		if i != 0 {
 			ctx.Write(", ")
 		}
 
-		pair.k.Write(ctx)
+		list[i].k.Write(ctx)
 		ctx.Write(" = ")
-		pair.v.Write(ctx)
+		list[i].v.Write(ctx)
 	}
 }
 
 // IsEmpty returns true if statement is undefined.
-func (s SetPairs) IsEmpty() bool {
-	return len(s.Pairs) == 0
+func (pairs SetPairs) IsEmpty() bool {
+	return len(pairs.Pairs) == 0
 }
 
 // Ensure that SetPairs is a Statement.
@@ -109,7 +110,12 @@ var _ Statement = SetPairs{}
 // ----------------------------------------------------------------------------
 
 // SetList is the column-list syntax.
-// Example: SET (foo, bar, baz) = (1, 2, 3) / SET (foo, bar, baz) = (sub-select)
+//
+// Example:
+//
+//   * SET (foo, bar, baz) = (1, 2, 3)
+//   * SET (foo, bar, baz) = (sub-select)
+//
 type SetList struct {
 	Columns     []Column
 	Expressions []Expression
@@ -121,35 +127,35 @@ func NewSetList() SetList {
 }
 
 // Write exposes statement as a SQL query.
-func (s SetList) Write(ctx *types.Context) {
-	if s.IsEmpty() {
+func (list SetList) Write(ctx *types.Context) {
+	if list.IsEmpty() {
 		panic("loukoum: set requires at least one column")
 	}
 
 	ctx.Write("(")
-	for i := range s.Columns {
+	for i := range list.Columns {
 		if i != 0 {
 			ctx.Write(", ")
 		}
-		s.Columns[i].Write(ctx)
+		list.Columns[i].Write(ctx)
 	}
 	ctx.Write(")")
 
 	ctx.Write(" = ")
 
 	ctx.Write("(")
-	for i := range s.Expressions {
+	for i := range list.Expressions {
 		if i != 0 {
 			ctx.Write(", ")
 		}
-		s.Expressions[i].Write(ctx)
+		list.Expressions[i].Write(ctx)
 	}
 	ctx.Write(")")
 }
 
 // IsEmpty returns true if statement is undefined.
-func (s SetList) IsEmpty() bool {
-	return len(s.Columns) == 0
+func (list SetList) IsEmpty() bool {
+	return len(list.Columns) == 0
 }
 
 // Ensure that SetList is a Statement.
