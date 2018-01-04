@@ -27,7 +27,7 @@ func (b Update) Only() Update {
 func (b Update) Set(args ...interface{}) Update {
 	// Set() without any argument is a nonsense.
 	if len(args) == 0 {
-		panic("loukoum: update requires Set arguments")
+		panic("loukoum: update set clause requires at least one argument")
 	}
 
 	switch args[0].(type) {
@@ -52,13 +52,12 @@ func (b Update) Using(args ...interface{}) Update {
 		panic("loukoum: you can only use Using with column-list syntax")
 	}
 
-	nargs := len(args)
-	if nargs == 0 {
-		panic("loukoum: using requires a column or an expression")
+	if len(args) == 0 {
+		panic("loukoum: using clause requires a column or an expression")
 	}
 
-	for _, arg := range args {
-		b.query.Set.List.Expressions = append(b.query.Set.List.Expressions, stmt.NewExpression(arg))
+	for i := range args {
+		b.query.Set.List.Expressions = append(b.query.Set.List.Expressions, stmt.NewExpression(args[i]))
 	}
 
 	return b
