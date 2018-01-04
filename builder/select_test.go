@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum"
+	"github.com/ulule/loukoum/builder"
 	"github.com/ulule/loukoum/stmt"
 )
 
@@ -886,6 +887,7 @@ func TestSelect_OrderBy(t *testing.T) {
 func TestSelect_Limit(t *testing.T) {
 	is := require.New(t)
 
+	// Limit with several types
 	{
 		query := loukoum.
 			Select("name").
@@ -910,16 +912,25 @@ func TestSelect_Limit(t *testing.T) {
 
 		is.Equal("SELECT name FROM user LIMIT 700", query.String())
 	}
+
+	// Corner cases...
 	{
-		is.Panics(func() { loukoum.Select("name").From("user").Limit(700.2) })
-		is.Panics(func() { loukoum.Select("name").From("user").Limit(float32(700.2)) })
-		is.Panics(func() { loukoum.Select("name").From("user").Limit(-700) })
+		Failure(is, func() builder.Builder {
+			return loukoum.Select("name").From("user").Limit(700.2)
+		})
+		Failure(is, func() builder.Builder {
+			return loukoum.Select("name").From("user").Limit(float32(700.2))
+		})
+		Failure(is, func() builder.Builder {
+			return loukoum.Select("name").From("user").Limit(-700)
+		})
 	}
 }
 
 func TestSelect_Offset(t *testing.T) {
 	is := require.New(t)
 
+	// Offset with several types
 	{
 		query := loukoum.
 			Select("name").
@@ -944,10 +955,18 @@ func TestSelect_Offset(t *testing.T) {
 
 		is.Equal("SELECT name FROM user OFFSET 700", query.String())
 	}
+
+	// Corner cases...
 	{
-		is.Panics(func() { loukoum.Select("name").From("user").Offset(700.2) })
-		is.Panics(func() { loukoum.Select("name").From("user").Offset(float32(700.2)) })
-		is.Panics(func() { loukoum.Select("name").From("user").Offset(-700) })
+		Failure(is, func() builder.Builder {
+			return loukoum.Select("name").From("user").Offset(700.2)
+		})
+		Failure(is, func() builder.Builder {
+			return loukoum.Select("name").From("user").Offset(float32(700.2))
+		})
+		Failure(is, func() builder.Builder {
+			return loukoum.Select("name").From("user").Offset(-700)
+		})
 	}
 }
 
