@@ -1,13 +1,17 @@
 package builder_test
 
 import (
+	"database/sql"
 	"fmt"
 	"testing"
+	"time"
 
+	"github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum"
 	"github.com/ulule/loukoum/builder"
+	"github.com/ulule/loukoum/format"
 )
 
 func TestInsert_Columns(t *testing.T) {
@@ -292,4 +296,65 @@ func TestInsert_Returning(t *testing.T) {
 	}
 
 	// TODO: expression
+}
+
+func TestInsert_Valuer(t *testing.T) {
+	is := require.New(t)
+
+	// pq.NullTime
+	{
+		now := time.Now()
+		query := loukoum.
+			Insert("table").
+			Columns("email", "enabled", "created_at").
+			Values("tech@ulule.com", true, pq.NullTime{Time: now, Valid: true})
+
+		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
+			"true, ", format.Time(now), ")"), query.String())
+	}
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("email", "enabled", "created_at").
+			Values("tech@ulule.com", true, pq.NullTime{})
+
+		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
+			"true, NULL)"), query.String())
+	}
+
+	// sql.NullString
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("email", "comment").
+			Values("tech@ulule.com", sql.NullString{String: "foobar", Valid: true})
+
+		is.Equal("INSERT INTO table (email, comment) VALUES ('tech@ulule.com', 'foobar')", query.String())
+	}
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("email", "comment").
+			Values("tech@ulule.com", sql.NullString{})
+
+		is.Equal("INSERT INTO table (email, comment) VALUES ('tech@ulule.com', NULL)", query.String())
+	}
+
+	// sql.NullInt64
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("email", "login").
+			Values("tech@ulule.com", sql.NullInt64{Int64: 30, Valid: true})
+
+		is.Equal("INSERT INTO table (email, login) VALUES ('tech@ulule.com', 30)", query.String())
+	}
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("email", "login").
+			Values("tech@ulule.com", sql.NullInt64{})
+
+		is.Equal("INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)", query.String())
+	}
 }

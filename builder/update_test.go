@@ -440,10 +440,9 @@ func TestUpdate_Set_Valuer(t *testing.T) {
 	// pq.NullTime
 	{
 		now := time.Now()
-		fnow := format.Time(now)
 
 		query := loukoum.Update("table").Set(loukoum.Map{"created_at": pq.NullTime{Time: now, Valid: true}})
-		is.Equal(fmt.Sprintf("UPDATE table SET created_at = %s", fnow), query.String())
+		is.Equal(fmt.Sprint("UPDATE table SET created_at = ", format.Time(now)), query.String())
 
 		query = loukoum.Update("table").Set(loukoum.Map{"created_at": pq.NullTime{Time: now, Valid: false}})
 		is.Equal("UPDATE table SET created_at = NULL", query.String())
@@ -459,7 +458,7 @@ func TestUpdate_Set_Valuer(t *testing.T) {
 
 	}
 
-	// sql.NullInt
+	// sql.NullInt64
 	{
 		query := loukoum.Update("table").Set(loukoum.Map{"count": sql.NullInt64{Int64: 30, Valid: true}})
 		is.Equal("UPDATE table SET count = 30", query.String())
