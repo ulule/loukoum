@@ -38,7 +38,7 @@ func ToColumn(arg interface{}) stmt.Column {
 
 	switch value := arg.(type) {
 	case string:
-		column = stmt.NewColumn(value)
+		column = stmt.NewColumn(strings.TrimSpace(value))
 	case stmt.Column:
 		column = value
 	default:
@@ -58,6 +58,11 @@ func ToColumns(values []interface{}) []stmt.Column {
 	if len(values) == 1 {
 		switch array := values[0].(type) {
 		case []stmt.Column:
+			for i := range array {
+				if array[i].IsEmpty() {
+					panic("loukoum: given column is undefined")
+				}
+			}
 			return array
 		case []string:
 			list := make([]interface{}, len(array))
@@ -71,7 +76,24 @@ func ToColumns(values []interface{}) []stmt.Column {
 	columns := make([]stmt.Column, 0, len(values))
 
 	for i := range values {
-		columns = append(columns, ToColumn(values[i]))
+		switch value := values[i].(type) {
+		case string:
+			array := strings.Split(value, ",")
+			for y := range array {
+				column := stmt.NewColumn(strings.TrimSpace(array[y]))
+				if column.IsEmpty() {
+					panic("loukoum: given column is undefined")
+				}
+				columns = append(columns, column)
+			}
+		case stmt.Column:
+			if value.IsEmpty() {
+				panic("loukoum: given column is undefined")
+			}
+			columns = append(columns, value)
+		default:
+			panic(fmt.Sprintf("loukoum: cannot use %T as column", values[i]))
+		}
 	}
 
 	return columns
