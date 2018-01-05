@@ -93,6 +93,9 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 		case driver.Valuer:
 			return NewExpression(value)
 
+		case types.Int64Encoder, types.BoolEncoder, types.TimeEncoder, types.StringEncoder:
+			return NewExpression(value)
+
 		case Select:
 			return NewExpression(value)
 
@@ -140,6 +143,15 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 			array.AddValue(NewValueFromValuer(value))
 		case Raw:
 			array.AddRaw(value)
+		case types.Int64Encoder:
+			array.AddValue(NewValue(value.Int64()))
+		case types.BoolEncoder:
+			array.AddValue(NewValue(value.Bool()))
+		case types.TimeEncoder:
+			array.AddValue(NewValue(value.Time()))
+		case types.StringEncoder:
+			array.AddValue(NewValue(value.String()))
+
 		default:
 			panic(fmt.Sprintf("cannot use {%+v}[%T] as loukoum Value", value, value))
 		}
