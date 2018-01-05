@@ -32,6 +32,14 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 		return NewValue(*value)
 	case driver.Valuer:
 		return NewValueFromValuer(value)
+	case types.Int64Encoder:
+		return NewValue(value.Int64())
+	case types.BoolEncoder:
+		return NewValue(value.Bool())
+	case types.TimeEncoder:
+		return NewValue(value.Time())
+	case types.StringEncoder:
+		return NewValue(value.String())
 	case []string:
 		return NewArrayString(value)
 	case []int:
