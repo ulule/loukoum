@@ -2,38 +2,14 @@
 
 
 [[projects]]
-  name = "github.com/Masterminds/squirrel"
+  name = "github.com/pkg/errors"
   packages = ["."]
-  revision = "a6b93000bd219143c56c16e6cb1c4b91da3f224b"
-  version = "v1.0"
-
-[[projects]]
-  name = "github.com/doug-martin/goqu"
-  packages = ["."]
-  revision = "fcccf41c26d20796d831aafe71d121a97f2bb6fb"
-  version = "v4.1.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/lann/builder"
-  packages = ["."]
-  revision = "f22ce00fd9394014049dad11c244859432bd6820"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/lann/ps"
-  packages = ["."]
-  revision = "62de8c46ede02a7675c4c79c84883eb164cb71e3"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/minodisk/sqlabble"
-  packages = [".","keyword","stmt","token","tokenizer"]
-  revision = "211cee25c1e85bff198c297b8290819edc7d41e4"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7cb5ede4655c3652dfd9b967aea993970968ecc368c17c0271af1c30ead80754"
+  inputs-digest = "37d4fb629df131a5be0130f8edc11fedf13b7b74715777d815563e7802d8c639"
   solver-name = "gps-cdcl"
   solver-version = 1
