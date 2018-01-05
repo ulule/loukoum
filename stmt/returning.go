@@ -22,20 +22,11 @@ func (returning Returning) Write(ctx *types.Context) {
 	ctx.Write(token.Returning.String())
 	ctx.Write(" ")
 
-	l := len(returning.Columns)
-	if l > 1 {
-		ctx.Write("(")
-	}
-
 	for i := range returning.Columns {
 		if i > 0 {
 			ctx.Write(", ")
 		}
 		returning.Columns[i].Write(ctx)
-	}
-
-	if l > 1 {
-		ctx.Write(")")
 	}
 }
 

@@ -281,10 +281,19 @@ func TestInsert_Returning(t *testing.T) {
 			Values([]string{"va", "vb", "vc"}).
 			Returning("a", "b")
 
-		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING (a, b)", query.String())
+		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b", query.String())
+	}
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("a", "b", "c").
+			Values([]string{"va", "vb", "vc"}).
+			Returning("a", "b", "c")
+
+		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b, c", query.String())
 	}
 
-	// AS
+	// With aliases
 	{
 		query := loukoum.
 			Insert("table").
@@ -293,6 +302,30 @@ func TestInsert_Returning(t *testing.T) {
 			Returning(loukoum.Column("a").As("alias_a"))
 
 		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a AS alias_a", query.String())
+	}
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("a", "b", "c").
+			Values([]string{"va", "vb", "vc"}).
+			Returning(loukoum.Column("a").As("alias_a"), loukoum.Column("b").As("alias_b"))
+
+		is.Equal(fmt.Sprint("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
+			"RETURNING a AS alias_a, b AS alias_b"), query.String())
+	}
+	{
+		query := loukoum.
+			Insert("table").
+			Columns("a", "b", "c").
+			Values([]string{"va", "vb", "vc"}).
+			Returning(
+				loukoum.Column("a").As("alias_a"),
+				loukoum.Column("b").As("alias_b"),
+				loukoum.Column("c").As("alias_c"),
+			)
+
+		is.Equal(fmt.Sprint("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
+			"RETURNING a AS alias_a, b AS alias_b, c AS alias_c"), query.String())
 	}
 
 	// TODO: expression
