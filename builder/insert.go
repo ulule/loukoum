@@ -43,7 +43,7 @@ func (b Insert) Into(into interface{}) Insert {
 	return b
 }
 
-// Columns sets the insert columns.
+// Columns sets the query columns.
 func (b Insert) Columns(columns ...interface{}) Insert {
 	if len(columns) == 0 {
 		return b
@@ -57,7 +57,7 @@ func (b Insert) Columns(columns ...interface{}) Insert {
 	return b
 }
 
-// Values sets the INSERT values.
+// Values sets the query values.
 func (b Insert) Values(values ...interface{}) Insert {
 	if !b.insert.Values.IsEmpty() {
 		panic("loukoum: insert builder has values clause already defined")
@@ -108,6 +108,29 @@ func (b Insert) OnConflict(args ...interface{}) Insert {
 	}
 
 	panic("loukoum: on conflict clause requires an action")
+}
+
+// Set is a wrapper that defines columns and values clauses using a pair.
+func (b Insert) Set(args ...interface{}) Insert {
+	if len(b.insert.Columns) != 0 {
+		panic("loukoum: insert builder has columns clause already defined")
+	}
+	if !b.insert.Values.IsEmpty() {
+		panic("loukoum: insert builder has values clause already defined")
+	}
+
+	pairs := ToSet(args).Pairs
+	columns, expressions := pairs.Values()
+
+	array := stmt.NewArray()
+	array.AddValues(expressions)
+
+	values := stmt.NewValues(array)
+
+	b.insert.Columns = columns
+	b.insert.Values = values
+
+	return b
 }
 
 // String returns the underlying query as a raw statement.

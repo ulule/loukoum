@@ -53,7 +53,7 @@ func ToColumn(arg interface{}) stmt.Column {
 }
 
 // ToColumns takes a list of empty interfaces and returns a slice of Column instance.
-func ToColumns(values []interface{}) []stmt.Column {
+func ToColumns(values []interface{}) []stmt.Column { // nolint: gocyclo
 	// If values is a slice, we try to use recursion to obtain a slice of Column.
 	if len(values) == 1 {
 		switch array := values[0].(type) {
@@ -224,40 +224,36 @@ func ToInt64(value interface{}) (int64, bool) { // nolint: gocyclo
 	return 0, false
 }
 
-// ToSetPairs takes either a types.Map or slice of types.Pair and returns
-// a slice of stmt.SetPair instances.
-func ToSetPairs(args []interface{}) map[stmt.Column]stmt.Expression {
-	pairs := map[stmt.Column]stmt.Expression{}
-
+// MergeSet merges new pairs into existing ones (last write wins).
+func MergeSet(set stmt.Set, args []interface{}) stmt.Set {
 	for i := range args {
 		switch value := args[i].(type) {
+		case string, stmt.Column:
+			columns := ToColumns([]interface{}{value})
+			for y := range columns {
+				set.Pairs.Set(columns[y])
+			}
 		case map[string]interface{}:
 			for k, v := range value {
-				pairs[ToColumn(k)] = stmt.NewExpression(v)
+				set.Pairs.Add(ToColumn(k), stmt.NewExpression(v))
 			}
 		case types.Map:
 			for k, v := range value {
-				pairs[ToColumn(k)] = stmt.NewExpression(v)
+				set.Pairs.Add(ToColumn(k), stmt.NewExpression(v))
 			}
 		case types.Pair:
-			pairs[ToColumn(value.Key)] = stmt.NewExpression(value.Value)
+			set.Pairs.Add(ToColumn(value.Key), stmt.NewExpression(value.Value))
+		default:
+			panic(fmt.Sprintf("loukoum: cannot use %T as pair", value))
 		}
 	}
-
-	return pairs
+	return set
 }
 
 // ToSet takes either a types.Map or slice of types.Pair and returns a stmt.Set instance.
 func ToSet(args []interface{}) stmt.Set {
 	set := stmt.NewSet()
-	set.Pairs = MergeSetPairs(set.Pairs, ToSetPairs(args))
+	set.Pairs.Mode = stmt.PairAssociativeMode
+	set = MergeSet(set, args)
 	return set
-}
-
-// MergeSetPairs merges new pairs into existing ones (last write wins).
-func MergeSetPairs(source stmt.SetPairs, update map[stmt.Column]stmt.Expression) stmt.SetPairs {
-	for key, value := range update {
-		source.Pairs[key] = value
-	}
-	return source
 }

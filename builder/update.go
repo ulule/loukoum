@@ -25,29 +25,18 @@ func (b Update) Only() Update {
 
 // Set adds a SET clause.
 func (b Update) Set(args ...interface{}) Update {
-	// Set() without any argument is a nonsense.
 	if len(args) == 0 {
 		panic("loukoum: update set clause requires at least one argument")
 	}
 
-	switch args[0].(type) {
-	case string, stmt.Column:
-		b.query.Set.IsList = true
-	}
-
-	if b.query.Set.IsList {
-		b.query.Set.List.Columns = append(b.query.Set.List.Columns, ToColumns(args)...)
-	} else {
-		b.query.Set.Pairs = MergeSetPairs(b.query.Set.Pairs, ToSetPairs(args))
-	}
-
+	b.query.Set = MergeSet(b.query.Set, args)
 	return b
 }
 
 // Using assigns the result of the given expression to
 // the columns defined in Set.
 func (b Update) Using(args ...interface{}) Update {
-	if !b.query.Set.IsList {
+	if b.query.Set.Pairs.Mode != stmt.PairArrayMode {
 		panic("loukoum: you can only use Using with column-list syntax")
 	}
 
@@ -56,7 +45,7 @@ func (b Update) Using(args ...interface{}) Update {
 	}
 
 	for i := range args {
-		b.query.Set.List.Expressions = append(b.query.Set.List.Expressions, stmt.NewExpression(args[i]))
+		b.query.Set.Pairs.Use(stmt.NewExpression(args[i]))
 	}
 
 	return b
