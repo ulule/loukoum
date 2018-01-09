@@ -507,6 +507,11 @@ func (array *Array) AddRaw(value Raw) {
 	array.Values = append(array.Values, value)
 }
 
+// AddValues appends a collection of expression to given array.
+func (array *Array) AddValues(values []Expression) {
+	array.Values = append(array.Values, values...)
+}
+
 // Ensure that Array is an Expression
 var _ Expression = Array{}
 

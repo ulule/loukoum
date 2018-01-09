@@ -391,3 +391,47 @@ func TestInsert_Valuer(t *testing.T) {
 		is.Equal("INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)", query.String())
 	}
 }
+
+func TestInsert_Set(t *testing.T) {
+	is := require.New(t)
+
+	// Variadic with Pair type.
+	{
+		query := loukoum.
+			Insert("table").
+			Set(
+				loukoum.Pair("email", "tech@ulule.com"),
+				loukoum.Pair("enabled", true),
+				loukoum.Pair("created_at", loukoum.Raw("NOW()")),
+			)
+
+		is.Equal(fmt.Sprint("INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), 'tech@ulule.com', true)"), query.String())
+	}
+
+	// Variadic with Map type.
+	{
+		query := loukoum.
+			Insert("table").
+			Set(
+				loukoum.Map{"email": "tech@ulule.com", "enabled": true},
+				loukoum.Map{"created_at": loukoum.Raw("NOW()")},
+			)
+
+		is.Equal(fmt.Sprint("INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), 'tech@ulule.com', true)"), query.String())
+	}
+
+	// Variadic with string / interface map
+	{
+		query := loukoum.
+			Insert("table").
+			Set(
+				map[string]interface{}{"email": "tech@ulule.com"},
+				map[string]interface{}{"enabled": true, "created_at": loukoum.Raw("NOW()")},
+			)
+
+		is.Equal(fmt.Sprint("INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), 'tech@ulule.com', true)"), query.String())
+	}
+}

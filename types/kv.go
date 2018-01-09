@@ -8,6 +8,3 @@ type Pair struct {
 	Key   interface{}
 	Value interface{}
 }
-
-// PairFunc is a function that returns a Pair instance.
-type PairFunc func(key interface{}, value interface{}) Pair
