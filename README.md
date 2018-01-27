@@ -20,9 +20,9 @@ $ go get github.com/ulule/loukoum
 ## Contributing
 
 * Ping us on twitter:
+  * [@novln_](https://twitter.com/novln_)
   * [@oibafsellig](https://twitter.com/oibafsellig)
   * [@thoas](https://twitter.com/thoas)
-  * [@novln_](https://twitter.com/novln_)
 * Fork the [project](https://github.com/ulule/loukoum)
 * Fix [bugs](https://github.com/ulule/loukoum/issues)
 
