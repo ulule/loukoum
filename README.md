@@ -17,6 +17,11 @@ $ go get github.com/ulule/loukoum
 
 > **TODO**
 
+## License
+
+This is Free Software, released under the [`MIT License`](LICENSE).
+Loukoum artworks are released under the [`Creative Commons BY-SA License`](docs/images/LICENSE).
+
 ## Contributing
 
 * Ping us on twitter:
