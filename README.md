@@ -5,12 +5,16 @@
 
 *A simple SQL Query Builder for PostgreSQL.*
 
+[![Loukoum][loukoum-img]][loukoum-url]
+
+## Introduction
+
 > **TODO**
 
 ## Installation
 
 ```bash
-$ go get github.com/ulule/loukoum
+$ dep ensure -add github.com/ulule/loukoum@master
 ```
 
 ## Usage
@@ -34,6 +38,8 @@ Loukoum artworks are released under the [`Creative Commons BY-SA License`](docs/
 
 Don't hesitate ;)
 
+[loukoum-url]: https://github.com/ulule/loukoum
+[loukoum-img]: https://raw.githubusercontent.com/ulule/loukoum/master/docs/images/banner.png
 [godoc-url]: https://godoc.org/github.com/ulule/loukoum
 [godoc-img]: https://godoc.org/github.com/ulule/loukoum?status.svg
 [license-img]: https://img.shields.io/badge/license-MIT-blue.svg
