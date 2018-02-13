@@ -23,9 +23,9 @@ $ dep ensure -add github.com/ulule/loukoum@master
 
 ## License
 
-This is Free Software, released under the [`MIT License`](LICENSE).
+This is Free Software, released under the [`MIT License`][software-license-url].
 
-Loukoum artworks are released under the [`Creative Commons BY-SA License`](docs/images/LICENSE).
+Loukoum artworks are released under the [`Creative Commons BY-SA License`][artwork-license-url].
 
 ## Contributing
 
@@ -39,7 +39,9 @@ Loukoum artworks are released under the [`Creative Commons BY-SA License`](docs/
 Don't hesitate ;)
 
 [loukoum-url]: https://github.com/ulule/loukoum
-[loukoum-img]: https://raw.githubusercontent.com/ulule/loukoum/master/docs/images/banner.png
+[loukoum-img]: docs/images/banner.png
 [godoc-url]: https://godoc.org/github.com/ulule/loukoum
 [godoc-img]: https://godoc.org/github.com/ulule/loukoum?status.svg
 [license-img]: https://img.shields.io/badge/license-MIT-blue.svg
+[software-license-url]: LICENSE
+[artwork-license-url]: docs/images/LICENSE
