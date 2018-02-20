@@ -9,7 +9,7 @@
 
 ## Introduction
 
-Loukoum is a simple SQL Query Builder for **PostgreSQL**.
+Loukoum is a simple SQL Query Builder currently only **PostgreSQL** is supported.
 
 If you have to generate complex queries, which relies on various context, **loukoum** is the right tool for you.
 
@@ -17,10 +17,10 @@ Afraid to slip a tiny **SQL injection** manipulating `fmt` to append conditions?
 
 Just a few examples when and where loukoum can become handy:
 
- * Remove user anonymity if user is an admin.
- * Display news draft for an author.
- * Add filters in query if there is query parameters in request.
- * Add a `ON CONFLICT` clause for resource's owner.
+ * Remove user anonymity if user is an admin
+ * Display news draft for an author
+ * Add filters in query based on request parameters
+ * Add a `ON CONFLICT` clause for resource's owner
  * And so on...
 
 ## Installation
@@ -40,19 +40,40 @@ However, this is not an ORM or a Mapper.
 ```go
 import lk "github.com/ulule/loukoum"
 
-stmt := lk.Select("id", "first_name", "last_name", "email").
-    From("users").
-    Where(lk.Condition("deleted_at").IsNull(true))
+// User model
+type User struct {
+	ID int64
 
-users := []User{}
-query, args := stmt.Prepare()
-
-err := sqlx.FromContext(ctx).Select(query, args, &users)
-if err != nil {
-    return nil, err
+	FirstName string `db:"first_name"`
+	LastName  string `db:"last_name"`
+	Email     string
+	DeletedAt pq.NullTime `db:"deleted_at"`
 }
 
-return users, nil
+// FindUsers retrieves non-deleted users
+func FindUsers(db *sqlx.DB) ([]User, error) {
+	builder := lk.Select("id", "first_name", "last_name", "email").
+		From("users").
+		Where(lk.Condition("deleted_at").IsNull(true))
+
+	users := []User{}
+
+	// query: SELECT id, first_name, last_name, email FROM users WHERE (deleted_at IS NULL)
+	// args: map[string]interface{}{}
+	query, args := builder.Prepare()
+
+	stmt, err := db.PrepareNamed(query)
+	if err != nil {
+		return nil, err
+	}
+
+	err = stmt.Select(users, args)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
 ```
 
 ### Insert
@@ -60,55 +81,167 @@ return users, nil
 ```go
 import lk "github.com/ulule/loukoum"
 
-stmt := lk.Insert("comments").
-    Set(
-        lk.Pair("email", comment.Email),
-        lk.Pair("status", "waiting"),
-        lk.Pair("message", comment.Message),
-        lk.Pair("created_at", lk.Raw("NOW()")),
-    ).
-    OnConflict("email", lk.DoUpdate(
-        lk.Pair("message", comment.Message),
-        lk.Pair("status", "waiting"),
-        lk.Pair("created_at", lk.Raw("NOW()")),
-        lk.Pair("deleted_at", nil),
-    )).
-    Returning("id")
+// Comment model
+type Comment struct {
+	ID        int64
+	Email     string      `db:"mail"`
+	Status    string      `db:"status"`
+	Message   string      `db:"message"`
+	CreatedAt pq.NullTime `db:"deleted_at"`
+	DeletedAt pq.NullTime `db:"deleted_at"`
+}
 
-query, args := stmt.Prepare()
-return sqlx.FromContext(ctx).Insert(query, args, comment)
+// CreateComment creates a comment.
+func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
+	builder := lk.Insert("comments").
+		Set(
+			lk.Pair("email", comment.Email),
+			lk.Pair("status", "waiting"),
+			lk.Pair("message", comment.Message),
+			lk.Pair("created_at", lk.Raw("NOW()")),
+		).
+		Returning("id")
+
+	query, args := builder.Prepare()
+	// query: INSERT INTO comments (created_at, email, message, status) VALUES (NOW(), :arg_1, :arg_2, :arg_3) RETURNING id
+	// args: (map[string]interface {}) (len=3) {
+	// (string) (len=5) "arg_1": (string) (len=5) comment.Email,
+	// (string) (len=5) "arg_2": (string) (len=7) comment.Message,
+	// (string) (len=5) "arg_3": (string) (len=7) "waiting"
+	// }
+
+	stmt, err := db.PrepareNamed(query)
+	if err != nil {
+		return comment, err
+	}
+
+	err = stmt.Get(&comment, args)
+	if err != nil {
+		return comment, err
+	}
+
+	return comment, nil
+}
 ```
 
-
-### Update
+### Insert on conflict (upsert)
 
 ```go
 import lk "github.com/ulule/loukoum"
 
-stmt := lk.Update("news").
-    Set(
-        lk.Pair("published_at", lk.Raw("NOW()")),
-        lk.Pair("status", "published"),
-    ).
-    Where(lk.Condition("id").Equal(news.ID)).
-    And(lk.Condition("deleted_at").IsNull(true)).
-    Returning("published_at")
+// UpsertComment insert or update a comment based on email attribute.
+func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
+	builder := lk.Insert("comments").
+		Set(
+			lk.Pair("email", comment.Email),
+			lk.Pair("status", "waiting"),
+			lk.Pair("message", comment.Message),
+			lk.Pair("created_at", lk.Raw("NOW()")),
+		).
+		OnConflict("email", lk.DoUpdate(
+			lk.Pair("message", comment.Message),
+			lk.Pair("status", "waiting"),
+			lk.Pair("created_at", lk.Raw("NOW()")),
+			lk.Pair("deleted_at", nil),
+		)).
+		Returning("id")
 
-query, args := stmt.Prepare()
-return sqlx.FromContext(ctx).Update(query, args, news)
+	query, args := builder.Prepare()
+	// query: INSERT INTO comments (created_at, email, message, status) VALUES (
+	//		NOW(), :arg_1, :arg_2, :arg_3
+	// ) ON CONFLICT (email) DO UPDATE SET created_at = NOW(), deleted_at = NULL, message = :arg_4, status = :arg_5 RETURNING id
+	// args: (map[string]interface {}) (len=5) {
+	// (string) (len=5) "arg_1": (string) (len=5) comment.Email,
+	// (string) (len=5) "arg_2": (string) (len=7) comment.Message,
+	// (string) (len=5) "arg_3": (string) (len=7) "waiting",
+	// (string) (len=5) "arg_4": (string) (len=7) comment.Message,
+	// (string) (len=5) "arg_5": (string) (len=7) "waiting"
+	// }
+
+	stmt, err := db.PrepareNamed(query)
+	if err != nil {
+		return comment, err
+	}
+
+	err = stmt.Get(&comment, args)
+	if err != nil {
+		return comment, err
+	}
+
+	return comment, nil
+}
+```
+
+### Update
+
+```go
+// News model
+type News struct {
+	ID          int64
+	Status      string      `db:"status"`
+	PublishedAt pq.NullTime `db:"deleted_at"`
+	DeletedAt   pq.NullTime `db:"deleted_at"`
+}
+
+// UpdateNews update a news.
+func UpdateNews(db *sqlx.DB, news News) (News, error) {
+	builder := lk.Update("news").
+		Set(
+			lk.Pair("published_at", lk.Raw("NOW()")),
+			lk.Pair("status", "published"),
+		).
+		Where(lk.Condition("id").Equal(news.ID)).
+		And(lk.Condition("deleted_at").IsNull(true)).
+		Returning("published_at")
+
+	query, args := builder.Prepare()
+	// query: UPDATE news SET published_at = NOW(), status = :arg_1 WHERE ((id = :arg_2) AND (deleted_at IS NULL)) RETURNING published_at
+	// args: (map[string]interface {}) (len=2) {
+	//  (string) (len=5) "arg_1": (string) (len=9) "published",
+	//  (string) (len=5) "arg_2": (int) news.ID
+	// }
+
+
+	stmt, err := db.PrepareNamed(query)
+	if err != nil {
+		return news, err
+	}
+
+	err = stmt.Get(&news, args)
+	if err != nil {
+		return news, err
+	}
+
+	return news, nil
+}
 ```
 
 ### Delete
 
 ```go
-import lk "github.com/ulule/loukoum"
+// DeleteUser deletes a user.
+func DeleteUser(db *sqlx.DB, user User) error {
+	builder := lk.Delete("users").
+		Where(lk.Condition("id").Equal(user.ID))
 
-stmt := lk.Delete("users").
-    Where(lk.Condition("email").Equal(email))
+	query, args := builder.Prepare()
+	// query: DELETE FROM users WHERE (id = :arg_1)
+	// args: (map[string]interface {}) (len=1) {
+	//  (string) (len=5) "arg_1": (int) user.ID
+	// }
 
-query, args := stmt.Prepare()
-return sqlx.FromContext(ctx).Exec(query, args)
+	stmt, err := db.PrepareNamed(query)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(args)
+
+	return err
+}
 ```
+
+See [examples](examples) directory for more information.
 
 ## License
 
