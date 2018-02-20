@@ -9,7 +9,7 @@
 
 ## Introduction
 
-Loukoum is a simple SQL Query Builder currently only **PostgreSQL** is supported.
+Loukoum is a simple SQL Query Builder, only **PostgreSQL** is supported at the moment.
 
 If you have to generate complex queries, which relies on various context, **loukoum** is the right tool for you.
 
