@@ -242,6 +242,12 @@ func DeleteUser(db *sqlx.DB, user User) error {
 
 See [examples](examples) directory for more information.
 
+## Inspiration
+
+* [squirrel](https://github.com/Masterminds/squirrel)
+* [goqu](https://github.com/doug-martin/goqu)
+* [sqlabble](https://github.com/minodisk/sqlabble)
+
 ## License
 
 This is Free Software, released under the [`MIT License`][software-license-url].
