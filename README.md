@@ -67,7 +67,7 @@ func FindUsers(db *sqlx.DB) ([]User, error) {
 		return nil, err
 	}
 
-	err = stmt.Select(users, args)
+	err = stmt.Select(&users, args)
 	if err != nil {
 		return nil, err
 	}
