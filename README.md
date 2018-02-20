@@ -105,9 +105,9 @@ func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
 	query, args := builder.Prepare()
 	// query: INSERT INTO comments (created_at, email, message, status) VALUES (NOW(), :arg_1, :arg_2, :arg_3) RETURNING id
 	// args: (map[string]interface {}) (len=3) {
-	// (string) (len=5) "arg_1": (string) (len=5) comment.Email,
-	// (string) (len=5) "arg_2": (string) (len=7) comment.Message,
-	// (string) (len=5) "arg_3": (string) (len=7) "waiting"
+	// (string) (len=5) "arg_1": (string) comment.Email,
+	// (string) (len=5) "arg_2": (string) comment.Message,
+	// (string) (len=5) "arg_3": (string) "waiting"
 	// }
 
 	stmt, err := db.PrepareNamed(query)
@@ -151,11 +151,11 @@ func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
 	//		NOW(), :arg_1, :arg_2, :arg_3
 	// ) ON CONFLICT (email) DO UPDATE SET created_at = NOW(), deleted_at = NULL, message = :arg_4, status = :arg_5 RETURNING id
 	// args: (map[string]interface {}) (len=5) {
-	// (string) (len=5) "arg_1": (string) (len=5) comment.Email,
-	// (string) (len=5) "arg_2": (string) (len=7) comment.Message,
-	// (string) (len=5) "arg_3": (string) (len=7) "waiting",
-	// (string) (len=5) "arg_4": (string) (len=7) comment.Message,
-	// (string) (len=5) "arg_5": (string) (len=7) "waiting"
+	// (string) (len=5) "arg_1": (string) comment.Email,
+	// (string) (len=5) "arg_2": (string) comment.Message,
+	// (string) (len=5) "arg_3": (string) "waiting",
+	// (string) (len=5) "arg_4": (string) comment.Message,
+	// (string) (len=5) "arg_5": (string) "waiting"
 	// }
 
 	stmt, err := db.PrepareNamed(query)
@@ -200,7 +200,6 @@ func UpdateNews(db *sqlx.DB, news News) (News, error) {
 	//  (string) (len=5) "arg_1": (string) (len=9) "published",
 	//  (string) (len=5) "arg_2": (int) news.ID
 	// }
-
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
