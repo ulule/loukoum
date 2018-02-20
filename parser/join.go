@@ -16,7 +16,7 @@ import (
 var ErrJoinInvalidCondition = fmt.Errorf("join condition is invalid")
 
 // ParseJoin will try to parse given subquery as a join statement.
-func ParseJoin(subquery string) (stmt.Join, error) {
+func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 	lexer := lexer.New(strings.NewReader(subquery))
 	it := lexer.Iterator()
 
