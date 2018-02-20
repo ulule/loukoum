@@ -16,11 +16,11 @@ RUN apt-get -y update \
     && git checkout tags/v0.4.1 \
     && go get github.com/golang/dep/cmd/dep \
     && dep ensure \
-    && go get -uv github.com/stretchr/testify/require \
-    && go get -uv github.com/davecgh/go-spew/spew \
-    && go get -uv github.com/lib/pq \
-    && go get -uv github.com/jmoiron/sqlx \
-    && go get -uv github.com/alecthomas/gometalinter \
+    && go get -u -v github.com/stretchr/testify/require \
+    && go get -u -v github.com/davecgh/go-spew/spew \
+    && go get -u -v github.com/lib/pq \
+    && go get -u -v github.com/jmoiron/sqlx \
+    && go get -u -v github.com/alecthomas/gometalinter \
     && gometalinter --install \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
