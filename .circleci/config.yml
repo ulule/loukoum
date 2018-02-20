@@ -14,10 +14,6 @@ jobs:
             git submodule update --init
 
       - run:
-          name: Update vendoring
-          command: scripts/dep --init
-
-      - run:
           name: Run tests
           command: scripts/go-wrapper scripts/test
           no_output_timeout: 10m
