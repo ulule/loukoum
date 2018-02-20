@@ -15,7 +15,6 @@ RUN apt-get -y update \
     && cd dep \
     && git checkout tags/v0.4.1 \
     && go get github.com/golang/dep/cmd/dep \
-    && dep ensure \
     && go get -u -v github.com/stretchr/testify/require \
     && go get -u -v github.com/davecgh/go-spew/spew \
     && go get -u -v github.com/lib/pq \
@@ -27,5 +26,6 @@ RUN apt-get -y update \
 
 COPY . /go/src/github.com/ulule/loukoum
 WORKDIR /go/src/github.com/ulule/loukoum
+RUN dep ensure
 
 CMD /bin/bash
