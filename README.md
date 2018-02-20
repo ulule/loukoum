@@ -33,7 +33,7 @@ $ dep ensure -add github.com/ulule/loukoum@master
 
 Loukoum helps you generate SQL queries from composable parts.
 
-However, this is not an ORM or a Mapper.
+However, keep in mind it's not an ORM or a Mapper so you have to use a SQL connector ([database/sql][sql-url], [sqlx][sqlx-url], etc.).
 
 ### Select
 
@@ -260,6 +260,8 @@ Loukoum artworks are released under the [`Creative Commons BY-SA License`][artwo
 
 **Don't hesitate ;)**
 
+[sql-url]: https://golang.org/pkg/database/sql/
+[sqlx-url]: https://github.com/jmoiron/sqlx
 [loukoum-url]: https://github.com/ulule/loukoum
 [loukoum-img]: docs/images/banner.png
 [godoc-url]: https://godoc.org/github.com/ulule/loukoum
