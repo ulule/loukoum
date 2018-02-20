@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Type defines a token type identified by the lexer.
 type Type string
 
 func (t Type) String() string {
@@ -12,7 +13,6 @@ func (t Type) String() string {
 }
 
 const (
-
 	// Illegal is an unknown token type.
 	Illegal = Type("Illegal")
 
@@ -21,18 +21,21 @@ const (
 
 	// Literal defines entities such as columns, tables, etc...
 	Literal = Type("Literal")
+)
 
-	// Delimiters
+// Symbols token types.
+const (
 	Comma     = Type(",")
 	Semicolon = Type(";")
 	Colon     = Type(":")
 	LParen    = Type("(")
 	RParen    = Type(")")
+	Equals    = Type("=")
+	Asterisk  = Type("*")
+)
 
-	Equals   = Type("=")
-	Asterisk = Type("*")
-
-	// Keywords
+// Keywords token types.
+const (
 	Select    = Type("SELECT")
 	Update    = Type("UPDATE")
 	Insert    = Type("INSERT")
@@ -66,6 +69,7 @@ const (
 	Nothing   = Type("NOTHING")
 )
 
+// A Token is defined by its type and a value.
 type Token struct {
 	Type  Type
 	Value string
@@ -109,6 +113,7 @@ var keywords = map[string]Type{
 	"NOTHING":   Nothing,
 }
 
+// Lookup will try to map a statement to a keyword.
 func Lookup(e string) Type {
 	n := strings.ToUpper(e)
 	t, ok := keywords[n]
@@ -118,6 +123,7 @@ func Lookup(e string) Type {
 	return Literal
 }
 
+// New creates a new Token using given type and a value.
 func New(t Type, v string) Token {
 	return Token{
 		Type:  t,
