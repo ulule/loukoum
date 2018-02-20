@@ -2,5 +2,28 @@
 
 set -eo pipefail
 
-dep ensure
-dep prune
+dep_path="${GOPATH}/bin/dep"
+
+if [[ ! -x "${dep_path}" ]]; then
+    go get -u github.com/golang/dep
+fi
+
+do_ensure() {
+    dep ensure
+}
+
+do_init() {
+    go get -u github.com/lib/pq
+    go get -u github.com/stretchr/testify/require
+}
+
+case "$1" in
+    --init)
+        do_ensure
+        do_init
+    ;;
+    *)
+        do_ensure
+    ;;
+esac
+exit 0

@@ -3,8 +3,17 @@
 ignored = [
   "github.com/stretchr/testify/require",
   "github.com/davecgh/go-spew",
-  "github.com/lib/pq"
+  "github.com/lib/pq",
+  "github.com/jmoiron/sqlx"
 ]
+
+[metadata]
+  codename = "loukoum"
+
+[prune]
+  unused-packages = true
+  non-go = true
+  go-tests = true
 
 [[constraint]]
   name = "github.com/pkg/errors"
