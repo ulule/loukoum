@@ -276,4 +276,4 @@ Loukoum artworks are released under the [`Creative Commons BY-SA License`][artwo
 [sql-url]: https://golang.org/pkg/database/sql/
 [sqlx-url]: https://github.com/jmoiron/sqlx
 [circle-url]: https://circleci.com/gh/ulule/loukoum/tree/master
-[circle-img]: https://circleci.com/gh/ulule/loukoum.svg?style=svg&circle-token=1de7bc4fd603b0df406ceef4bbba3fb3d6b5ed10
+[circle-img]: https://circleci.com/gh/ulule/loukoum.svg?style=shield&circle-token=1de7bc4fd603b0df406ceef4bbba3fb3d6b5ed10
