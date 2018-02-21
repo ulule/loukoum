@@ -1,5 +1,6 @@
 # Loukoum
 
+[![CircleCI][circle-img]][circle-url]
 [![Documentation][godoc-img]][godoc-url]
 ![License][license-img]
 
@@ -265,8 +266,6 @@ Loukoum artworks are released under the [`Creative Commons BY-SA License`][artwo
 
 **Don't hesitate ;)**
 
-[sql-url]: https://golang.org/pkg/database/sql/
-[sqlx-url]: https://github.com/jmoiron/sqlx
 [loukoum-url]: https://github.com/ulule/loukoum
 [loukoum-img]: docs/images/banner.png
 [godoc-url]: https://godoc.org/github.com/ulule/loukoum
@@ -274,3 +273,7 @@ Loukoum artworks are released under the [`Creative Commons BY-SA License`][artwo
 [license-img]: https://img.shields.io/badge/license-MIT-blue.svg
 [software-license-url]: LICENSE
 [artwork-license-url]: docs/images/LICENSE
+[sql-url]: https://golang.org/pkg/database/sql/
+[sqlx-url]: https://github.com/jmoiron/sqlx
+[circle-url]: https://circleci.com/gh/ulule/loukoum/tree/master
+[circle-img]: https://circleci.com/gh/ulule/loukoum/tree/master.svg?style=svg
