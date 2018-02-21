@@ -32,13 +32,15 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 		return NewValue(*value)
 	case driver.Valuer:
 		return NewValueFromValuer(value)
-	case types.Int64Encoder:
+	case StatementEncoder:
+		return NewValue(value.Statement())
+	case Int64Encoder:
 		return NewValue(value.Int64())
-	case types.BoolEncoder:
+	case BoolEncoder:
 		return NewValue(value.Bool())
-	case types.TimeEncoder:
+	case TimeEncoder:
 		return NewValue(value.Time())
-	case types.StringEncoder:
+	case StringEncoder:
 		return NewValue(value.String())
 	case []string:
 		return NewArrayString(value)
@@ -77,8 +79,7 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 	// We pass only one argument and it's a slice or an expression.
 	if len(values) == 1 {
-		value := values[0]
-		switch value.(type) {
+		switch value := values[0].(type) {
 		case []string, []int, []uint, []int8, []uint8, []int16, []uint16,
 			[]int32, []uint32, []int64, []uint64, []bool, []float32, []float64:
 			return NewExpression(value)
@@ -93,10 +94,13 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 		case driver.Valuer:
 			return NewExpression(value)
 
-		case types.Int64Encoder, types.BoolEncoder, types.TimeEncoder, types.StringEncoder:
+		case Select:
 			return NewExpression(value)
 
-		case Select:
+		case StatementEncoder:
+			return NewExpression(value.Statement())
+
+		case Int64Encoder, BoolEncoder, TimeEncoder, StringEncoder:
 			return NewExpression(value)
 
 		default:
@@ -143,13 +147,15 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 			array.AddValue(NewValueFromValuer(value))
 		case Raw:
 			array.AddRaw(value)
-		case types.Int64Encoder:
+		case StatementEncoder:
+			array.AddValue(NewValue(value.Statement()))
+		case Int64Encoder:
 			array.AddValue(NewValue(value.Int64()))
-		case types.BoolEncoder:
+		case BoolEncoder:
 			array.AddValue(NewValue(value.Bool()))
-		case types.TimeEncoder:
+		case TimeEncoder:
 			array.AddValue(NewValue(value.Time()))
-		case types.StringEncoder:
+		case StringEncoder:
 			array.AddValue(NewValue(value.String()))
 
 		default:
