@@ -14,7 +14,7 @@ type News struct {
 	DeletedAt   pq.NullTime `db:"deleted_at"`
 }
 
-// PublishNews update a news.
+// PublishNews publishes a news.
 func PublishNews(db *sqlx.DB, news News) (News, error) {
 	builder := lk.Update("news").
 		Set(
