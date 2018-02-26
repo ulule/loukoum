@@ -12,8 +12,66 @@ type Comment struct {
 	Email     string      `db:"mail"`
 	Status    string      `db:"status"`
 	Message   string      `db:"message"`
+	UserID    int64       `db:"user_id"`
+	User      *User       `db:"users"`
 	CreatedAt pq.NullTime `db:"deleted_at"`
 	DeletedAt pq.NullTime `db:"deleted_at"`
+}
+
+// FindComments retrieves comment by users.
+func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
+	builder := lk.Select("id", "email", "status", "user_id", "message", "created_at").
+		From("comments").
+		Join(lk.Table("users"), lk.On("comments.user_id", "users.id")).
+		Where(lk.Condition("deleted_at").IsNull(true))
+
+	// query: SELECT id, email, status, user_id, message, created_at FROM comments WHERE ((deleted_at IS NULL) AND (user_id IN (SELECT id FROM users WHERE (is_staff IS :arg_1))))
+	// args: (map[string]interface {}) (len=1) {
+	// (string) (len=5) "arg_1": (bool) true
+	// }
+	query, args := builder.Prepare()
+
+	stmt, err := db.PrepareNamed(query)
+	if err != nil {
+		return nil, err
+	}
+
+	comments := []Comment{}
+
+	err = stmt.Select(&comments, args)
+	if err != nil {
+		return comments, err
+	}
+
+	return comments, nil
+}
+
+// FindStaffComments retrieves comment by staff users.
+func FindStaffComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
+	builder := lk.Select("id", "email", "status", "user_id", "message", "created_at").
+		From("comments").
+		Where(lk.Condition("deleted_at").IsNull(true)).
+		Where(lk.Condition("user_id").In(lk.Select("id").From("users").Where(lk.Condition("is_staff").Is(true))))
+
+	// query: SELECT id, email, status, user_id, message, created_at FROM comments WHERE ((deleted_at IS NULL) AND (user_id IN (SELECT id FROM users WHERE (is_staff IS :arg_1))))
+	// args: (map[string]interface {}) (len=1) {
+	// (string) (len=5) "arg_1": (bool) true
+	// }
+	query, args := builder.Prepare()
+
+	stmt, err := db.PrepareNamed(query)
+	if err != nil {
+		return nil, err
+	}
+
+	comments := []Comment{}
+
+	err = stmt.Select(&comments, args)
+	if err != nil {
+		return comments, err
+	}
+
+	return comments, nil
 }
 
 // CreateComment creates a comment.

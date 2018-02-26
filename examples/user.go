@@ -13,6 +13,7 @@ type User struct {
 	FirstName string `db:"first_name"`
 	LastName  string `db:"last_name"`
 	Email     string
+	IsStaff   bool        `db:"is_staff"`
 	DeletedAt pq.NullTime `db:"deleted_at"`
 }
 
@@ -22,8 +23,6 @@ func FindUsers(db *sqlx.DB) ([]User, error) {
 		From("users").
 		Where(lk.Condition("deleted_at").IsNull(true))
 
-	users := []User{}
-
 	// query: SELECT id, first_name, last_name, email FROM users WHERE (deleted_at IS NULL)
 	// args: map[string]interface{}{}
 	query, args := builder.Prepare()
@@ -32,6 +31,8 @@ func FindUsers(db *sqlx.DB) ([]User, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	users := []User{}
 
 	err = stmt.Select(&users, args)
 	if err != nil {

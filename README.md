@@ -36,48 +36,9 @@ Loukoum helps you generate SQL queries from composable parts.
 
 However, keep in mind it's not an ORM or a Mapper so you have to use a SQL connector ([database/sql][sql-url], [sqlx][sqlx-url], etc.).
 
-### Select
+### INSERT
 
-```go
-import lk "github.com/ulule/loukoum"
-
-// User model
-type User struct {
-	ID int64
-
-	FirstName string `db:"first_name"`
-	LastName  string `db:"last_name"`
-	Email     string
-	DeletedAt pq.NullTime `db:"deleted_at"`
-}
-
-// FindUsers retrieves non-deleted users
-func FindUsers(db *sqlx.DB) ([]User, error) {
-	builder := lk.Select("id", "first_name", "last_name", "email").
-		From("users").
-		Where(lk.Condition("deleted_at").IsNull(true))
-
-	users := []User{}
-
-	// query: SELECT id, first_name, last_name, email FROM users WHERE (deleted_at IS NULL)
-	// args: map[string]interface{}{}
-	query, args := builder.Prepare()
-
-	stmt, err := db.PrepareNamed(query)
-	if err != nil {
-		return nil, err
-	}
-
-	err = stmt.Select(&users, args)
-	if err != nil {
-		return nil, err
-	}
-
-	return users, nil
-}
-```
-
-### Insert
+Insert a new `Comment` and retrieve its `id`.
 
 ```go
 import lk "github.com/ulule/loukoum"
@@ -88,6 +49,7 @@ type Comment struct {
 	Email     string      `db:"mail"`
 	Status    string      `db:"status"`
 	Message   string      `db:"message"`
+	UserID    int64       `db:"user_id"`
 	CreatedAt pq.NullTime `db:"deleted_at"`
 	DeletedAt pq.NullTime `db:"deleted_at"`
 }
@@ -125,7 +87,7 @@ func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
 }
 ```
 
-### Insert on conflict (upsert)
+### INSERT on conflict (UPSERT)
 
 ```go
 import lk "github.com/ulule/loukoum"
@@ -173,7 +135,9 @@ func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
 }
 ```
 
-### Update
+### UPDATE
+
+Publish a `News` by updating its status and publication date.
 
 ```go
 // News model
@@ -184,8 +148,8 @@ type News struct {
 	DeletedAt   pq.NullTime `db:"deleted_at"`
 }
 
-// UpdateNews update a news.
-func UpdateNews(db *sqlx.DB, news News) (News, error) {
+// PublishNews update a news.
+func PublishNews(db *sqlx.DB, news News) (News, error) {
 	builder := lk.Update("news").
 		Set(
 			lk.Pair("published_at", lk.Raw("NOW()")),
@@ -216,7 +180,142 @@ func UpdateNews(db *sqlx.DB, news News) (News, error) {
 }
 ```
 
-### Delete
+### SELECT
+
+#### Basic SELECT with an unique condition
+
+Retrieve non-deleted users.
+
+```go
+import lk "github.com/ulule/loukoum"
+
+// User model
+type User struct {
+	ID int64
+
+	FirstName string `db:"first_name"`
+	LastName  string `db:"last_name"`
+	Email     string
+	IsStaff   bool        `db:"is_staff"`
+	DeletedAt pq.NullTime `db:"deleted_at"`
+}
+
+// FindUsers retrieves non-deleted users
+func FindUsers(db *sqlx.DB) ([]User, error) {
+	builder := lk.Select("id", "first_name", "last_name", "email").
+		From("users").
+		Where(lk.Condition("deleted_at").IsNull(true))
+
+	users := []User{}
+
+	// query: SELECT id, first_name, last_name, email FROM users WHERE (deleted_at IS NULL)
+	// args: map[string]interface{}{}
+	query, args := builder.Prepare()
+
+	stmt, err := db.PrepareNamed(query)
+	if err != nil {
+		return nil, err
+	}
+
+	err = stmt.Select(&users, args)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+```
+
+#### SELECT IN with subquery
+
+Retrieve comments only sent by staff users, the staff users query will be a subquery
+as we don't want to use any JOIN operations.
+
+```go
+// FindStaffComments retrieves comment by staff users.
+func FindStaffComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
+	builder := lk.Select("id", "email", "status", "user_id", "message", "created_at").
+		From("comments").
+		Where(lk.Condition("deleted_at").IsNull(true)).
+		Where(lk.Condition("user_id").In(lk.Select("id").From("users").Where(lk.Condition("is_staff").Is(true))))
+
+	// query: SELECT id, email, status, user_id, message, created_at FROM comments WHERE ((deleted_at IS NULL) AND (user_id IN (SELECT id FROM users WHERE (is_staff IS :arg_1))))
+	// args: (map[string]interface {}) (len=1) {
+	// (string) (len=5) "arg_1": (bool) true
+	// }
+	query, args := builder.Prepare()
+
+	stmt, err := db.PrepareNamed(query)
+	if err != nil {
+		return nil, err
+	}
+
+	comments := []Comment{}
+
+	err = stmt.Select(&comments, args)
+	if err != nil {
+		return comments, err
+	}
+
+	return comments, nil
+}
+```
+
+#### SELECT with JOIN
+
+Retrieve non-deleted comments sent by a user with embedded user in results.
+
+First, we need to update the `Comment` struct to embed `User`.
+
+```go
+// Comment model
+type Comment struct {
+	ID        int64
+	Email     string      `db:"mail"`
+	Status    string      `db:"status"`
+	Message   string      `db:"message"`
+	UserID    int64       `db:"user_id"`
+	User      *User       `db:"users"`
+	CreatedAt pq.NullTime `db:"deleted_at"`
+	DeletedAt pq.NullTime `db:"deleted_at"`
+}
+```
+
+Let's create a `FindComments` method to retrieve these comments, in our case we want an `INNER JOIN` but loukoum
+also supports `LEFT JOIN` and `RIGHT JOIN`.
+
+```go
+// FindComments retrieves comment by users.
+func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
+	builder := lk.Select("id", "email", "status", "user_id", "message", "created_at").
+		From("comments").
+		Join(lk.Table("users"), lk.On("comments.user_id", "users.id")).
+		Where(lk.Condition("deleted_at").IsNull(true))
+
+	// query: SELECT id, email, status, user_id, message, created_at FROM comments INNER JOIN users ON comments.user_id = users.id WHERE (deleted_at IS NULL)
+	// args: (map[string]interface {}) {
+	// }
+	query, args := builder.Prepare()
+
+	stmt, err := db.PrepareNamed(query)
+	if err != nil {
+		return nil, err
+	}
+
+	comments := []Comment{}
+
+	err = stmt.Select(&comments, args)
+	if err != nil {
+		return comments, err
+	}
+
+	return comments, nil
+}
+```
+
+### DELETE
+
+Delete a user based on ID.
 
 ```go
 // DeleteUser deletes a user.
