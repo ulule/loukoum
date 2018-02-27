@@ -281,8 +281,9 @@ type Comment struct {
 }
 ```
 
-Let's create a `FindComments` method to retrieve these comments, in our case we want an `INNER JOIN` but loukoum
-also supports `LEFT JOIN` and `RIGHT JOIN`.
+Let's create a `FindComments` method to retrieve these comments.
+
+In this scenario we will use an `INNER JOIN` but loukoum also supports `LEFT JOIN` and `RIGHT JOIN`.
 
 ```go
 // FindComments retrieves comment by users.
