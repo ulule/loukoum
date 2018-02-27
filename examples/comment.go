@@ -9,16 +9,16 @@ import (
 // Comment model
 type Comment struct {
 	ID        int64
-	Email     string      `db:"mail"`
+	Email     string      `db:"email"`
 	Status    string      `db:"status"`
 	Message   string      `db:"message"`
 	UserID    int64       `db:"user_id"`
 	User      *User       `db:"users"`
-	CreatedAt pq.NullTime `db:"deleted_at"`
+	CreatedAt pq.NullTime `db:"created_at"`
 	DeletedAt pq.NullTime `db:"deleted_at"`
 }
 
-// FindComments retrieves comment by users.
+// FindComments retrieves comments by users.
 func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	builder := lk.Select("id", "email", "status", "user_id", "message", "created_at").
 		From("comments").
@@ -46,7 +46,7 @@ func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	return comments, nil
 }
 
-// FindStaffComments retrieves comment by staff users.
+// FindStaffComments retrieves comments by staff users.
 func FindStaffComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	builder := lk.Select("id", "email", "status", "user_id", "message", "created_at").
 		From("comments").
@@ -110,7 +110,7 @@ func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
 	return comment, nil
 }
 
-// UpsertComment insert or update a comment based on email attribute.
+// UpsertComment inserts or updates a comment based on the email attribute.
 func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
 	builder := lk.Insert("comments").
 		Set(
