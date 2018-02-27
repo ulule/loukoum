@@ -42,7 +42,8 @@ go get -u github.com/ulule/loukoum
 
 Loukoum helps you generate SQL queries from composable parts.
 
-However, keep in mind it's not an ORM or a Mapper so you have to use a SQL connector ([database/sql][sql-url], [sqlx][sqlx-url], etc.).
+However, keep in mind it's not an ORM or a Mapper so you have to use a SQL connector ([database/sql][sql-url], [sqlx][sqlx-url], etc.)
+to execute queries.
 
 ### INSERT
 
