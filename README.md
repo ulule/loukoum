@@ -12,7 +12,7 @@
 
 Loukoum is a simple SQL Query Builder, only **PostgreSQL** is supported at the moment.
 
-If you have to generate complex queries, which relies on various context, **loukoum** is the right tool for you.
+If you have to generate complex queries, which rely on various contexts, **loukoum** is the right tool for you.
 
 Afraid to slip a tiny **SQL injection** manipulating `fmt` to append conditions? **Fear no more**, loukoum is here to protect you against yourself.
 
@@ -46,11 +46,11 @@ import lk "github.com/ulule/loukoum"
 // Comment model
 type Comment struct {
 	ID        int64
-	Email     string      `db:"mail"`
+	Email     string      `db:"email"`
 	Status    string      `db:"status"`
 	Message   string      `db:"message"`
 	UserID    int64       `db:"user_id"`
-	CreatedAt pq.NullTime `db:"deleted_at"`
+	CreatedAt pq.NullTime `db:"created_at"`
 	DeletedAt pq.NullTime `db:"deleted_at"`
 }
 
@@ -92,7 +92,7 @@ func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
 ```go
 import lk "github.com/ulule/loukoum"
 
-// UpsertComment insert or update a comment based on email attribute.
+// UpsertComment inserts or updates a comment based on the email attribute.
 func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
 	builder := lk.Insert("comments").
 		Set(
@@ -144,7 +144,7 @@ Publish a `News` by updating its status and publication date.
 type News struct {
 	ID          int64
 	Status      string      `db:"status"`
-	PublishedAt pq.NullTime `db:"deleted_at"`
+	PublishedAt pq.NullTime `db:"published_at"`
 	DeletedAt   pq.NullTime `db:"deleted_at"`
 }
 
@@ -232,7 +232,7 @@ Retrieve comments only sent by staff users, the staff users query will be a subq
 as we don't want to use any JOIN operations.
 
 ```go
-// FindStaffComments retrieves comment by staff users.
+// FindStaffComments retrieves comments by staff users.
 func FindStaffComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	builder := lk.Select("id", "email", "status", "user_id", "message", "created_at").
 		From("comments").
@@ -271,12 +271,12 @@ First, we need to update the `Comment` struct to embed `User`.
 // Comment model
 type Comment struct {
 	ID        int64
-	Email     string      `db:"mail"`
+	Email     string      `db:"email"`
 	Status    string      `db:"status"`
 	Message   string      `db:"message"`
 	UserID    int64       `db:"user_id"`
 	User      *User       `db:"users"`
-	CreatedAt pq.NullTime `db:"deleted_at"`
+	CreatedAt pq.NullTime `db:"created_at"`
 	DeletedAt pq.NullTime `db:"deleted_at"`
 }
 ```
@@ -286,7 +286,7 @@ Let's create a `FindComments` method to retrieve these comments.
 In this scenario we will use an `INNER JOIN` but loukoum also supports `LEFT JOIN` and `RIGHT JOIN`.
 
 ```go
-// FindComments retrieves comment by users.
+// FindComments retrieves comments by users.
 func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	builder := lk.Select("id", "email", "status", "user_id", "message", "created_at").
 		From("comments").
