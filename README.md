@@ -26,8 +26,16 @@ Just a few examples when and where loukoum can become handy:
 
 ## Installation
 
-```bash
-$ dep ensure -add github.com/ulule/loukoum@master
+Using [dep](https://github.com/golang/dep)
+
+```console
+dep ensure -add github.com/ulule/loukoum@master
+```
+
+or `go get`
+
+```console
+go get -u github.com/ulule/loukoum
 ```
 
 ## Usage
