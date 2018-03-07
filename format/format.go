@@ -11,6 +11,8 @@ func Value(arg interface{}) string { // nolint: gocyclo
 	switch value := arg.(type) {
 	case string:
 		return String(value)
+	case []byte:
+		return String(string(value))
 	case time.Time:
 		return Time(value)
 	case int:
