@@ -31,6 +31,7 @@ func FindUsers(db *sqlx.DB) ([]User, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	users := []User{}
 
@@ -57,6 +58,7 @@ func DeleteUser(db *sqlx.DB, user User) error {
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(args)
 

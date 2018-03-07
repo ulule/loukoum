@@ -36,6 +36,7 @@ func PublishNews(db *sqlx.DB, news News) (News, error) {
 	if err != nil {
 		return news, err
 	}
+	defer stmt.Close()
 
 	err = stmt.Get(&news, args)
 	if err != nil {
