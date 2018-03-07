@@ -97,6 +97,18 @@ func (b Delete) Prepare() (string, map[string]interface{}) {
 	return query, args
 }
 
+// Query returns the underlying query as a regular statement.
+func (b Delete) Query() (string, []interface{}) {
+	ctx := types.NewContext()
+	ctx.Prefix = types.PostgresPrefix
+	b.query.Write(ctx)
+
+	query := ctx.Query()
+	args := ctx.Args()
+
+	return query, args
+}
+
 // Statement returns underlying statement.
 func (b Delete) Statement() stmt.Statement {
 	return b.query

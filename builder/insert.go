@@ -149,6 +149,18 @@ func (b Insert) Prepare() (string, map[string]interface{}) {
 	return query, args
 }
 
+// Query returns the underlying query as a regular statement.
+func (b Insert) Query() (string, []interface{}) {
+	ctx := types.NewContext()
+	ctx.Prefix = types.PostgresPrefix
+	b.insert.Write(ctx)
+
+	query := ctx.Query()
+	args := ctx.Args()
+
+	return query, args
+}
+
 // Statement returns underlying statement.
 func (b Insert) Statement() stmt.Statement {
 	return b.insert
