@@ -48,7 +48,7 @@ func Value(arg interface{}) string { // nolint: gocyclo
 }
 
 // String formats the given string.
-func String(value string) string {
+func String(value string) string { // nolint: errcheck
 	var b strings.Builder
 	b.WriteByte('\'')
 	for _, r := range value {
