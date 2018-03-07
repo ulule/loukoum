@@ -35,6 +35,7 @@ func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	comments := []Comment{}
 
@@ -67,6 +68,7 @@ func FindStaffComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	comments := []Comment{}
 
@@ -101,6 +103,7 @@ func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
 	if err != nil {
 		return comment, err
 	}
+	defer stmt.Close()
 
 	err = stmt.Get(&comment, args)
 	if err != nil {
@@ -143,6 +146,7 @@ func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
 	if err != nil {
 		return comment, err
 	}
+	defer stmt.Close()
 
 	err = stmt.Get(&comment, args)
 	if err != nil {

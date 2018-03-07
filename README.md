@@ -86,6 +86,7 @@ func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
 	if err != nil {
 		return comment, err
 	}
+	defer stmt.Close()
 
 	err = stmt.Get(&comment, args)
 	if err != nil {
@@ -134,6 +135,7 @@ func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
 	if err != nil {
 		return comment, err
 	}
+	defer stmt.Close()
 
 	err = stmt.Get(&comment, args)
 	if err != nil {
@@ -179,6 +181,7 @@ func PublishNews(db *sqlx.DB, news News) (News, error) {
 	if err != nil {
 		return news, err
 	}
+	defer stmt.Close()
 
 	err = stmt.Get(&news, args)
 	if err != nil {
@@ -225,6 +228,7 @@ func FindUsers(db *sqlx.DB) ([]User, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	err = stmt.Select(&users, args)
 	if err != nil {
@@ -258,6 +262,7 @@ func FindStaffComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	comments := []Comment{}
 
@@ -311,6 +316,7 @@ func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	comments := []Comment{}
 
@@ -343,6 +349,7 @@ func DeleteUser(db *sqlx.DB, user User) error {
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(args)
 
