@@ -3,6 +3,7 @@ package format
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -11,6 +12,8 @@ func Value(arg interface{}) string { // nolint: gocyclo
 	switch value := arg.(type) {
 	case string:
 		return String(value)
+	case []byte:
+		return String(string(value))
 	case time.Time:
 		return Time(value)
 	case int:
@@ -45,8 +48,27 @@ func Value(arg interface{}) string { // nolint: gocyclo
 }
 
 // String formats the given string.
-func String(value string) string {
-	return fmt.Sprint("'", value, "'")
+func String(value string) string { // nolint: errcheck
+	var b strings.Builder
+	b.WriteByte('\'')
+	for _, r := range value {
+		switch r {
+		case '\'':
+			b.WriteString(`\'`)
+		case '\\':
+			b.WriteString(`\\`)
+		case '\n':
+			b.WriteString(`\n`)
+		case '\r':
+			b.WriteString(`\r`)
+		case '\t':
+			b.WriteString(`\t`)
+		default:
+			b.WriteRune(r)
+		}
+	}
+	b.WriteByte('\'')
+	return b.String()
 }
 
 // Int formats the given number.
