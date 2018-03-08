@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ulule/loukoum/format"
 	"github.com/ulule/loukoum/stmt"
 	"github.com/ulule/loukoum/types"
 )
@@ -21,17 +20,6 @@ type Builder interface {
 	Query() (string, []interface{})
 	// Statement returns underlying statement.
 	Statement() stmt.Statement
-}
-
-// rawify will replace given arguments in query to obtain a human readable statement.
-// Be advised, this function is not optimized, use with caution.
-func rawify(query string, args map[string]interface{}) string {
-	for key, arg := range args {
-		key = fmt.Sprint(":", key)
-		value := format.Value(arg)
-		query = strings.Replace(query, key, value, 1)
-	}
-	return query
 }
 
 // ToColumn takes an empty interfaces and returns a Column instance.
