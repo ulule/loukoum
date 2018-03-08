@@ -3,21 +3,24 @@ package types
 import (
 	"bytes"
 	"fmt"
+	"github.com/ulule/loukoum/format"
 )
 
 // A Context is passed to a root stmt.Statement to generate a query.
-type Context struct {
+type Context interface {
+	Write(query string)
+	Bind(value interface{})
+	Query() string
+}
 
-	// Prefix added to query placeholders
-	Prefix string
-
+// StringContext embeds values directly in the query.
+type StringContext struct {
 	buffer bytes.Buffer
 	values map[string]interface{}
-	args   []interface{}
 }
 
 // Write appends given subquery in context's buffer.
-func (ctx *Context) Write(query string) {
+func (ctx *StringContext) Write(query string) {
 	_, err := ctx.buffer.WriteString(query)
 	if err != nil {
 		panic("loukoum: cannot write on buffer")
@@ -25,39 +28,41 @@ func (ctx *Context) Write(query string) {
 }
 
 // Bind adds given value in context's values.
-func (ctx *Context) Bind(value interface{}) {
-	idx := len(ctx.args) + 1
-	name := fmt.Sprintf("arg_%d", idx)
-	ctx.values[name] = value
-	ctx.args = append(ctx.args, value)
-	ctx.Write(fmt.Sprintf("%s%d", ctx.Prefix, idx))
+func (ctx *StringContext) Bind(value interface{}) {
+	ctx.Write(format.Value(value))
 }
 
 // Query returns the underlaying query.
-func (ctx *Context) Query() string {
+func (ctx *StringContext) Query() string {
 	return ctx.buffer.String()
 }
 
-// Values returns the underlaying values of the query.
-func (ctx *Context) Values() map[string]interface{} {
-	return ctx.values
+// NamedContext uses named query placeholders
+type NamedContext struct {
+	StringContext
+	values map[string]interface{}
 }
 
-// Args return the underlying values of the query as a slice.
-func (ctx *Context) Args() []interface{} {
-	return ctx.args
-}
-
-// Placeholder prefixes
-const (
-	NamedPrefix    = ":arg_"
-	PostgresPrefix = "$"
-)
-
-// NewContext creates a new Context instance.
-func NewContext() *Context {
-	return &Context{
-		Prefix: NamedPrefix,
-		values: make(map[string]interface{}),
+// Bind adds given value in context's values.
+func (ctx *NamedContext) Bind(value interface{}) {
+	if ctx.values == nil {
+		ctx.values = make(map[string]interface{})
 	}
+	idx := len(ctx.values) + 1
+	name := fmt.Sprintf("arg_%d", idx)
+	ctx.values[name] = value
+	ctx.Write(":" + name)
+}
+
+// StdContext uses positional query placeholders
+type StdContext struct {
+	StringContext
+	values []interface{}
+}
+
+// Bind adds give value in context's values.
+func (ctx *StdContext) Bind(value interface{}) {
+	idx := len(ctx.values) + 1
+	ctx.values = append(ctx.values, value)
+	ctx.Write(fmt.Sprintf("$%d", idx))
 }
