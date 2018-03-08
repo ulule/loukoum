@@ -226,30 +226,23 @@ func (b Select) Prefix(prefix interface{}) Select {
 
 // String returns the underlying query as a raw statement.
 func (b Select) String() string {
-	return rawify(b.Prepare())
+	var ctx types.RawContext
+	b.query.Write(&ctx)
+	return ctx.Query()
 }
 
 // Prepare returns the underlying query as a named statement.
 func (b Select) Prepare() (string, map[string]interface{}) {
-	ctx := types.NewContext()
-	b.query.Write(ctx)
-
-	query := ctx.Query()
-	args := ctx.Values()
-
-	return query, args
+	var ctx types.NamedContext
+	b.query.Write(&ctx)
+	return ctx.Query(), ctx.Values()
 }
 
 // Query returns the underlying query as a regular statement.
 func (b Select) Query() (string, []interface{}) {
-	ctx := types.NewContext()
-	ctx.Prefix = types.PostgresPrefix
-	b.query.Write(ctx)
-
-	query := ctx.Query()
-	args := ctx.Args()
-
-	return query, args
+	var ctx types.StdContext
+	b.query.Write(&ctx)
+	return ctx.Query(), ctx.Values()
 }
 
 // Statement returns underlying statement.

@@ -20,7 +20,7 @@ func NewOnConflict(target ConflictTarget, action ConflictAction) OnConflict {
 }
 
 // Write exposes statement as a SQL query.
-func (conflict OnConflict) Write(ctx *types.Context) {
+func (conflict OnConflict) Write(ctx types.Context) {
 	if conflict.IsEmpty() {
 		return
 	}
@@ -56,7 +56,7 @@ func NewConflictTarget(columns []Column) ConflictTarget {
 }
 
 // Write exposes statement as a SQL query.
-func (target ConflictTarget) Write(ctx *types.Context) {
+func (target ConflictTarget) Write(ctx types.Context) {
 	if target.IsEmpty() {
 		return
 	}
@@ -96,7 +96,7 @@ func NewConflictUpdateAction(set Set) ConflictUpdateAction {
 }
 
 // Write exposes statement as a SQL query.
-func (action ConflictUpdateAction) Write(ctx *types.Context) {
+func (action ConflictUpdateAction) Write(ctx types.Context) {
 	ctx.Write(token.Do.String())
 	ctx.Write(" ")
 	ctx.Write(token.Update.String())
@@ -120,7 +120,7 @@ func NewConflictNoAction() ConflictNoAction {
 }
 
 // Write exposes statement as a SQL query.
-func (ConflictNoAction) Write(ctx *types.Context) {
+func (ConflictNoAction) Write(ctx types.Context) {
 	ctx.Write(token.Do.String())
 	ctx.Write(" ")
 	ctx.Write(token.Nothing.String())

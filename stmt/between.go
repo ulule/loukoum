@@ -38,7 +38,7 @@ func NewNotBetween(identifier Identifier, from, to Expression) Between {
 func (Between) expression() {}
 
 // Write exposes statement as a SQL query.
-func (between Between) Write(ctx *types.Context) {
+func (between Between) Write(ctx types.Context) {
 	if between.IsEmpty() {
 		panic("loukoum: expression is undefined")
 	}

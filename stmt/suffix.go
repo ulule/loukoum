@@ -17,7 +17,7 @@ func NewSuffix(suffix string) Suffix {
 }
 
 // Write exposes statement as a SQL query.
-func (suffix Suffix) Write(ctx *types.Context) {
+func (suffix Suffix) Write(ctx types.Context) {
 	if suffix.IsEmpty() {
 		return
 	}

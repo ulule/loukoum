@@ -10,5 +10,5 @@ type Statement interface {
 	// IsEmpty returns true if statement is undefined.
 	IsEmpty() bool
 	// Write exposes statement as a SQL query.
-	Write(ctx *types.Context)
+	Write(ctx types.Context)
 }

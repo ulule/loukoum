@@ -24,7 +24,7 @@ func NewUpdate(table Table) Update {
 }
 
 // Write exposes statement as a SQL query.
-func (update Update) Write(ctx *types.Context) {
+func (update Update) Write(ctx types.Context) {
 	if update.IsEmpty() {
 		panic("loukoum: an update statement must have a table and/or values")
 	}

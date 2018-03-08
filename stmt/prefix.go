@@ -17,7 +17,7 @@ func NewPrefix(prefix string) Prefix {
 }
 
 // Write exposes statement as a SQL query.
-func (prefix Prefix) Write(ctx *types.Context) {
+func (prefix Prefix) Write(ctx types.Context) {
 	if prefix.IsEmpty() {
 		return
 	}

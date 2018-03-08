@@ -13,14 +13,14 @@ type Context interface {
 	Query() string
 }
 
-// StringContext embeds values directly in the query.
-type StringContext struct {
+// RawContext embeds values directly in the query.
+type RawContext struct {
 	buffer bytes.Buffer
 	values map[string]interface{}
 }
 
 // Write appends given subquery in context's buffer.
-func (ctx *StringContext) Write(query string) {
+func (ctx *RawContext) Write(query string) {
 	_, err := ctx.buffer.WriteString(query)
 	if err != nil {
 		panic("loukoum: cannot write on buffer")
@@ -28,18 +28,18 @@ func (ctx *StringContext) Write(query string) {
 }
 
 // Bind adds given value in context's values.
-func (ctx *StringContext) Bind(value interface{}) {
+func (ctx *RawContext) Bind(value interface{}) {
 	ctx.Write(format.Value(value))
 }
 
 // Query returns the underlaying query.
-func (ctx *StringContext) Query() string {
+func (ctx *RawContext) Query() string {
 	return ctx.buffer.String()
 }
 
 // NamedContext uses named query placeholders
 type NamedContext struct {
-	StringContext
+	RawContext
 	values map[string]interface{}
 }
 
@@ -54,9 +54,14 @@ func (ctx *NamedContext) Bind(value interface{}) {
 	ctx.Write(":" + name)
 }
 
+// Values returns the named argument values
+func (ctx *NamedContext) Values() map[string]interface{} {
+	return ctx.values
+}
+
 // StdContext uses positional query placeholders
 type StdContext struct {
-	StringContext
+	RawContext
 	values []interface{}
 }
 
@@ -65,4 +70,9 @@ func (ctx *StdContext) Bind(value interface{}) {
 	idx := len(ctx.values) + 1
 	ctx.values = append(ctx.values, value)
 	ctx.Write(fmt.Sprintf("$%d", idx))
+}
+
+// Values returns the positional argument values
+func (ctx *StdContext) Values() []interface{} {
+	return ctx.values
 }
