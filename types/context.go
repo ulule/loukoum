@@ -16,7 +16,6 @@ type Context interface {
 // RawContext embeds values directly in the query.
 type RawContext struct {
 	buffer bytes.Buffer
-	values map[string]interface{}
 }
 
 // Write appends given subquery in context's buffer.
