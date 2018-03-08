@@ -17,7 +17,7 @@ func TestExpression_Valuer(t *testing.T) {
 
 	// pq.NullTime
 	{
-		ctx := types.NewContext()
+		var ctx types.NamedContext
 
 		source := pq.NullTime{Valid: true, Time: time.Now()}
 		expression := stmt.NewExpression(source)
@@ -25,7 +25,7 @@ func TestExpression_Valuer(t *testing.T) {
 
 		is.Equal(source.Time, value.Value)
 
-		value.Write(ctx)
+		value.Write(&ctx)
 		query := ctx.Query()
 		args := ctx.Values()
 
@@ -33,7 +33,7 @@ func TestExpression_Valuer(t *testing.T) {
 		is.Equal(source.Time, args["arg_1"])
 	}
 	{
-		ctx := types.NewContext()
+		var ctx types.NamedContext
 
 		source := pq.NullTime{}
 		expression := stmt.NewExpression(source)
@@ -41,7 +41,7 @@ func TestExpression_Valuer(t *testing.T) {
 
 		is.Equal(nil, value.Value)
 
-		value.Write(ctx)
+		value.Write(&ctx)
 		query := ctx.Query()
 		args := ctx.Values()
 
@@ -51,7 +51,7 @@ func TestExpression_Valuer(t *testing.T) {
 
 	// sql.NullString
 	{
-		ctx := types.NewContext()
+		var ctx types.NamedContext
 
 		source := sql.NullString{Valid: true, String: "ok"}
 		expression := stmt.NewExpression(source)
@@ -59,7 +59,7 @@ func TestExpression_Valuer(t *testing.T) {
 
 		is.Equal(source.String, value.Value)
 
-		value.Write(ctx)
+		value.Write(&ctx)
 		query := ctx.Query()
 		args := ctx.Values()
 
@@ -67,7 +67,7 @@ func TestExpression_Valuer(t *testing.T) {
 		is.Equal(source.String, args["arg_1"])
 	}
 	{
-		ctx := types.NewContext()
+		var ctx types.NamedContext
 
 		source := sql.NullString{}
 		expression := stmt.NewExpression(source)
@@ -75,7 +75,7 @@ func TestExpression_Valuer(t *testing.T) {
 
 		is.Equal(nil, value.Value)
 
-		value.Write(ctx)
+		value.Write(&ctx)
 		query := ctx.Query()
 		args := ctx.Values()
 
@@ -85,7 +85,7 @@ func TestExpression_Valuer(t *testing.T) {
 
 	// sql.NullInt64
 	{
-		ctx := types.NewContext()
+		var ctx types.NamedContext
 
 		source := sql.NullInt64{Valid: true, Int64: 32}
 		expression := stmt.NewExpression(source)
@@ -93,7 +93,7 @@ func TestExpression_Valuer(t *testing.T) {
 
 		is.Equal(source.Int64, value.Value)
 
-		value.Write(ctx)
+		value.Write(&ctx)
 		query := ctx.Query()
 		args := ctx.Values()
 
@@ -101,7 +101,7 @@ func TestExpression_Valuer(t *testing.T) {
 		is.Equal(source.Int64, args["arg_1"])
 	}
 	{
-		ctx := types.NewContext()
+		var ctx types.NamedContext
 
 		source := sql.NullInt64{}
 		expression := stmt.NewExpression(source)
@@ -109,7 +109,7 @@ func TestExpression_Valuer(t *testing.T) {
 
 		is.Equal(nil, value.Value)
 
-		value.Write(ctx)
+		value.Write(&ctx)
 		query := ctx.Query()
 		args := ctx.Values()
 
@@ -123,7 +123,7 @@ func TestExpression_Encoder(t *testing.T) {
 
 	// StringEncoder
 	{
-		ctx := types.NewContext()
+		var ctx types.NamedContext
 
 		source := tsencoder{value: "foobar"}
 		expression := stmt.NewExpression(source)
@@ -131,7 +131,7 @@ func TestExpression_Encoder(t *testing.T) {
 
 		is.Equal(source.value, value.Value)
 
-		value.Write(ctx)
+		value.Write(&ctx)
 		query := ctx.Query()
 		args := ctx.Values()
 
@@ -141,7 +141,7 @@ func TestExpression_Encoder(t *testing.T) {
 
 	// Int64Encoder
 	{
-		ctx := types.NewContext()
+		var ctx types.NamedContext
 
 		source := tiencoder{value: 32}
 		expression := stmt.NewExpression(source)
@@ -149,7 +149,7 @@ func TestExpression_Encoder(t *testing.T) {
 
 		is.Equal(source.value, value.Value)
 
-		value.Write(ctx)
+		value.Write(&ctx)
 		query := ctx.Query()
 		args := ctx.Values()
 
@@ -159,7 +159,7 @@ func TestExpression_Encoder(t *testing.T) {
 
 	// BoolEncoder
 	{
-		ctx := types.NewContext()
+		var ctx types.NamedContext
 
 		source := tbencoder{value: true}
 		expression := stmt.NewExpression(source)
@@ -167,7 +167,7 @@ func TestExpression_Encoder(t *testing.T) {
 
 		is.Equal(source.value, value.Value)
 
-		value.Write(ctx)
+		value.Write(&ctx)
 		query := ctx.Query()
 		args := ctx.Values()
 
@@ -177,7 +177,7 @@ func TestExpression_Encoder(t *testing.T) {
 
 	// TimeEncoder
 	{
-		ctx := types.NewContext()
+		var ctx types.NamedContext
 
 		source := ttencoder{value: time.Now()}
 		expression := stmt.NewExpression(source)
@@ -185,7 +185,7 @@ func TestExpression_Encoder(t *testing.T) {
 
 		is.Equal(source.value, value.Value)
 
-		value.Write(ctx)
+		value.Write(&ctx)
 		query := ctx.Query()
 		args := ctx.Values()
 
