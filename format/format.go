@@ -1,9 +1,9 @@
 package format
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -49,26 +49,26 @@ func Value(arg interface{}) string { // nolint: gocyclo
 
 // String formats the given string.
 func String(value string) string { // nolint: errcheck
-	var b strings.Builder
-	b.WriteByte('\'')
-	for _, r := range value {
-		switch r {
+	buffer := &bytes.Buffer{}
+	writeRune(buffer, '\'')
+	for _, char := range value {
+		switch char {
 		case '\'':
-			b.WriteString(`\'`)
+			writeString(buffer, `\'`)
 		case '\\':
-			b.WriteString(`\\`)
+			writeString(buffer, `\\`)
 		case '\n':
-			b.WriteString(`\n`)
+			writeString(buffer, `\n`)
 		case '\r':
-			b.WriteString(`\r`)
+			writeString(buffer, `\r`)
 		case '\t':
-			b.WriteString(`\t`)
+			writeString(buffer, `\t`)
 		default:
-			b.WriteRune(r)
+			writeRune(buffer, char)
 		}
 	}
-	b.WriteByte('\'')
-	return b.String()
+	writeRune(buffer, '\'')
+	return buffer.String()
 }
 
 // Int formats the given number.
@@ -94,4 +94,18 @@ func Float(value float64) string {
 // Time formats the given time.
 func Time(value time.Time) string {
 	return fmt.Sprint("'", value.UTC().Format("2006-01-02 15:04:05.999999"), "+00'")
+}
+
+func writeRune(buffer *bytes.Buffer, chunk rune) {
+	_, err := buffer.WriteRune(chunk)
+	if err != nil {
+		panic("loukoum: cannot write on bytes buffer")
+	}
+}
+
+func writeString(buffer *bytes.Buffer, chunk string) {
+	_, err := buffer.WriteString(chunk)
+	if err != nil {
+		panic("loukoum: cannot write on bytes buffer")
+	}
 }
