@@ -2,6 +2,7 @@ package format
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"time"
@@ -13,7 +14,7 @@ func Value(arg interface{}) string { // nolint: gocyclo
 	case string:
 		return String(value)
 	case []byte:
-		return String(string(value))
+		return Bytes(value)
 	case time.Time:
 		return Time(value)
 	case int:
@@ -69,6 +70,12 @@ func String(value string) string { // nolint: errcheck
 	}
 	writeRune(buffer, '\'')
 	return buffer.String()
+}
+
+// Bytes formats the give bytes.
+func Bytes(value []byte) string {
+	encoded := hex.EncodeToString(value)
+	return fmt.Sprintf("decode('%s', 'hex')", encoded)
 }
 
 // Int formats the given number.
