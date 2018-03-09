@@ -28,9 +28,6 @@ func (b *BuilderTest) Run(t *testing.T) {
 			})
 		})
 	}
-	if b.Builder == nil {
-		return
-	}
 	t.Run("String", func(t *testing.T) {
 		if b.String != "" {
 			require.Equal(t, b.String, b.Builder.String())
