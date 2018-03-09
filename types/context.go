@@ -3,6 +3,7 @@ package types
 import (
 	"bytes"
 	"fmt"
+
 	"github.com/ulule/loukoum/format"
 )
 
