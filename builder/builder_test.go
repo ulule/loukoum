@@ -33,23 +33,17 @@ func (b *BuilderTest) Run(t *testing.T) {
 		return
 	}
 	t.Run("String", func(t *testing.T) {
-		if b.String != "" {
-			require.Equal(t, b.String, b.Builder.String())
-		}
+		require.Equal(t, b.String, b.Builder.String())
 	})
 	t.Run("Query", func(t *testing.T) {
 		query, args := b.Builder.Query()
-		if b.Query != "" {
-			require.Equal(t, b.Query, query)
-			require.Equal(t, b.Args, args)
-		}
+		require.Equal(t, b.Query, query)
+		require.Equal(t, b.Args, args)
 	})
 	t.Run("NamedQuery", func(t *testing.T) {
 		query, args := b.Builder.NamedQuery()
-		if b.NamedQuery != "" {
-			require.Equal(t, b.NamedQuery, query)
-			require.Equal(t, b.NamedArgs, args)
-		}
+		require.Equal(t, b.NamedQuery, query)
+		require.Equal(t, b.NamedArgs, args)
 	})
 }
 
