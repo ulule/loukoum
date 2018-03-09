@@ -11,7 +11,6 @@ import (
 type Context interface {
 	Write(query string)
 	Bind(value interface{})
-	Query() string
 }
 
 // RawContext embeds values directly in the query.
