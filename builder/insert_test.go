@@ -14,202 +14,219 @@ import (
 	"github.com/ulule/loukoum/format"
 )
 
-func TestInsert_Columns(t *testing.T) {
-	is := require.New(t)
+var now = time.Now()
 
-	// With columns
-	{
-		query := loukoum.Insert("table").Columns("a", "b", "c")
-		is.Equal("INSERT INTO table (a, b, c)", query.String())
-	}
-
-	// Without columns
-	{
-		query := loukoum.Insert("table")
-		is.Equal("INSERT INTO table", query.String())
-	}
+type BuilderTest struct {
+	Name       string
+	Builder    builder.Builder
+	String     string
+	Query      string
+	Args       []interface{}
+	NamedQuery string
+	NamedArgs  map[string]interface{}
+	Failure    func() builder.Builder
 }
 
-func TestInsert_Values(t *testing.T) {
-	is := require.New(t)
-
-	// With columns
-	{
-		query := loukoum.
-			Insert("table").
-			Columns("a", "b", "c").
-			Values([]string{"va", "vb", "vc"})
-
-		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')", query.String())
+func (b *BuilderTest) Run(t *testing.T) {
+	if b.Failure != nil {
+		t.Run("Failure", func(t *testing.T) {
+			require.Panics(t, func() {
+				_ = b.Failure()
+			})
+		})
 	}
-	{
-		query := loukoum.
-			Insert("table").
-			Columns("a", "b", "c").
-			Values("va", "vb", "vc")
-
-		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')", query.String())
+	if b.Builder == nil {
+		return
 	}
-
-	// Without columns
-	{
-		query := loukoum.
-			Insert("table").
-			Values([]string{"va", "vb", "vc"})
-
-		is.Equal("INSERT INTO table VALUES ('va', 'vb', 'vc')", query.String())
-	}
-	{
-		query := loukoum.
-			Insert("table").
-			Values("va", "vb", "vc")
-
-		is.Equal("INSERT INTO table VALUES ('va', 'vb', 'vc')", query.String())
-	}
-
-	// With raw values
-	{
-		query := loukoum.
-			Insert("table").
-			Columns("email", "enabled", "created_at").
-			Values("tech@ulule.com", true, loukoum.Raw("NOW()"))
-
-		is.Equal("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW())", query.String())
-	}
+	t.Run("String", func(t *testing.T) {
+		if b.String != "" {
+			require.Equal(t, b.String, b.Builder.String())
+		}
+	})
+	t.Run("Query", func(t *testing.T) {
+		query, args := b.Builder.Query()
+		if b.Query != "" {
+			require.Equal(t, b.Query, query)
+			require.Equal(t, b.Args, args)
+		}
+	})
+	t.Run("NamedQuery", func(t *testing.T) {
+		query, args := b.Builder.NamedQuery()
+		if b.NamedQuery != "" {
+			require.Equal(t, b.NamedQuery, query)
+			require.Equal(t, b.NamedArgs, args)
+		}
+	})
 }
 
-func TestInsert_OnConflict(t *testing.T) {
-	is := require.New(t)
-
-	// Do nothing without target
+var inserttests = []BuilderTest{
 	{
-		query := loukoum.
+		Name:    "Columns With columns",
+		Builder: loukoum.Insert("table").Columns("a", "b", "c"),
+		String:  "INSERT INTO table (a, b, c)",
+	},
+	{
+		Name:    "Columns Without columns",
+		Builder: loukoum.Insert("table"),
+		String:  "INSERT INTO table",
+	},
+	{
+		Name: "Values With columns A",
+		Builder: loukoum.Insert("table").
+			Columns("a", "b", "c").
+			Values([]string{"va", "vb", "vc"}),
+		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')",
+	},
+	{
+		Name: "Values With Columns B",
+		Builder: loukoum.
+			Insert("table").
+			Columns("a", "b", "c").
+			Values("va", "vb", "vc"),
+		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')",
+	},
+	{
+		Name: "Values Without columns A",
+		Builder: loukoum.
+			Insert("table").
+			Values([]string{"va", "vb", "vc"}),
+		String: "INSERT INTO table VALUES ('va', 'vb', 'vc')",
+	},
+	{
+		Name: "Values Without columns B",
+		Builder: loukoum.
+			Insert("table").
+			Values("va", "vb", "vc"),
+		String: "INSERT INTO table VALUES ('va', 'vb', 'vc')",
+	},
+	{
+		Name: "OnConflict Do nothing without target",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "enabled", "created_at").
 			Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
-			OnConflict(loukoum.DoNothing())
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-			"ON CONFLICT DO NOTHING"), query.String())
-	}
-
-	// Do nothing
+			OnConflict(loukoum.DoNothing()),
+		String: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
+			"ON CONFLICT DO NOTHING",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "OnConflict Do nothing A",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "enabled", "created_at").
 			Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
-			OnConflict("email", loukoum.DoNothing())
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-			"ON CONFLICT (email) DO NOTHING"), query.String())
-	}
+			OnConflict("email", loukoum.DoNothing()),
+		String: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
+			"ON CONFLICT (email) DO NOTHING",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "OnConflict Do nothing B",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "enabled", "created_at").
 			Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
-			OnConflict(loukoum.Column("email"), loukoum.DoNothing())
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-			"ON CONFLICT (email) DO NOTHING"), query.String())
-	}
+			OnConflict(loukoum.Column("email"), loukoum.DoNothing()),
+		String: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
+			"ON CONFLICT (email) DO NOTHING",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "OnConflict Do nothing C",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "enabled", "created_at").
 			Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
-			OnConflict("email", "uuid", loukoum.DoNothing())
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-			"ON CONFLICT (email, uuid) DO NOTHING"), query.String())
-	}
+			OnConflict("email", "uuid", loukoum.DoNothing()),
+		String: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
+			"ON CONFLICT (email, uuid) DO NOTHING",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "OnConflict Do nothing D",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "enabled", "created_at").
 			Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
-			OnConflict("email", loukoum.Column("uuid"), "reference", loukoum.DoNothing())
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-			"ON CONFLICT (email, uuid, reference) DO NOTHING"), query.String())
-	}
-
-	// Do update
+			OnConflict("email", loukoum.Column("uuid"), "reference", loukoum.DoNothing()),
+		String: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
+			"ON CONFLICT (email, uuid, reference) DO NOTHING",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "OnConflict Do update A",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "enabled", "created_at").
 			Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 			OnConflict("email", loukoum.DoUpdate(
 				loukoum.Pair("created_at", loukoum.Raw("NOW()")),
 				loukoum.Pair("enabled", true),
-			))
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-			"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = true"), query.String())
-	}
+			)),
+		String: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
+			"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = true",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "OnConflict Do update B",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "enabled", "created_at").
 			Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 			OnConflict(loukoum.Column("email"), loukoum.DoUpdate(
 				loukoum.Pair("created_at", loukoum.Raw("NOW()")),
 				loukoum.Pair("enabled", true),
-			))
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-			"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = true"), query.String())
-	}
+			)),
+		String: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
+			"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = true",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "OnConflict Do update C",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "enabled", "created_at").
 			Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 			OnConflict("email", "uuid", loukoum.DoUpdate(
 				loukoum.Pair("created_at", loukoum.Raw("NOW()")),
 				loukoum.Pair("enabled", true),
-			))
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-			"ON CONFLICT (email, uuid) DO UPDATE SET created_at = NOW(), enabled = true"), query.String())
-	}
+			)),
+		String: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
+			"ON CONFLICT (email, uuid) DO UPDATE SET created_at = NOW(), enabled = true",
+		),
+	},
 	{
-		query := loukoum.
-			Insert("table").
-			Columns("email", "enabled", "created_at").
-			Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
-			OnConflict("email", loukoum.Column("uuid"), "reference", loukoum.DoUpdate(
-				loukoum.Pair("created_at", loukoum.Raw("NOW()")),
-				loukoum.Pair("enabled", true),
-			))
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-			"ON CONFLICT (email, uuid, reference) DO UPDATE SET created_at = NOW(), enabled = true"), query.String())
-	}
-
-	// Corner cases...
-	{
-		Failure(is, func() builder.Builder {
+		Name: "OnConflict Corner case A",
+		Failure: func() builder.Builder {
 			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 				OnConflict()
-		})
-	}
+		},
+	},
 	{
-		Failure(is, func() builder.Builder {
+		Name: "OnConflict Corner case B",
+		Failure: func() builder.Builder {
 			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 				OnConflict("email")
-		})
-	}
+		},
+	},
 	{
-		Failure(is, func() builder.Builder {
+		Name: "OnConflict Corner case C",
+		Failure: func() builder.Builder {
 			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
@@ -218,103 +235,99 @@ func TestInsert_OnConflict(t *testing.T) {
 					loukoum.Pair("created_at", loukoum.Raw("NOW()")),
 					loukoum.Pair("enabled", true),
 				))
-		})
-	}
+		},
+	},
 	{
-		Failure(is, func() builder.Builder {
+		Name: "OnConflict Corner case D",
+		Failure: func() builder.Builder {
 			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 				OnConflict("email", 6700)
-		})
-	}
+		},
+	},
 	{
-		Failure(is, func() builder.Builder {
+		Name: "OnConflict Corner case E",
+		Failure: func() builder.Builder {
 			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 				OnConflict(569)
-		})
-	}
+		},
+	},
 	{
-		Failure(is, func() builder.Builder {
+		Name: "OnConflict Corner case F",
+		Failure: func() builder.Builder {
 			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 				OnConflict("email", "uuid")
-		})
-	}
+		},
+	},
 	{
-		Failure(is, func() builder.Builder {
+		Name: "OnConflict Corner case G",
+		Failure: func() builder.Builder {
 			return loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 				OnConflict(loukoum.Column("email"), loukoum.Column("uuid"), loukoum.Column("reference"))
-		})
-	}
-
-}
-
-func TestInsert_Returning(t *testing.T) {
-	is := require.New(t)
-
-	// One column
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Returning One column",
+		Builder: loukoum.
 			Insert("table").
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
-			Returning("a")
-
-		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a", query.String())
-	}
-
-	// Many columns
+			Returning("a"),
+		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a",
+	},
 	{
-		query := loukoum.
+		Name: "Returning Many columns A",
+		Builder: loukoum.
 			Insert("table").
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
-			Returning("a", "b")
-
-		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b", query.String())
-	}
+			Returning("a", "b"),
+		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b",
+	},
 	{
-		query := loukoum.
+		Name: "Returning Many columns B",
+		Builder: loukoum.
 			Insert("table").
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
-			Returning("a", "b", "c")
-
-		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b, c", query.String())
-	}
-
-	// With aliases
+			Returning("a", "b", "c"),
+		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b, c",
+	},
 	{
-		query := loukoum.
+		Name: "Returning With aliases A",
+		Builder: loukoum.
 			Insert("table").
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
-			Returning(loukoum.Column("a").As("alias_a"))
-
-		is.Equal("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a AS alias_a", query.String())
-	}
+			Returning(loukoum.Column("a").As("alias_a")),
+		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a AS alias_a",
+	},
 	{
-		query := loukoum.
+		Name: "Returning With aliases B",
+		Builder: loukoum.
 			Insert("table").
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
-			Returning(loukoum.Column("a").As("alias_a"), loukoum.Column("b").As("alias_b"))
-
-		is.Equal(fmt.Sprint("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
-			"RETURNING a AS alias_a, b AS alias_b"), query.String())
-	}
+			Returning(loukoum.Column("a").As("alias_a"), loukoum.Column("b").As("alias_b")),
+		String: fmt.Sprint(
+			"INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
+			"RETURNING a AS alias_a, b AS alias_b",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Returning With aliases C",
+		Builder: loukoum.
 			Insert("table").
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
@@ -322,116 +335,110 @@ func TestInsert_Returning(t *testing.T) {
 				loukoum.Column("a").As("alias_a"),
 				loukoum.Column("b").As("alias_b"),
 				loukoum.Column("c").As("alias_c"),
-			)
-
-		is.Equal(fmt.Sprint("INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
-			"RETURNING a AS alias_a, b AS alias_b, c AS alias_c"), query.String())
-	}
-
-	// TODO: expression
-}
-
-func TestInsert_Valuer(t *testing.T) {
-	is := require.New(t)
-
-	// pq.NullTime
+			),
+		String: fmt.Sprint(
+			"INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
+			"RETURNING a AS alias_a, b AS alias_b, c AS alias_c",
+		),
+	},
 	{
-		now := time.Now()
-		query := loukoum.
+		Name: "Valuer pq.NullTime A",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "enabled", "created_at").
-			Values("tech@ulule.com", true, pq.NullTime{Time: now, Valid: true})
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
-			"true, ", format.Time(now), ")"), query.String())
-	}
+			Values("tech@ulule.com", true, pq.NullTime{Time: now, Valid: true}),
+		String: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
+			"true, ", format.Time(now), ")",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Valuer pq.NullTime B",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "enabled", "created_at").
-			Values("tech@ulule.com", true, pq.NullTime{})
-
-		is.Equal(fmt.Sprint("INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
-			"true, NULL)"), query.String())
-	}
-
-	// sql.NullString
+			Values("tech@ulule.com", true, pq.NullTime{}),
+		String: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
+			"true, NULL)",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Valuer sql.NullString A",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "comment").
-			Values("tech@ulule.com", sql.NullString{String: "foobar", Valid: true})
-
-		is.Equal("INSERT INTO table (email, comment) VALUES ('tech@ulule.com', 'foobar')", query.String())
-	}
+			Values("tech@ulule.com", sql.NullString{String: "foobar", Valid: true}),
+		String: "INSERT INTO table (email, comment) VALUES ('tech@ulule.com', 'foobar')",
+	},
 	{
-		query := loukoum.
+		Name: "Valuer sql.NullString B",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "comment").
-			Values("tech@ulule.com", sql.NullString{})
-
-		is.Equal("INSERT INTO table (email, comment) VALUES ('tech@ulule.com', NULL)", query.String())
-	}
-
-	// sql.NullInt64
+			Values("tech@ulule.com", sql.NullString{}),
+		String: "INSERT INTO table (email, comment) VALUES ('tech@ulule.com', NULL)",
+	},
 	{
-		query := loukoum.
+		Name: "Valuer sql.NullInt64 A",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "login").
-			Values("tech@ulule.com", sql.NullInt64{Int64: 30, Valid: true})
-
-		is.Equal("INSERT INTO table (email, login) VALUES ('tech@ulule.com', 30)", query.String())
-	}
+			Values("tech@ulule.com", sql.NullInt64{Int64: 30, Valid: true}),
+		String: "INSERT INTO table (email, login) VALUES ('tech@ulule.com', 30)",
+	},
 	{
-		query := loukoum.
+		Name: "Valuer sql.NullInt64 B",
+		Builder: loukoum.
 			Insert("table").
 			Columns("email", "login").
-			Values("tech@ulule.com", sql.NullInt64{})
-
-		is.Equal("INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)", query.String())
-	}
-}
-
-func TestInsert_Set(t *testing.T) {
-	is := require.New(t)
-
-	// Variadic with Pair type.
+			Values("tech@ulule.com", sql.NullInt64{}),
+		String: "INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)",
+	},
 	{
-		query := loukoum.
+		Name: "Set Variadic with Pair type",
+		Builder: loukoum.
 			Insert("table").
 			Set(
 				loukoum.Pair("email", "tech@ulule.com"),
 				loukoum.Pair("enabled", true),
 				loukoum.Pair("created_at", loukoum.Raw("NOW()")),
-			)
-
-		is.Equal(fmt.Sprint("INSERT INTO table (created_at, email, enabled) ",
-			"VALUES (NOW(), 'tech@ulule.com', true)"), query.String())
-	}
-
-	// Variadic with Map type.
+			),
+		String: fmt.Sprint(
+			"INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), 'tech@ulule.com', true)",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Set Variadic with Map type",
+		Builder: loukoum.
 			Insert("table").
 			Set(
 				loukoum.Map{"email": "tech@ulule.com", "enabled": true},
 				loukoum.Map{"created_at": loukoum.Raw("NOW()")},
-			)
-
-		is.Equal(fmt.Sprint("INSERT INTO table (created_at, email, enabled) ",
-			"VALUES (NOW(), 'tech@ulule.com', true)"), query.String())
-	}
-
-	// Variadic with string / interface map
+			),
+		String: fmt.Sprint(
+			"INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), 'tech@ulule.com', true)",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Set Variadic with string / interface map",
+		Builder: loukoum.
 			Insert("table").
 			Set(
 				map[string]interface{}{"email": "tech@ulule.com"},
 				map[string]interface{}{"enabled": true, "created_at": loukoum.Raw("NOW()")},
-			)
+			),
+		String: fmt.Sprint(
+			"INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), 'tech@ulule.com', true)",
+		),
+	},
+}
 
-		is.Equal(fmt.Sprint("INSERT INTO table (created_at, email, enabled) ",
-			"VALUES (NOW(), 'tech@ulule.com', true)"), query.String())
+func TestInsert(t *testing.T) {
+	for _, tt := range inserttests {
+		t.Run(tt.Name, tt.Run)
 	}
 }
