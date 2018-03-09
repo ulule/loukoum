@@ -140,8 +140,8 @@ func (b Insert) String() string {
 	return ctx.Query()
 }
 
-// Prepare returns the underlying query as a named statement.
-func (b Insert) Prepare() (string, map[string]interface{}) {
+// NamedQuery returns the underlying query as a named statement.
+func (b Insert) NamedQuery() (string, map[string]interface{}) {
 	var ctx types.NamedContext
 	b.insert.Write(&ctx)
 	return ctx.Query(), ctx.Values()

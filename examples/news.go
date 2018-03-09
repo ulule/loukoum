@@ -25,7 +25,7 @@ func PublishNews(db *sqlx.DB, news News) (News, error) {
 		And(lk.Condition("deleted_at").IsNull(true)).
 		Returning("published_at")
 
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 	// query: UPDATE news SET published_at = NOW(), status = :arg_1 WHERE ((id = :arg_2) AND (deleted_at IS NULL)) RETURNING published_at
 	// args: (map[string]interface {}) (len=2) {
 	//  (string) (len=5) "arg_1": (string) (len=9) "published",

@@ -25,7 +25,7 @@ func FindUsers(db *sqlx.DB) ([]User, error) {
 
 	// query: SELECT id, first_name, last_name, email FROM users WHERE (deleted_at IS NULL)
 	// args: map[string]interface{}{}
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -48,7 +48,7 @@ func DeleteUser(db *sqlx.DB, user User) error {
 	builder := lk.Delete("users").
 		Where(lk.Condition("id").Equal(user.ID))
 
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 	// query: DELETE FROM users WHERE (id = :arg_1)
 	// args: (map[string]interface {}) (len=1) {
 	//  (string) (len=5) "arg_1": (int) user.ID

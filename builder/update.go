@@ -102,8 +102,8 @@ func (b Update) String() string {
 	return ctx.Query()
 }
 
-// Prepare returns the underlying query as a named statement.
-func (b Update) Prepare() (string, map[string]interface{}) {
+// NamedQuery returns the underlying query as a named statement.
+func (b Update) NamedQuery() (string, map[string]interface{}) {
 	var ctx types.NamedContext
 	b.query.Write(&ctx)
 	return ctx.Query(), ctx.Values()

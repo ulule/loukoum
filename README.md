@@ -74,7 +74,7 @@ func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
 		).
 		Returning("id")
 
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 	// query: INSERT INTO comments (created_at, email, message, status) VALUES (NOW(), :arg_1, :arg_2, :arg_3) RETURNING id
 	// args: (map[string]interface {}) (len=3) {
 	// (string) (len=5) "arg_1": (string) comment.Email,
@@ -119,7 +119,7 @@ func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
 		)).
 		Returning("id")
 
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 	// query: INSERT INTO comments (created_at, email, message, status) VALUES (
 	//		NOW(), :arg_1, :arg_2, :arg_3
 	// ) ON CONFLICT (email) DO UPDATE SET created_at = NOW(), deleted_at = NULL, message = :arg_4, status = :arg_5 RETURNING id
@@ -170,7 +170,7 @@ func PublishNews(db *sqlx.DB, news News) (News, error) {
 		And(lk.Condition("deleted_at").IsNull(true)).
 		Returning("published_at")
 
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 	// query: UPDATE news SET published_at = NOW(), status = :arg_1 WHERE ((id = :arg_2) AND (deleted_at IS NULL)) RETURNING published_at
 	// args: (map[string]interface {}) (len=2) {
 	//  (string) (len=5) "arg_1": (string) (len=9) "published",
@@ -222,7 +222,7 @@ func FindUsers(db *sqlx.DB) ([]User, error) {
 
 	// query: SELECT id, first_name, last_name, email FROM users WHERE (deleted_at IS NULL)
 	// args: map[string]interface{}{}
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -256,7 +256,7 @@ func FindStaffComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	// args: (map[string]interface {}) (len=1) {
 	// (string) (len=5) "arg_1": (bool) true
 	// }
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -310,7 +310,7 @@ func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	// query: SELECT id, email, status, user_id, message, created_at FROM comments INNER JOIN users ON comments.user_id = users.id WHERE (deleted_at IS NULL)
 	// args: (map[string]interface {}) {
 	// }
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -339,7 +339,7 @@ func DeleteUser(db *sqlx.DB, user User) error {
 	builder := lk.Delete("users").
 		Where(lk.Condition("id").Equal(user.ID))
 
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 	// query: DELETE FROM users WHERE (id = :arg_1)
 	// args: (map[string]interface {}) (len=1) {
 	//  (string) (len=5) "arg_1": (int) user.ID

@@ -29,7 +29,7 @@ func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	// args: (map[string]interface {}) (len=1) {
 	// (string) (len=5) "arg_1": (bool) true
 	// }
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -62,7 +62,7 @@ func FindStaffComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	// args: (map[string]interface {}) (len=1) {
 	// (string) (len=5) "arg_1": (bool) true
 	// }
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -91,7 +91,7 @@ func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
 		).
 		Returning("id")
 
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 	// query: INSERT INTO comments (created_at, email, message, status) VALUES (NOW(), :arg_1, :arg_2, :arg_3) RETURNING id
 	// args: (map[string]interface {}) (len=3) {
 	// (string) (len=5) "arg_1": (string) comment.Email,
@@ -130,7 +130,7 @@ func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
 		)).
 		Returning("id")
 
-	query, args := builder.Prepare()
+	query, args := builder.NamedQuery()
 	// query: INSERT INTO comments (created_at, email, message, status) VALUES (
 	//		NOW(), :arg_1, :arg_2, :arg_3
 	// ) ON CONFLICT (email) DO UPDATE SET created_at = NOW(), deleted_at = NULL, message = :arg_4, status = :arg_5 RETURNING id

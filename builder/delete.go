@@ -88,8 +88,8 @@ func (b Delete) String() string {
 	return ctx.Query()
 }
 
-// Prepare returns the underlying query as a named statement.
-func (b Delete) Prepare() (string, map[string]interface{}) {
+// NamedQuery returns the underlying query as a named statement.
+func (b Delete) NamedQuery() (string, map[string]interface{}) {
 	var ctx types.NamedContext
 	b.query.Write(&ctx)
 	return ctx.Query(), ctx.Values()
