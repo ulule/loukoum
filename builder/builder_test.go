@@ -27,7 +27,7 @@ func (b *BuilderTest) Run(t *testing.T) {
 	if b.Failure != nil {
 		t.Run("Failure", func(t *testing.T) {
 			require.Panics(t, func() {
-				_ = b.Failure()
+				_ = b.Failure().String()
 			})
 		})
 		return
