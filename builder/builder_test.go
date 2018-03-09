@@ -47,12 +47,6 @@ func (b *BuilderTest) Run(t *testing.T) {
 	})
 }
 
-func Failure(is *require.Assertions, callback func() builder.Builder) {
-	is.Panics(func() {
-		_ = callback().String()
-	})
-}
-
 func TestToColumns(t *testing.T) {
 	is := require.New(t)
 
