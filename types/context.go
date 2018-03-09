@@ -36,7 +36,7 @@ func (ctx *RawContext) Query() string {
 	return ctx.buffer.String()
 }
 
-// NamedContext uses named query placeholders
+// NamedContext uses named query placeholders.
 type NamedContext struct {
 	RawContext
 	values map[string]interface{}
@@ -53,25 +53,25 @@ func (ctx *NamedContext) Bind(value interface{}) {
 	ctx.Write(":" + name)
 }
 
-// Values returns the named argument values
+// Values returns the named argument values.
 func (ctx *NamedContext) Values() map[string]interface{} {
 	return ctx.values
 }
 
-// StdContext uses positional query placeholders
+// StdContext uses positional query placeholders.
 type StdContext struct {
 	RawContext
 	values []interface{}
 }
 
-// Bind adds give value in context's values.
+// Bind adds given value in context's values.
 func (ctx *StdContext) Bind(value interface{}) {
 	idx := len(ctx.values) + 1
 	ctx.values = append(ctx.values, value)
 	ctx.Write(fmt.Sprintf("$%d", idx))
 }
 
-// Values returns the positional argument values
+// Values returns the positional argument values.
 func (ctx *StdContext) Values() []interface{} {
 	return ctx.values
 }
