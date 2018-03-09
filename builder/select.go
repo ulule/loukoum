@@ -193,8 +193,8 @@ func (b Select) Offset(value interface{}) Select {
 	}
 
 	offset, ok := ToInt64(value)
-	if !ok || offset <= 0 {
-		panic("loukoum: offset must be a positive integer")
+	if !ok || offset < 0 {
+		panic("loukoum: offset must be a non-negative integer")
 	}
 
 	b.query.Offset = stmt.NewOffset(offset)
