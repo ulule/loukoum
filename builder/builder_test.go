@@ -2,12 +2,15 @@ package builder_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum/builder"
 	"github.com/ulule/loukoum/stmt"
 )
+
+var now = time.Now()
 
 type BuilderTest struct {
 	Name       string

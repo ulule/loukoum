@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/lib/pq"
 
@@ -12,8 +11,6 @@ import (
 	"github.com/ulule/loukoum/builder"
 	"github.com/ulule/loukoum/format"
 )
-
-var now = time.Now()
 
 var inserttests = []BuilderTest{
 	{
