@@ -4,201 +4,317 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/ulule/loukoum"
 	"github.com/ulule/loukoum/builder"
 	"github.com/ulule/loukoum/stmt"
 )
 
-func TestSelect(t *testing.T) {
-	is := require.New(t)
-
+var selecttests = []BuilderTest{
 	{
-		query := loukoum.Select("test")
-		is.Equal("SELECT test", query.String())
-	}
+		Name:       "Select",
+		Builder:    loukoum.Select("test"),
+		String:     "SELECT test",
+		Query:      "SELECT test",
+		NamedQuery: "SELECT test",
+	},
 	{
-		query := loukoum.Select("test").Distinct()
-		is.Equal("SELECT DISTINCT test", query.String())
-	}
+		Name:       "Distinct",
+		Builder:    loukoum.Select("test").Distinct(),
+		String:     "SELECT DISTINCT test",
+		Query:      "SELECT DISTINCT test",
+		NamedQuery: "SELECT DISTINCT test",
+	},
 	{
-		query := loukoum.Select(loukoum.Column("test").As("foobar"))
-		is.Equal("SELECT test AS foobar", query.String())
-	}
+		Name:       "As",
+		Builder:    loukoum.Select(loukoum.Column("test").As("foobar")),
+		String:     "SELECT test AS foobar",
+		Query:      "SELECT test AS foobar",
+		NamedQuery: "SELECT test AS foobar",
+	},
 	{
-		query := loukoum.Select("test", "foobar")
-		is.Equal("SELECT test, foobar", query.String())
-	}
+		Name:       "Select two columns",
+		Builder:    loukoum.Select("test", "foobar"),
+		String:     "SELECT test, foobar",
+		Query:      "SELECT test, foobar",
+		NamedQuery: "SELECT test, foobar",
+	},
 	{
-		query := loukoum.Select("test", loukoum.Column("test2").As("foobar"))
-		is.Equal("SELECT test, test2 AS foobar", query.String())
-	}
+		Name:       "As with Column statement",
+		Builder:    loukoum.Select("test", loukoum.Column("test2").As("foobar")),
+		String:     "SELECT test, test2 AS foobar",
+		Query:      "SELECT test, test2 AS foobar",
+		NamedQuery: "SELECT test, test2 AS foobar",
+	},
 	{
-		query := loukoum.Select("a", "b", loukoum.Column("c").As("x"))
-		is.Equal("SELECT a, b, c AS x", query.String())
-	}
+		Name:       "As with mixed columns types A",
+		Builder:    loukoum.Select("a", "b", loukoum.Column("c").As("x")),
+		String:     "SELECT a, b, c AS x",
+		Query:      "SELECT a, b, c AS x",
+		NamedQuery: "SELECT a, b, c AS x",
+	},
 	{
-		query := loukoum.Select("a", loukoum.Column("b"), loukoum.Column("c").As("x"))
-		is.Equal("SELECT a, b, c AS x", query.String())
-	}
+		Name:       "As with mixed column types B",
+		Builder:    loukoum.Select("a", loukoum.Column("b"), loukoum.Column("c").As("x")),
+		String:     "SELECT a, b, c AS x",
+		Query:      "SELECT a, b, c AS x",
+		NamedQuery: "SELECT a, b, c AS x",
+	},
 	{
-		query := loukoum.Select([]string{"a", "b", "c"})
-		is.Equal("SELECT a, b, c", query.String())
-	}
+		Name:       "slice of column names",
+		Builder:    loukoum.Select([]string{"a", "b", "c"}),
+		String:     "SELECT a, b, c",
+		Query:      "SELECT a, b, c",
+		NamedQuery: "SELECT a, b, c",
+	},
 	{
-		query := loukoum.Select([]stmt.Column{loukoum.Column("a"), loukoum.Column("b"), loukoum.Column("c")})
-		is.Equal("SELECT a, b, c", query.String())
-	}
-}
-
-func TestSelect_From(t *testing.T) {
-	is := require.New(t)
-
+		Name: "slice of column statements",
+		Builder: loukoum.Select([]stmt.Column{
+			loukoum.Column("a"),
+			loukoum.Column("b"),
+			loukoum.Column("c"),
+		}),
+		String:     "SELECT a, b, c",
+		Query:      "SELECT a, b, c",
+		NamedQuery: "SELECT a, b, c",
+	},
 	{
-		query := loukoum.Select("a", "b", "c").From("foobar")
-		is.Equal("SELECT a, b, c FROM foobar", query.String())
-	}
+		Name:       "From",
+		Builder:    loukoum.Select("a", "b", "c").From("foobar"),
+		String:     "SELECT a, b, c FROM foobar",
+		Query:      "SELECT a, b, c FROM foobar",
+		NamedQuery: "SELECT a, b, c FROM foobar",
+	},
 	{
-		query := loukoum.Select("a").From(loukoum.Table("foobar").As("example"))
-		is.Equal("SELECT a FROM foobar AS example", query.String())
-	}
-}
-
-func TestSelect_Join(t *testing.T) {
-	is := require.New(t)
-
+		Name:       "From column statement as",
+		Builder:    loukoum.Select("a").From(loukoum.Table("foobar").As("example")),
+		String:     "SELECT a FROM foobar AS example",
+		Query:      "SELECT a FROM foobar AS example",
+		NamedQuery: "SELECT a FROM foobar AS example",
+	},
 	{
-		query := loukoum.
+		Name: "Join A",
+		Builder: loukoum.
 			Select("a", "b", "c").
 			From("test1").
-			Join("test2 ON test1.id = test2.fk_id")
-
-		is.Equal("SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id", query.String())
-	}
+			Join("test2 ON test1.id = test2.fk_id"),
+		String:     "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
+		Query:      "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
+		NamedQuery: "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
+	},
 	{
-		query := loukoum.
+		Name: "Join B",
+		Builder: loukoum.
 			Select("a", "b", "c").
 			From("test1").
-			Join("test2", "test1.id = test2.fk_id")
-
-		is.Equal("SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id", query.String())
-	}
+			Join("test2", "test1.id = test2.fk_id"),
+		String:     "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
+		Query:      "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
+		NamedQuery: "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
+	},
 	{
-		query := loukoum.
+		Name: "Join inner",
+		Builder: loukoum.
 			Select("a", "b", "c").
 			From("test1").
-			Join("test2", "test1.id = test2.fk_id", loukoum.InnerJoin)
-
-		is.Equal("SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id", query.String())
-	}
+			Join("test2", "test1.id = test2.fk_id", loukoum.InnerJoin),
+		String:     "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
+		Query:      "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
+		NamedQuery: "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
+	},
 	{
-		query := loukoum.
+		Name: "Join left",
+		Builder: loukoum.
 			Select("a", "b", "c").
 			From("test1").
-			Join("test3", "test3.fkey = test1.id", loukoum.LeftJoin)
-
-		is.Equal("SELECT a, b, c FROM test1 LEFT JOIN test3 ON test3.fkey = test1.id", query.String())
-	}
+			Join("test3", "test3.fkey = test1.id", loukoum.LeftJoin),
+		String:     "SELECT a, b, c FROM test1 LEFT JOIN test3 ON test3.fkey = test1.id",
+		Query:      "SELECT a, b, c FROM test1 LEFT JOIN test3 ON test3.fkey = test1.id",
+		NamedQuery: "SELECT a, b, c FROM test1 LEFT JOIN test3 ON test3.fkey = test1.id",
+	},
 	{
-		query := loukoum.
+		Name: "Join right",
+		Builder: loukoum.
 			Select("a", "b", "c").
 			From("test2").
-			Join("test4", "test4.gid = test2.id", loukoum.RightJoin)
-
-		is.Equal("SELECT a, b, c FROM test2 RIGHT JOIN test4 ON test4.gid = test2.id", query.String())
-	}
+			Join("test4", "test4.gid = test2.id", loukoum.RightJoin),
+		String:     "SELECT a, b, c FROM test2 RIGHT JOIN test4 ON test4.gid = test2.id",
+		Query:      "SELECT a, b, c FROM test2 RIGHT JOIN test4 ON test4.gid = test2.id",
+		NamedQuery: "SELECT a, b, c FROM test2 RIGHT JOIN test4 ON test4.gid = test2.id",
+	},
 	{
-		query := loukoum.
+		Name: "Join inner B",
+		Builder: loukoum.
 			Select("a", "b", "c").
 			From("test5").
-			Join("test3", "ON test3.id = test5.fk_id", loukoum.InnerJoin)
-
-		is.Equal("SELECT a, b, c FROM test5 INNER JOIN test3 ON test3.id = test5.fk_id", query.String())
-	}
+			Join("test3", "ON test3.id = test5.fk_id", loukoum.InnerJoin),
+		String:     "SELECT a, b, c FROM test5 INNER JOIN test3 ON test3.id = test5.fk_id",
+		Query:      "SELECT a, b, c FROM test5 INNER JOIN test3 ON test3.id = test5.fk_id",
+		NamedQuery: "SELECT a, b, c FROM test5 INNER JOIN test3 ON test3.id = test5.fk_id",
+	},
 	{
-		query := loukoum.
+		Name: "Join Join",
+		Builder: loukoum.
 			Select("a", "b", "c").
 			From("test2").
-			Join("test4", "test4.gid = test2.id").Join("test3", "test4.uid = test3.id")
-
-		is.Equal(fmt.Sprint("SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
-			"INNER JOIN test3 ON test4.uid = test3.id"), query.String())
-	}
+			Join("test4", "test4.gid = test2.id").Join("test3", "test4.uid = test3.id"),
+		String: fmt.Sprint(
+			"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
+			"INNER JOIN test3 ON test4.uid = test3.id",
+		),
+		Query: fmt.Sprint(
+			"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
+			"INNER JOIN test3 ON test4.uid = test3.id",
+		),
+		NamedQuery: fmt.Sprint(
+			"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
+			"INNER JOIN test3 ON test4.uid = test3.id",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Join Join On",
+		Builder: loukoum.
 			Select("a", "b", "c").
 			From("test2").
 			Join("test4", loukoum.On("test4.gid", "test2.id")).
-			Join("test3", loukoum.On("test4.uid", "test3.id"))
-
-		is.Equal(fmt.Sprint("SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
-			"INNER JOIN test3 ON test4.uid = test3.id"), query.String())
-	}
+			Join("test3", loukoum.On("test4.uid", "test3.id")),
+		String: fmt.Sprint(
+			"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
+			"INNER JOIN test3 ON test4.uid = test3.id",
+		),
+		Query: fmt.Sprint(
+			"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
+			"INNER JOIN test3 ON test4.uid = test3.id",
+		),
+		NamedQuery: fmt.Sprint(
+			"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
+			"INNER JOIN test3 ON test4.uid = test3.id",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Join Join with table statement",
+		Builder: loukoum.
 			Select("a", "b", "c").
 			From("test2").
 			Join(loukoum.Table("test4"), loukoum.On("test4.gid", "test2.id")).
-			Join(loukoum.Table("test3"), loukoum.On("test4.uid", "test3.id"))
-
-		is.Equal(fmt.Sprint("SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
-			"INNER JOIN test3 ON test4.uid = test3.id"), query.String())
-	}
-}
-
-func TestSelect_WhereOperatorOrder(t *testing.T) {
-	is := require.New(t)
-
+			Join(loukoum.Table("test3"), loukoum.On("test4.uid", "test3.id")),
+		String: fmt.Sprint(
+			"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
+			"INNER JOIN test3 ON test4.uid = test3.id",
+		),
+		Query: fmt.Sprint(
+			"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
+			"INNER JOIN test3 ON test4.uid = test3.id",
+		),
+		NamedQuery: fmt.Sprint(
+			"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
+			"INNER JOIN test3 ON test4.uid = test3.id",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Where",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("id").Equal(1))
-
-		is.Equal(`SELECT id FROM table WHERE (id = 1)`, query.String())
-	}
+			Where(loukoum.Condition("id").Equal(1)),
+		String:     `SELECT id FROM table WHERE (id = 1)`,
+		Query:      `SELECT id FROM table WHERE (id = $1)`,
+		NamedQuery: `SELECT id FROM table WHERE (id = :arg_1)`,
+		Args:       []interface{}{1},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where two",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
-			And(loukoum.Condition("slug").Equal("foo"))
-
-		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (slug = 'foo'))", query.String())
-	}
+			And(loukoum.Condition("slug").Equal("foo")),
+		String:     "SELECT id FROM table WHERE ((id = 1) AND (slug = 'foo'))",
+		Query:      "SELECT id FROM table WHERE ((id = $1) AND (slug = $2))",
+		NamedQuery: "SELECT id FROM table WHERE ((id = :arg_1) AND (slug = :arg_2))",
+		Args:       []interface{}{1, "foo"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "foo",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where nested A",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
 			And(loukoum.Condition("slug").Equal("foo")).
-			And(loukoum.Condition("title").Equal("hello"))
-
-		is.Equal("SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) AND (title = 'hello'))", query.String())
-	}
+			And(loukoum.Condition("title").Equal("hello")),
+		String:     "SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) AND (title = 'hello'))",
+		Query:      "SELECT id FROM table WHERE (((id = $1) AND (slug = $2)) AND (title = $3))",
+		NamedQuery: "SELECT id FROM table WHERE (((id = :arg_1) AND (slug = :arg_2)) AND (title = :arg_3))",
+		Args:       []interface{}{1, "foo", "hello"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "foo",
+			"arg_3": "hello",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where nested B",
+		Builder: loukoum.
+			Select("id").
+			From("table").
+			Where(loukoum.Condition("id").Equal(1)).
+			And(loukoum.Condition("slug").Equal("foo")).
+			And(loukoum.Condition("title").Equal("hello")),
+		String:     "SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) AND (title = 'hello'))",
+		Query:      "SELECT id FROM table WHERE (((id = $1) AND (slug = $2)) AND (title = $3))",
+		NamedQuery: "SELECT id FROM table WHERE (((id = :arg_1) AND (slug = :arg_2)) AND (title = :arg_3))",
+		Args:       []interface{}{1, "foo", "hello"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "foo",
+			"arg_3": "hello",
+		},
+	},
+	{
+		Name: "Where nested C",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
 			Or(loukoum.Condition("slug").Equal("foo")).
-			Or(loukoum.Condition("title").Equal("hello"))
-
-		is.Equal("SELECT id FROM table WHERE (((id = 1) OR (slug = 'foo')) OR (title = 'hello'))", query.String())
-	}
+			Or(loukoum.Condition("title").Equal("hello")),
+		String:     "SELECT id FROM table WHERE (((id = 1) OR (slug = 'foo')) OR (title = 'hello'))",
+		Query:      "SELECT id FROM table WHERE (((id = $1) OR (slug = $2)) OR (title = $3))",
+		NamedQuery: "SELECT id FROM table WHERE (((id = :arg_1) OR (slug = :arg_2)) OR (title = :arg_3))",
+		Args:       []interface{}{1, "foo", "hello"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "foo",
+			"arg_3": "hello",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where nested D",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
 			And(loukoum.Condition("slug").Equal("foo")).
-			Or(loukoum.Condition("title").Equal("hello"))
-
-		is.Equal(`SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) OR (title = 'hello'))`, query.String())
-	}
+			Or(loukoum.Condition("title").Equal("hello")),
+		String:     `SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) OR (title = 'hello'))`,
+		Query:      `SELECT id FROM table WHERE (((id = $1) AND (slug = $2)) OR (title = $3))`,
+		NamedQuery: `SELECT id FROM table WHERE (((id = :arg_1) AND (slug = :arg_2)) OR (title = :arg_3))`,
+		Args:       []interface{}{1, "foo", "hello"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "foo",
+			"arg_3": "hello",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where nested E",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(
@@ -206,468 +322,502 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 			).
 			Or(
 				loukoum.And(loukoum.Condition("slug").Equal("foo"), loukoum.Condition("active").Equal(true)),
-			)
+			),
 
-		is.Equal(fmt.Sprint("SELECT id FROM table WHERE (((id = 1) OR (title = 'hello')) OR ",
-			"((slug = 'foo') AND (active = true)))"), query.String())
-	}
+		String: fmt.Sprint(
+			"SELECT id FROM table WHERE (((id = 1) OR (title = 'hello')) OR ",
+			"((slug = 'foo') AND (active = true)))",
+		),
+		Query: fmt.Sprint(
+			"SELECT id FROM table WHERE (((id = $1) OR (title = $2)) OR ",
+			"((slug = $3) AND (active = $4)))",
+		),
+		NamedQuery: fmt.Sprint(
+			"SELECT id FROM table WHERE (((id = :arg_1) OR (title = :arg_2)) OR ",
+			"((slug = :arg_3) AND (active = :arg_4)))",
+		),
+		Args: []interface{}{1, "hello", "foo", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "hello",
+			"arg_3": "foo",
+			"arg_4": true,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where nested F",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(
 				loukoum.And(loukoum.Condition("id").Equal(1), loukoum.Condition("title").Equal("hello")),
-			)
-
-		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))", query.String())
-	}
+			),
+		String:     "SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))",
+		Query:      "SELECT id FROM table WHERE ((id = $1) AND (title = $2))",
+		NamedQuery: "SELECT id FROM table WHERE ((id = :arg_1) AND (title = :arg_2))",
+		Args:       []interface{}{1, "hello"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "hello",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where nested G",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
-			Where(loukoum.Condition("title").Equal("hello"))
-
-		is.Equal("SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))", query.String())
-	}
+			Where(loukoum.Condition("title").Equal("hello")),
+		String:     "SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))",
+		Query:      "SELECT id FROM table WHERE ((id = $1) AND (title = $2))",
+		NamedQuery: "SELECT id FROM table WHERE ((id = :arg_1) AND (title = :arg_2))",
+		Args:       []interface{}{1, "hello"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "hello",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where nested H",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
 			Where(loukoum.Condition("title").Equal("hello")).
-			Where(loukoum.Condition("disable").Equal(false))
-
-		is.Equal("SELECT id FROM table WHERE (((id = 1) AND (title = 'hello')) AND (disable = false))", query.String())
-	}
+			Where(loukoum.Condition("disable").Equal(false)),
+		String:     "SELECT id FROM table WHERE (((id = 1) AND (title = 'hello')) AND (disable = false))",
+		Query:      "SELECT id FROM table WHERE (((id = $1) AND (title = $2)) AND (disable = $3))",
+		NamedQuery: "SELECT id FROM table WHERE (((id = :arg_1) AND (title = :arg_2)) AND (disable = :arg_3))",
+		Args:       []interface{}{1, "hello", false},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "hello",
+			"arg_3": false,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where nested I",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1)).
 			Or(
 				loukoum.Condition("slug").Equal("foo").And(loukoum.Condition("active").Equal(true)),
-			)
-
-		is.Equal("SELECT id FROM table WHERE ((id = 1) OR ((slug = 'foo') AND (active = true)))", query.String())
-	}
+			),
+		String:     "SELECT id FROM table WHERE ((id = 1) OR ((slug = 'foo') AND (active = true)))",
+		Query:      "SELECT id FROM table WHERE ((id = $1) OR ((slug = $2) AND (active = $3)))",
+		NamedQuery: "SELECT id FROM table WHERE ((id = :arg_1) OR ((slug = :arg_2) AND (active = :arg_3)))",
+		Args:       []interface{}{1, "foo", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "foo",
+			"arg_3": true,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where nested J",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").Equal(1).And(loukoum.Condition("slug").Equal("foo"))).
-			Or(loukoum.Condition("active").Equal(true))
-
-		is.Equal("SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) OR (active = true))", query.String())
-	}
-}
-
-func TestSelect_WhereEqual(t *testing.T) {
-	is := require.New(t)
-
+			Or(loukoum.Condition("active").Equal(true)),
+		String:     "SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) OR (active = true))",
+		Query:      "SELECT id FROM table WHERE (((id = $1) AND (slug = $2)) OR (active = $3))",
+		NamedQuery: "SELECT id FROM table WHERE (((id = :arg_1) AND (slug = :arg_2)) OR (active = :arg_3))",
+		Args:       []interface{}{1, "foo", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": "foo",
+			"arg_3": true,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Equal A",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("disabled").Equal(false))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (disabled = :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal(false, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (disabled = false)", query.String())
-	}
+			Where(loukoum.Condition("disabled").Equal(false)),
+		String:     "SELECT id FROM table WHERE (disabled = false)",
+		Query:      "SELECT id FROM table WHERE (disabled = $1)",
+		NamedQuery: "SELECT id FROM table WHERE (disabled = :arg_1)",
+		Args:       []interface{}{false},
+		NamedArgs: map[string]interface{}{
+			"arg_1": false,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Equal B",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("disabled").NotEqual(false))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (disabled != :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal(false, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (disabled != false)", query.String())
-	}
-}
-
-func TestSelect_WhereIs(t *testing.T) {
-	is := require.New(t)
-
+			Where(loukoum.Condition("disabled").NotEqual(false)),
+		String:     "SELECT id FROM table WHERE (disabled != false)",
+		Query:      "SELECT id FROM table WHERE (disabled != $1)",
+		NamedQuery: "SELECT id FROM table WHERE (disabled != :arg_1)",
+		Args:       []interface{}{false},
+		NamedArgs: map[string]interface{}{
+			"arg_1": false,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Is A",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("disabled").Is(nil))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (disabled IS NULL)", stmt)
-		is.Len(args, 0)
-
-		is.Equal("SELECT id FROM table WHERE (disabled IS NULL)", query.String())
-	}
+			Where(loukoum.Condition("disabled").Is(nil)),
+		String:     "SELECT id FROM table WHERE (disabled IS NULL)",
+		Query:      "SELECT id FROM table WHERE (disabled IS NULL)",
+		NamedQuery: "SELECT id FROM table WHERE (disabled IS NULL)",
+	},
 	{
-		query := loukoum.
+		Name: "Where Is B",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("active").IsNot(true))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (active IS NOT :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal(true, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (active IS NOT true)", query.String())
-	}
-}
-
-func TestSelect_WhereGreaterThan(t *testing.T) {
-	is := require.New(t)
-
+			Where(loukoum.Condition("active").IsNot(true)),
+		String:     "SELECT id FROM table WHERE (active IS NOT true)",
+		Query:      "SELECT id FROM table WHERE (active IS NOT $1)",
+		NamedQuery: "SELECT id FROM table WHERE (active IS NOT :arg_1)",
+		Args:       []interface{}{true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": true,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Greater Than A",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").GreaterThan(2))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (count > :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal(2, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (count > 2)", query.String())
-	}
+			Where(loukoum.Condition("count").GreaterThan(2)),
+		String:     "SELECT id FROM table WHERE (count > 2)",
+		Query:      "SELECT id FROM table WHERE (count > $1)",
+		NamedQuery: "SELECT id FROM table WHERE (count > :arg_1)",
+		Args:       []interface{}{2},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 2,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Greater Than B",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").GreaterThanOrEqual(4))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (count >= :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal(4, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (count >= 4)", query.String())
-	}
+			Where(loukoum.Condition("count").GreaterThanOrEqual(4)),
+		String:     "SELECT id FROM table WHERE (count >= 4)",
+		Query:      "SELECT id FROM table WHERE (count >= $1)",
+		NamedQuery: "SELECT id FROM table WHERE (count >= :arg_1)",
+		Args:       []interface{}{4},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 4,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Greater Than C",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("updated_at").GreaterThanOrEqual(loukoum.Raw("NOW()")))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (updated_at >= NOW())", stmt)
-		is.Len(args, 0)
-		is.Equal("SELECT id FROM table WHERE (updated_at >= NOW())", query.String())
-	}
-}
-
-func TestSelect_WhereLessThan(t *testing.T) {
-	is := require.New(t)
-
+			Where(loukoum.Condition("updated_at").GreaterThanOrEqual(loukoum.Raw("NOW()"))),
+		String:     "SELECT id FROM table WHERE (updated_at >= NOW())",
+		Query:      "SELECT id FROM table WHERE (updated_at >= NOW())",
+		NamedQuery: "SELECT id FROM table WHERE (updated_at >= NOW())",
+	},
 	{
-		query := loukoum.
+		Name: "Where Less Than A",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").LessThan(3))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (count < :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal(3, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (count < 3)", query.String())
-	}
+			Where(loukoum.Condition("count").LessThan(3)),
+		String:     "SELECT id FROM table WHERE (count < 3)",
+		Query:      "SELECT id FROM table WHERE (count < $1)",
+		NamedQuery: "SELECT id FROM table WHERE (count < :arg_1)",
+		Args:       []interface{}{3},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 3,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Less Than B",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").LessThanOrEqual(6))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (count <= :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal(6, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (count <= 6)", query.String())
-	}
-}
-
-func TestSelect_WhereLike(t *testing.T) {
-	is := require.New(t)
-
+			Where(loukoum.Condition("count").LessThanOrEqual(6)),
+		String:     "SELECT id FROM table WHERE (count <= 6)",
+		Query:      "SELECT id FROM table WHERE (count <= $1)",
+		NamedQuery: "SELECT id FROM table WHERE (count <= :arg_1)",
+		Args:       []interface{}{6},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 6,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Like A",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("title").Like("foo%"))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (title LIKE :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal("foo%", args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (title LIKE 'foo%')", query.String())
-	}
+			Where(loukoum.Condition("title").Like("foo%")),
+		String:     "SELECT id FROM table WHERE (title LIKE 'foo%')",
+		Query:      "SELECT id FROM table WHERE (title LIKE $1)",
+		NamedQuery: "SELECT id FROM table WHERE (title LIKE :arg_1)",
+		Args:       []interface{}{"foo%"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "foo%",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Like B",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("title").NotLike("foo%"))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (title NOT LIKE :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal("foo%", args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (title NOT LIKE 'foo%')", query.String())
-	}
+			Where(loukoum.Condition("title").NotLike("foo%")),
+		String:     "SELECT id FROM table WHERE (title NOT LIKE 'foo%')",
+		Query:      "SELECT id FROM table WHERE (title NOT LIKE $1)",
+		NamedQuery: "SELECT id FROM table WHERE (title NOT LIKE :arg_1)",
+		Args:       []interface{}{"foo%"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "foo%",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Like C",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("title").ILike("foo%"))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (title ILIKE :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal("foo%", args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (title ILIKE 'foo%')", query.String())
-	}
+			Where(loukoum.Condition("title").ILike("foo%")),
+		String:     "SELECT id FROM table WHERE (title ILIKE 'foo%')",
+		Query:      "SELECT id FROM table WHERE (title ILIKE $1)",
+		NamedQuery: "SELECT id FROM table WHERE (title ILIKE :arg_1)",
+		Args:       []interface{}{"foo%"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "foo%",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Like D",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("title").NotILike("foo%"))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (title NOT ILIKE :arg_1)", stmt)
-		is.Len(args, 1)
-		is.Equal("foo%", args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (title NOT ILIKE 'foo%')", query.String())
-	}
-}
-
-func TestSelect_WhereBetween(t *testing.T) {
-	is := require.New(t)
-
+			Where(loukoum.Condition("title").NotILike("foo%")),
+		String:     "SELECT id FROM table WHERE (title NOT ILIKE 'foo%')",
+		Query:      "SELECT id FROM table WHERE (title NOT ILIKE $1)",
+		NamedQuery: "SELECT id FROM table WHERE (title NOT ILIKE :arg_1)",
+		Args:       []interface{}{"foo%"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "foo%",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Between A",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").Between(10, 20))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (count BETWEEN :arg_1 AND :arg_2)", stmt)
-		is.Len(args, 2)
-		is.Equal(10, args["arg_1"])
-		is.Equal(20, args["arg_2"])
-
-		is.Equal("SELECT id FROM table WHERE (count BETWEEN 10 AND 20)", query.String())
-	}
+			Where(loukoum.Condition("count").Between(10, 20)),
+		String:     "SELECT id FROM table WHERE (count BETWEEN 10 AND 20)",
+		Query:      "SELECT id FROM table WHERE (count BETWEEN $1 AND $2)",
+		NamedQuery: "SELECT id FROM table WHERE (count BETWEEN :arg_1 AND :arg_2)",
+		Args:       []interface{}{10, 20},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 10,
+			"arg_2": 20,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Between B",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("count").NotBetween(50, 70))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (count NOT BETWEEN :arg_1 AND :arg_2)", stmt)
-		is.Len(args, 2)
-		is.Equal(50, args["arg_1"])
-		is.Equal(70, args["arg_2"])
-
-		is.Equal("SELECT id FROM table WHERE (count NOT BETWEEN 50 AND 70)", query.String())
-	}
-}
-
-func TestSelect_WhereIn(t *testing.T) {
-	is := require.New(t)
-
-	// Slice of integers
+			Where(loukoum.Condition("count").NotBetween(50, 70)),
+		String:     "SELECT id FROM table WHERE (count NOT BETWEEN 50 AND 70)",
+		Query:      "SELECT id FROM table WHERE (count NOT BETWEEN $1 AND $2)",
+		NamedQuery: "SELECT id FROM table WHERE (count NOT BETWEEN :arg_1 AND :arg_2)",
+		Args:       []interface{}{50, 70},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 50,
+			"arg_2": 70,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where In Slice of integers",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("id").In([]int64{1, 2, 3}))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (id IN (:arg_1, :arg_2, :arg_3))", stmt)
-		is.Len(args, 3)
-		is.Equal(int64(1), args["arg_1"])
-		is.Equal(int64(2), args["arg_2"])
-		is.Equal(int64(3), args["arg_3"])
-
-		is.Equal("SELECT id FROM table WHERE (id IN (1, 2, 3))", query.String())
-	}
+			Where(loukoum.Condition("id").In([]int64{1, 2, 3})),
+		String:     "SELECT id FROM table WHERE (id IN (1, 2, 3))",
+		Query:      "SELECT id FROM table WHERE (id IN ($1, $2, $3))",
+		NamedQuery: "SELECT id FROM table WHERE (id IN (:arg_1, :arg_2, :arg_3))",
+		Args:       []interface{}{int64(1), int64(2), int64(3)},
+		NamedArgs: map[string]interface{}{
+			"arg_1": int64(1),
+			"arg_2": int64(2),
+			"arg_3": int64(3),
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Not In Slice of integers",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("id").NotIn([]int{1, 2, 3}))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (:arg_1, :arg_2, :arg_3))", stmt)
-		is.Len(args, 3)
-		is.Equal(int(1), args["arg_1"])
-		is.Equal(int(2), args["arg_2"])
-		is.Equal(int(3), args["arg_3"])
-
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (1, 2, 3))", query.String())
-	}
-
-	// Integers as variadic
+			Where(loukoum.Condition("id").NotIn([]int{1, 2, 3})),
+		String:     "SELECT id FROM table WHERE (id NOT IN (1, 2, 3))",
+		Query:      "SELECT id FROM table WHERE (id NOT IN ($1, $2, $3))",
+		NamedQuery: "SELECT id FROM table WHERE (id NOT IN (:arg_1, :arg_2, :arg_3))",
+		Args:       []interface{}{1, 2, 3},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": 2,
+			"arg_3": 3,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where In integers variadic",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("id").In(1, 2, 3))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (id IN (:arg_1, :arg_2, :arg_3))", stmt)
-		is.Len(args, 3)
-		is.Equal(int(1), args["arg_1"])
-		is.Equal(int(2), args["arg_2"])
-		is.Equal(int(3), args["arg_3"])
-
-		is.Equal("SELECT id FROM table WHERE (id IN (1, 2, 3))", query.String())
-	}
+			Where(loukoum.Condition("id").In(1, 2, 3)),
+		String:     "SELECT id FROM table WHERE (id IN (1, 2, 3))",
+		Query:      "SELECT id FROM table WHERE (id IN ($1, $2, $3))",
+		NamedQuery: "SELECT id FROM table WHERE (id IN (:arg_1, :arg_2, :arg_3))",
+		Args:       []interface{}{1, 2, 3},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": 2,
+			"arg_3": 3,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Not In integers variadic",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("id").NotIn(1, 2, 3))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (:arg_1, :arg_2, :arg_3))", stmt)
-		is.Len(args, 3)
-		is.Equal(int(1), args["arg_1"])
-		is.Equal(int(2), args["arg_2"])
-		is.Equal(int(3), args["arg_3"])
-
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (1, 2, 3))", query.String())
-	}
-
-	// Slice of strings
+			Where(loukoum.Condition("id").NotIn(1, 2, 3)),
+		String:     "SELECT id FROM table WHERE (id NOT IN (1, 2, 3))",
+		Query:      "SELECT id FROM table WHERE (id NOT IN ($1, $2, $3))",
+		NamedQuery: "SELECT id FROM table WHERE (id NOT IN (:arg_1, :arg_2, :arg_3))",
+		Args:       []interface{}{1, 2, 3},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": 2,
+			"arg_3": 3,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where In slice of strings",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").In([]string{"read", "unread"}))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1, :arg_2))", stmt)
-		is.Len(args, 2)
-		is.Equal("read", args["arg_1"])
-		is.Equal("unread", args["arg_2"])
-
-		is.Equal("SELECT id FROM table WHERE (status IN ('read', 'unread'))", query.String())
-	}
+			Where(loukoum.Condition("status").In([]string{"read", "unread"})),
+		String:     "SELECT id FROM table WHERE (status IN ('read', 'unread'))",
+		Query:      "SELECT id FROM table WHERE (status IN ($1, $2))",
+		NamedQuery: "SELECT id FROM table WHERE (status IN (:arg_1, :arg_2))",
+		Args:       []interface{}{"read", "unread"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "read",
+			"arg_2": "unread",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Not In slice of strings",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").NotIn([]string{"read", "unread"}))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1, :arg_2))", stmt)
-		is.Len(args, 2)
-		is.Equal("read", args["arg_1"])
-		is.Equal("unread", args["arg_2"])
-
-		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
-	}
-
-	// Strings as variadic
+			Where(loukoum.Condition("status").NotIn([]string{"read", "unread"})),
+		String:     "SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))",
+		Query:      "SELECT id FROM table WHERE (status NOT IN ($1, $2))",
+		NamedQuery: "SELECT id FROM table WHERE (status NOT IN (:arg_1, :arg_2))",
+		Args:       []interface{}{"read", "unread"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "read",
+			"arg_2": "unread",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where In strings as variadic",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").In("read", "unread"))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1, :arg_2))", stmt)
-		is.Len(args, 2)
-		is.Equal("read", args["arg_1"])
-		is.Equal("unread", args["arg_2"])
-
-		is.Equal("SELECT id FROM table WHERE (status IN ('read', 'unread'))", query.String())
-	}
+			Where(loukoum.Condition("status").In("read", "unread")),
+		String:     "SELECT id FROM table WHERE (status IN ('read', 'unread'))",
+		Query:      "SELECT id FROM table WHERE (status IN ($1, $2))",
+		NamedQuery: "SELECT id FROM table WHERE (status IN (:arg_1, :arg_2))",
+		Args:       []interface{}{"read", "unread"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "read",
+			"arg_2": "unread",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Not In strings as variadic",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").NotIn("read", "unread"))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1, :arg_2))", stmt)
-		is.Len(args, 2)
-		is.Equal("read", args["arg_1"])
-		is.Equal("unread", args["arg_2"])
-
-		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))", query.String())
-	}
+			Where(loukoum.Condition("status").NotIn("read", "unread")),
+		String:     "SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))",
+		Query:      "SELECT id FROM table WHERE (status NOT IN ($1, $2))",
+		NamedQuery: "SELECT id FROM table WHERE (status NOT IN (:arg_1, :arg_2))",
+		Args:       []interface{}{"read", "unread"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "read",
+			"arg_2": "unread",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where In strings as variadic single",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").In("read"))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1))", stmt)
-		is.Len(args, 1)
-		is.Equal("read", args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (status IN ('read'))", query.String())
-	}
+			Where(loukoum.Condition("status").In("read")),
+		String:     "SELECT id FROM table WHERE (status IN ('read'))",
+		Query:      "SELECT id FROM table WHERE (status IN ($1))",
+		NamedQuery: "SELECT id FROM table WHERE (status IN (:arg_1))",
+		Args:       []interface{}{"read"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "read",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Not In strings as variadic single",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").NotIn("read"))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1))", stmt)
-		is.Len(args, 1)
-		is.Equal("read", args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read'))", query.String())
-	}
+			Where(loukoum.Condition("status").NotIn("read")),
+		String:     "SELECT id FROM table WHERE (status NOT IN ('read'))",
+		Query:      "SELECT id FROM table WHERE (status NOT IN ($1))",
+		NamedQuery: "SELECT id FROM table WHERE (status NOT IN (:arg_1))",
+		Args:       []interface{}{"read"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "read",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where In strings as single slice",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").In([]string{"read"}))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (status IN (:arg_1))", stmt)
-		is.Len(args, 1)
-		is.Equal("read", args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (status IN ('read'))", query.String())
-	}
+			Where(loukoum.Condition("status").In([]string{"read"})),
+		String:     "SELECT id FROM table WHERE (status IN ('read'))",
+		Query:      "SELECT id FROM table WHERE (status IN ($1))",
+		NamedQuery: "SELECT id FROM table WHERE (status IN (:arg_1))",
+		Args:       []interface{}{"read"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "read",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Not In strings as single slice",
+		Builder: loukoum.
 			Select("id").
 			From("table").
-			Where(loukoum.Condition("status").NotIn([]string{"read"}))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (status NOT IN (:arg_1))", stmt)
-		is.Len(args, 1)
-		is.Equal("read", args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (status NOT IN ('read'))", query.String())
-	}
-
-	// Subquery
+			Where(loukoum.Condition("status").NotIn([]string{"read"})),
+		String:     "SELECT id FROM table WHERE (status NOT IN ('read'))",
+		Query:      "SELECT id FROM table WHERE (status NOT IN ($1))",
+		NamedQuery: "SELECT id FROM table WHERE (status NOT IN (:arg_1))",
+		Args:       []interface{}{"read"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "read",
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where In subquery A",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").In(
@@ -675,17 +825,18 @@ func TestSelect_WhereIn(t *testing.T) {
 					From("table").
 					Where(loukoum.Condition("id").Equal(1)).
 					Statement(),
-			))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = :arg_1)))", stmt)
-		is.Len(args, 1)
-		is.Equal(1, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = 1)))", query.String())
-	}
+			)),
+		String:     "SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = 1)))",
+		Query:      "SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = $1)))",
+		NamedQuery: "SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = :arg_1)))",
+		Args:       []interface{}{1},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where In subquery B",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").NotIn(
@@ -693,339 +844,396 @@ func TestSelect_WhereIn(t *testing.T) {
 					From("table").
 					Where(loukoum.Condition("id").Equal(1)).
 					Statement(),
-			))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = :arg_1)))", stmt)
-		is.Len(args, 1)
-		is.Equal(1, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))", query.String())
-	}
+			)),
+		String:     "SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))",
+		Query:      "SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = $1)))",
+		NamedQuery: "SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = :arg_1)))",
+		Args:       []interface{}{1},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where In subquery C",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").In(
 				loukoum.Select("id").
 					From("table").
 					Where(loukoum.Condition("id").Equal(1)),
-			))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = :arg_1)))", stmt)
-		is.Len(args, 1)
-		is.Equal(1, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = 1)))", query.String())
-	}
+			)),
+		String:     "SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = 1)))",
+		Query:      "SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = $1)))",
+		NamedQuery: "SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = :arg_1)))",
+		Args:       []interface{}{1},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where In subquery D",
+		Builder: loukoum.
 			Select("id").
 			From("table").
 			Where(loukoum.Condition("id").NotIn(
 				loukoum.Select("id").
 					From("table").
 					Where(loukoum.Condition("id").Equal(1)),
-			))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = :arg_1)))", stmt)
-		is.Len(args, 1)
-		is.Equal(1, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))", query.String())
-	}
-}
-
-func TestSelect_GroupBy(t *testing.T) {
-	is := require.New(t)
-
-	// One column
+			)),
+		String:     "SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))",
+		Query:      "SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = $1)))",
+		NamedQuery: "SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = :arg_1)))",
+		Args:       []interface{}{1},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Where Group By one column",
+		Builder: loukoum.
 			Select("name", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
-			GroupBy("name")
-
-		is.Equal("SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
-	}
+			GroupBy("name"),
+		String:     "SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name",
+		Query:      "SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name",
+		NamedQuery: "SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name",
+	},
 	{
-		query := loukoum.
+		Name: "Where Group By many columns A",
+		Builder: loukoum.
 			Select("name", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
-			GroupBy(loukoum.Column("name"))
-
-		is.Equal("SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name", query.String())
-	}
-
-	// Many columns
+			GroupBy(loukoum.Column("name")),
+		String:     "SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name",
+		Query:      "SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name",
+		NamedQuery: "SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name",
+	},
 	{
-		query := loukoum.
+		Name: "Where Group By many columns B",
+		Builder: loukoum.
 			Select("name", "locale", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
-			GroupBy("name", "locale")
-
-		is.Equal(fmt.Sprint("SELECT name, locale, COUNT(*) FROM user ",
-			"WHERE (disabled IS NOT NULL) GROUP BY name, locale"), query.String())
-	}
+			GroupBy("name", "locale"),
+		String: fmt.Sprint(
+			"SELECT name, locale, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale",
+		),
+		Query: fmt.Sprint(
+			"SELECT name, locale, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale",
+		),
+		NamedQuery: fmt.Sprint(
+			"SELECT name, locale, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Where Group By many columns C",
+		Builder: loukoum.
 			Select("name", "locale", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
-			GroupBy(loukoum.Column("name"), loukoum.Column("locale"))
-
-		is.Equal(fmt.Sprint("SELECT name, locale, COUNT(*) FROM user ",
-			"WHERE (disabled IS NOT NULL) GROUP BY name, locale"), query.String())
-	}
+			GroupBy(loukoum.Column("name"), loukoum.Column("locale")),
+		String: fmt.Sprint(
+			"SELECT name, locale, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale",
+		),
+		Query: fmt.Sprint(
+			"SELECT name, locale, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale",
+		),
+		NamedQuery: fmt.Sprint(
+			"SELECT name, locale, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Where Group By many columns D",
+		Builder: loukoum.
 			Select("name", "locale", "country", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
-			GroupBy("name", "locale", "country")
-
-		is.Equal(fmt.Sprint("SELECT name, locale, country, COUNT(*) FROM user ",
-			"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country"), query.String())
-	}
+			GroupBy("name", "locale", "country"),
+		String: fmt.Sprint(
+			"SELECT name, locale, country, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country",
+		),
+		Query: fmt.Sprint(
+			"SELECT name, locale, country, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country",
+		),
+		NamedQuery: fmt.Sprint(
+			"SELECT name, locale, country, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Where Group By many columns E",
+		Builder: loukoum.
 			Select("name", "locale", "country", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
-			GroupBy(loukoum.Column("name"), loukoum.Column("locale"), loukoum.Column("country"))
-
-		is.Equal(fmt.Sprint("SELECT name, locale, country, COUNT(*) FROM user ",
-			"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country"), query.String())
-	}
-}
-
-func TestSelect_Having(t *testing.T) {
-	is := require.New(t)
-
-	// One condition
+			GroupBy(loukoum.Column("name"), loukoum.Column("locale"), loukoum.Column("country")),
+		String: fmt.Sprint(
+			"SELECT name, locale, country, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country",
+		),
+		Query: fmt.Sprint(
+			"SELECT name, locale, country, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country",
+		),
+		NamedQuery: fmt.Sprint(
+			"SELECT name, locale, country, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country",
+		),
+	},
 	{
-		query := loukoum.
+		Name: "Having one condition",
+		Builder: loukoum.
 			Select("name", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
 			GroupBy("name").
-			Having(loukoum.Condition("COUNT(*)").GreaterThan(10))
-
-		is.Equal(fmt.Sprint("SELECT name, COUNT(*) FROM user ",
-			"WHERE (disabled IS NOT NULL) GROUP BY name HAVING (COUNT(*) > 10)"), query.String())
-	}
-
-	// Two conditions
+			Having(loukoum.Condition("COUNT(*)").GreaterThan(10)),
+		String: fmt.Sprint(
+			"SELECT name, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name HAVING (COUNT(*) > 10)",
+		),
+		Query: fmt.Sprint(
+			"SELECT name, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name HAVING (COUNT(*) > $1)",
+		),
+		NamedQuery: fmt.Sprint(
+			"SELECT name, COUNT(*) FROM user ",
+			"WHERE (disabled IS NOT NULL) GROUP BY name HAVING (COUNT(*) > :arg_1)",
+		),
+		Args: []interface{}{10},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 10,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Having two conditions",
+		Builder: loukoum.
 			Select("name", "COUNT(*)").
 			From("user").
 			Where(loukoum.Condition("disabled").IsNull(false)).
 			GroupBy("name").
 			Having(
 				loukoum.Condition("COUNT(*)").GreaterThan(10).And(loukoum.Condition("COUNT(*)").LessThan(500)),
-			)
-
-		is.Equal(fmt.Sprint("SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name ",
-			"HAVING ((COUNT(*) > 10) AND (COUNT(*) < 500))"), query.String())
-	}
-}
-
-func TestSelect_OrderBy(t *testing.T) {
-	is := require.New(t)
-
-	// With Order
+			),
+		String: fmt.Sprint(
+			"SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name ",
+			"HAVING ((COUNT(*) > 10) AND (COUNT(*) < 500))",
+		),
+		Query: fmt.Sprint(
+			"SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name ",
+			"HAVING ((COUNT(*) > $1) AND (COUNT(*) < $2))",
+		),
+		NamedQuery: fmt.Sprint(
+			"SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name ",
+			"HAVING ((COUNT(*) > :arg_1) AND (COUNT(*) < :arg_2))",
+		),
+		Args: []interface{}{10, 500},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 10,
+			"arg_2": 500,
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Order By",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			OrderBy(loukoum.Order("id"))
-
-		is.Equal("SELECT name FROM user ORDER BY id ASC", query.String())
-	}
+			OrderBy(loukoum.Order("id")),
+		String:     "SELECT name FROM user ORDER BY id ASC",
+		Query:      "SELECT name FROM user ORDER BY id ASC",
+		NamedQuery: "SELECT name FROM user ORDER BY id ASC",
+	},
 	{
-		query := loukoum.
+		Name: "Order By Asc",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			OrderBy(loukoum.Order("id", loukoum.Asc))
-
-		is.Equal("SELECT name FROM user ORDER BY id ASC", query.String())
-	}
+			OrderBy(loukoum.Order("id", loukoum.Asc)),
+		String:     "SELECT name FROM user ORDER BY id ASC",
+		Query:      "SELECT name FROM user ORDER BY id ASC",
+		NamedQuery: "SELECT name FROM user ORDER BY id ASC",
+	},
 	{
-		query := loukoum.
+		Name: "Order By Desc",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			OrderBy(loukoum.Order("id", loukoum.Desc))
-
-		is.Equal("SELECT name FROM user ORDER BY id DESC", query.String())
-	}
+			OrderBy(loukoum.Order("id", loukoum.Desc)),
+		String:     "SELECT name FROM user ORDER BY id DESC",
+		Query:      "SELECT name FROM user ORDER BY id DESC",
+		NamedQuery: "SELECT name FROM user ORDER BY id DESC",
+	},
 	{
-		query := loukoum.
+		Name: "Order By Multiple",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			OrderBy(loukoum.Order("locale"), loukoum.Order("id", loukoum.Desc))
-
-		is.Equal("SELECT name FROM user ORDER BY locale ASC, id DESC", query.String())
-	}
+			OrderBy(loukoum.Order("locale"), loukoum.Order("id", loukoum.Desc)),
+		String:     "SELECT name FROM user ORDER BY locale ASC, id DESC",
+		Query:      "SELECT name FROM user ORDER BY locale ASC, id DESC",
+		NamedQuery: "SELECT name FROM user ORDER BY locale ASC, id DESC",
+	},
 	{
-		query := loukoum.
+		Name: "Order By Asc with column",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			OrderBy(loukoum.Order("locale")).
-			OrderBy(loukoum.Order("id", loukoum.Desc))
-
-		is.Equal("SELECT name FROM user ORDER BY locale ASC, id DESC", query.String())
-	}
-
-	// With Column
+			OrderBy(loukoum.Column("id").Asc()),
+		String:     "SELECT name FROM user ORDER BY id ASC",
+		Query:      "SELECT name FROM user ORDER BY id ASC",
+		NamedQuery: "SELECT name FROM user ORDER BY id ASC",
+	},
 	{
-		query := loukoum.
+		Name: "Order By Desc with column",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			OrderBy(loukoum.Column("id").Asc())
-
-		is.Equal("SELECT name FROM user ORDER BY id ASC", query.String())
-	}
+			OrderBy(loukoum.Column("id").Desc()),
+		String:     "SELECT name FROM user ORDER BY id DESC",
+		Query:      "SELECT name FROM user ORDER BY id DESC",
+		NamedQuery: "SELECT name FROM user ORDER BY id DESC",
+	},
 	{
-		query := loukoum.
+		Name: "Order By Asc and Desc with column",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			OrderBy(loukoum.Column("id").Desc())
-
-		is.Equal("SELECT name FROM user ORDER BY id DESC", query.String())
-	}
+			OrderBy(loukoum.Column("locale").Asc(), loukoum.Column("id").Desc()),
+		String:     "SELECT name FROM user ORDER BY locale ASC, id DESC",
+		Query:      "SELECT name FROM user ORDER BY locale ASC, id DESC",
+		NamedQuery: "SELECT name FROM user ORDER BY locale ASC, id DESC",
+	},
 	{
-		query := loukoum.
+		Name: "Limit with several types A",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			OrderBy(loukoum.Column("locale").Asc(), loukoum.Column("id").Desc())
-
-		is.Equal("SELECT name FROM user ORDER BY locale ASC, id DESC", query.String())
-	}
+			Limit(10),
+		String:     "SELECT name FROM user LIMIT 10",
+		Query:      "SELECT name FROM user LIMIT 10",
+		NamedQuery: "SELECT name FROM user LIMIT 10",
+	},
 	{
-		query := loukoum.
+		Name: "Limit with several types B",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			OrderBy(loukoum.Column("locale").Asc()).
-			OrderBy(loukoum.Column("id").Desc())
-
-		is.Equal("SELECT name FROM user ORDER BY locale ASC, id DESC", query.String())
-	}
-}
-
-func TestSelect_Limit(t *testing.T) {
-	is := require.New(t)
-
-	// Limit with several types
+			Limit("50"),
+		String:     "SELECT name FROM user LIMIT 50",
+		Query:      "SELECT name FROM user LIMIT 50",
+		NamedQuery: "SELECT name FROM user LIMIT 50",
+	},
 	{
-		query := loukoum.
+		Name: "Limit with several types C",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			Limit(10)
-
-		is.Equal("SELECT name FROM user LIMIT 10", query.String())
-	}
+			Limit(uint64(700)),
+		String:     "SELECT name FROM user LIMIT 700",
+		Query:      "SELECT name FROM user LIMIT 700",
+		NamedQuery: "SELECT name FROM user LIMIT 700",
+	},
 	{
-		query := loukoum.
-			Select("name").
-			From("user").
-			Limit("50")
-
-		is.Equal("SELECT name FROM user LIMIT 50", query.String())
-	}
-	{
-		query := loukoum.
-			Select("name").
-			From("user").
-			Limit(uint64(700))
-
-		is.Equal("SELECT name FROM user LIMIT 700", query.String())
-	}
-
-	// Corner cases...
-	{
-		Failure(is, func() builder.Builder {
+		Name: "Limit corner case A",
+		Failure: func() builder.Builder {
 			return loukoum.Select("name").From("user").Limit(700.2)
-		})
-		Failure(is, func() builder.Builder {
+		},
+	},
+	{
+		Name: "Limit corner case B",
+		Failure: func() builder.Builder {
 			return loukoum.Select("name").From("user").Limit(float32(700.2))
-		})
-		Failure(is, func() builder.Builder {
+		},
+	},
+	{
+		Name: "Limit corner case C",
+		Failure: func() builder.Builder {
 			return loukoum.Select("name").From("user").Limit(-700)
-		})
-	}
-}
-
-func TestSelect_Offset(t *testing.T) {
-	is := require.New(t)
-
-	// Offset with several types
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Offset with several types A",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			Offset(10)
-
-		is.Equal("SELECT name FROM user OFFSET 10", query.String())
-	}
+			Offset(10),
+		String:     "SELECT name FROM user OFFSET 10",
+		Query:      "SELECT name FROM user OFFSET 10",
+		NamedQuery: "SELECT name FROM user OFFSET 10",
+	},
 	{
-		query := loukoum.
+		Name: "Offset with several types B",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			Offset("50")
-
-		is.Equal("SELECT name FROM user OFFSET 50", query.String())
-	}
+			Offset("50"),
+		String:     "SELECT name FROM user OFFSET 50",
+		Query:      "SELECT name FROM user OFFSET 50",
+		NamedQuery: "SELECT name FROM user OFFSET 50",
+	},
 	{
-		query := loukoum.
+		Name: "Offset with several types C",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			Offset(uint64(700))
-
-		is.Equal("SELECT name FROM user OFFSET 700", query.String())
-	}
-
-	// Corner cases...
+			Offset(uint64(700)),
+		String:     "SELECT name FROM user OFFSET 700",
+		Query:      "SELECT name FROM user OFFSET 700",
+		NamedQuery: "SELECT name FROM user OFFSET 700",
+	},
 	{
-		Failure(is, func() builder.Builder {
+		Name: "Offset corner case A",
+		Failure: func() builder.Builder {
 			return loukoum.Select("name").From("user").Offset(700.2)
-		})
-		Failure(is, func() builder.Builder {
+		},
+	},
+	{
+		Name: "Offset corner case B",
+		Failure: func() builder.Builder {
 			return loukoum.Select("name").From("user").Offset(float32(700.2))
-		})
-		Failure(is, func() builder.Builder {
+		},
+	},
+	{
+		Name: "Offset corner case C",
+		Failure: func() builder.Builder {
 			return loukoum.Select("name").From("user").Offset(-700)
-		})
-	}
-}
-
-func TestSelect_Prefix(t *testing.T) {
-	is := require.New(t)
-
+		},
+	},
 	{
-		query := loukoum.
+		Name: "Prefix",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			Prefix("EXPLAIN ANALYZE")
-
-		is.Equal("EXPLAIN ANALYZE SELECT name FROM user", query.String())
-	}
-}
-
-func TestSelect_Suffix(t *testing.T) {
-	is := require.New(t)
-
+			Prefix("EXPLAIN ANALYZE"),
+		String:     "EXPLAIN ANALYZE SELECT name FROM user",
+		Query:      "EXPLAIN ANALYZE SELECT name FROM user",
+		NamedQuery: "EXPLAIN ANALYZE SELECT name FROM user",
+	},
 	{
-		query := loukoum.
+		Name: "Suffix",
+		Builder: loukoum.
 			Select("name").
 			From("user").
-			Suffix("FOR UPDATE")
+			Suffix("FOR UPDATE"),
+		String:     "SELECT name FROM user FOR UPDATE",
+		Query:      "SELECT name FROM user FOR UPDATE",
+		NamedQuery: "SELECT name FROM user FOR UPDATE",
+	},
+}
 
-		is.Equal("SELECT name FROM user FOR UPDATE", query.String())
+func TestSelect(t *testing.T) {
+	for _, tt := range selecttests {
+		t.Run(tt.Name, tt.Run)
 	}
 }

@@ -1,104 +1,134 @@
 package builder_test
 
 import (
+	"fmt"
 	"testing"
-	"time"
-
-	"github.com/stretchr/testify/require"
 
 	"github.com/ulule/loukoum"
+	"github.com/ulule/loukoum/format"
 )
 
-func TestDelete(t *testing.T) {
-	is := require.New(t)
-
+var deletetests = []BuilderTest{
 	{
-		query := loukoum.Delete("table")
-		is.Equal("DELETE FROM table", query.String())
-	}
+		Name:       "Simple",
+		Builder:    loukoum.Delete("table"),
+		String:     "DELETE FROM table",
+		Query:      "DELETE FROM table",
+		NamedQuery: "DELETE FROM table",
+	},
 	{
-		query := loukoum.Delete("table").Only()
-		is.Equal("DELETE FROM ONLY table", query.String())
-	}
+		Name:       "Only",
+		Builder:    loukoum.Delete("table").Only(),
+		String:     "DELETE FROM ONLY table",
+		Query:      "DELETE FROM ONLY table",
+		NamedQuery: "DELETE FROM ONLY table",
+	},
 	{
-		query := loukoum.Delete(loukoum.Table("table"))
-		is.Equal("DELETE FROM table", query.String())
-	}
+		Name:       "Table statement",
+		Builder:    loukoum.Delete(loukoum.Table("table")),
+		String:     "DELETE FROM table",
+		Query:      "DELETE FROM table",
+		NamedQuery: "DELETE FROM table",
+	},
 	{
-		query := loukoum.Delete(loukoum.Table("table")).Only()
-		is.Equal("DELETE FROM ONLY table", query.String())
-	}
+		Name:       "As",
+		Builder:    loukoum.Delete(loukoum.Table("table").As("foobar")),
+		String:     "DELETE FROM table AS foobar",
+		Query:      "DELETE FROM table AS foobar",
+		NamedQuery: "DELETE FROM table AS foobar",
+	},
 	{
-		query := loukoum.Delete(loukoum.Table("table").As("foobar"))
-		is.Equal("DELETE FROM table AS foobar", query.String())
-	}
+		Name:       "As and Only",
+		Builder:    loukoum.Delete(loukoum.Table("table").As("foobar")).Only(),
+		String:     "DELETE FROM ONLY table AS foobar",
+		Query:      "DELETE FROM ONLY table AS foobar",
+		NamedQuery: "DELETE FROM ONLY table AS foobar",
+	},
 	{
-		query := loukoum.Delete(loukoum.Table("table").As("foobar")).Only()
-		is.Equal("DELETE FROM ONLY table AS foobar", query.String())
-	}
-}
-
-func TestDelete_Using(t *testing.T) {
-	is := require.New(t)
-
-	// One table
+		Name:       "Using one table",
+		Builder:    loukoum.Delete("table").Using("foobar"),
+		String:     "DELETE FROM table USING foobar",
+		Query:      "DELETE FROM table USING foobar",
+		NamedQuery: "DELETE FROM table USING foobar",
+	},
 	{
-		query := loukoum.Delete("table").Using("foobar")
-		is.Equal("DELETE FROM table USING foobar", query.String())
-	}
+		Name:       "Using one table statement",
+		Builder:    loukoum.Delete("table").Using(loukoum.Table("foobar")),
+		String:     "DELETE FROM table USING foobar",
+		Query:      "DELETE FROM table USING foobar",
+		NamedQuery: "DELETE FROM table USING foobar",
+	},
 	{
-		query := loukoum.Delete("table").Using(loukoum.Table("foobar"))
-		is.Equal("DELETE FROM table USING foobar", query.String())
-	}
+		Name:       "Using one table statement as",
+		Builder:    loukoum.Delete("table").Using(loukoum.Table("foobar").As("foo")),
+		String:     "DELETE FROM table USING foobar AS foo",
+		Query:      "DELETE FROM table USING foobar AS foo",
+		NamedQuery: "DELETE FROM table USING foobar AS foo",
+	},
 	{
-		query := loukoum.Delete("table").Using(loukoum.Table("foobar").As("foo"))
-		is.Equal("DELETE FROM table USING foobar AS foo", query.String())
-	}
-
-	// Two tables
+		Name:       "Using two tables",
+		Builder:    loukoum.Delete("table").Using("foobar", "example"),
+		String:     "DELETE FROM table USING foobar, example",
+		Query:      "DELETE FROM table USING foobar, example",
+		NamedQuery: "DELETE FROM table USING foobar, example",
+	},
 	{
-		query := loukoum.Delete("table").Using("foobar", "example")
-		is.Equal("DELETE FROM table USING foobar, example", query.String())
-	}
+		Name:       "Using two tables with table statement",
+		Builder:    loukoum.Delete("table").Using(loukoum.Table("foobar"), "example"),
+		String:     "DELETE FROM table USING foobar, example",
+		Query:      "DELETE FROM table USING foobar, example",
+		NamedQuery: "DELETE FROM table USING foobar, example",
+	},
 	{
-		query := loukoum.Delete("table").Using(loukoum.Table("foobar"), "example")
-		is.Equal("DELETE FROM table USING foobar, example", query.String())
-	}
+		Name:       "Using two tables with as",
+		Builder:    loukoum.Delete("table").Using(loukoum.Table("example"), loukoum.Table("foobar").As("foo")),
+		String:     "DELETE FROM table USING example, foobar AS foo",
+		Query:      "DELETE FROM table USING example, foobar AS foo",
+		NamedQuery: "DELETE FROM table USING example, foobar AS foo",
+	},
 	{
-		query := loukoum.Delete("table").Using(loukoum.Table("example"), loukoum.Table("foobar").As("foo"))
-		is.Equal("DELETE FROM table USING example, foobar AS foo", query.String())
-	}
-}
-
-func TestDelete_Where(t *testing.T) {
-	is := require.New(t)
-
+		Name:       "Where",
+		Builder:    loukoum.Delete("table").Where(loukoum.Condition("id").Equal(1)),
+		String:     "DELETE FROM table WHERE (id = 1)",
+		Query:      "DELETE FROM table WHERE (id = $1)",
+		NamedQuery: "DELETE FROM table WHERE (id = :arg_1)",
+		Args:       []interface{}{1},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+		},
+	},
 	{
-		query := loukoum.Delete("table").Where(loukoum.Condition("id").Equal(1))
-		is.Equal("DELETE FROM table WHERE (id = 1)", query.String())
-	}
-	{
-		when, err := time.Parse(time.RFC3339, "2017-11-23T17:47:27+01:00")
-		is.NoError(err)
-		is.NotZero(when)
-
-		query := loukoum.Delete("table").
+		Name: "Where time",
+		Builder: loukoum.Delete("table").
 			Where(loukoum.Condition("id").Equal(1)).
-			And(loukoum.Condition("created_at").GreaterThan(when))
-
-		is.Equal("DELETE FROM table WHERE ((id = 1) AND (created_at > '2017-11-23 16:47:27+00'))", query.String())
-	}
+			And(loukoum.Condition("created_at").GreaterThan(now)),
+		String:     fmt.Sprintf("DELETE FROM table WHERE ((id = 1) AND (created_at > %s))", format.Time(now)),
+		Query:      "DELETE FROM table WHERE ((id = $1) AND (created_at > $2))",
+		NamedQuery: "DELETE FROM table WHERE ((id = :arg_1) AND (created_at > :arg_2))",
+		Args:       []interface{}{1, now},
+		NamedArgs: map[string]interface{}{
+			"arg_1": 1,
+			"arg_2": now,
+		},
+	},
+	{
+		Name:       "Returning *",
+		Builder:    loukoum.Delete("table").Returning("*"),
+		String:     "DELETE FROM table RETURNING *",
+		Query:      "DELETE FROM table RETURNING *",
+		NamedQuery: "DELETE FROM table RETURNING *",
+	},
+	{
+		Name:       "Returning id",
+		Builder:    loukoum.Delete("table").Returning("id"),
+		String:     "DELETE FROM table RETURNING id",
+		Query:      "DELETE FROM table RETURNING id",
+		NamedQuery: "DELETE FROM table RETURNING id",
+	},
 }
 
-func TestDelete_Returning(t *testing.T) {
-	is := require.New(t)
-
-	{
-		query := loukoum.Delete("table").Returning("*")
-		is.Equal("DELETE FROM table RETURNING *", query.String())
-	}
-	{
-		query := loukoum.Delete("table").Returning("id")
-		is.Equal("DELETE FROM table RETURNING id", query.String())
+func TestDelete(t *testing.T) {
+	for _, tt := range deletetests {
+		t.Run(tt.Name, tt.Run)
 	}
 }

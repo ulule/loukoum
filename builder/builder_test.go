@@ -2,6 +2,7 @@ package builder_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -9,9 +10,40 @@ import (
 	"github.com/ulule/loukoum/stmt"
 )
 
-func Failure(is *require.Assertions, callback func() builder.Builder) {
-	is.Panics(func() {
-		_ = callback().String()
+var now = time.Now()
+
+type BuilderTest struct {
+	Name       string
+	Builder    builder.Builder
+	String     string
+	Query      string
+	Args       []interface{}
+	NamedQuery string
+	NamedArgs  map[string]interface{}
+	Failure    func() builder.Builder
+}
+
+func (b *BuilderTest) Run(t *testing.T) {
+	if b.Failure != nil {
+		t.Run("Failure", func(t *testing.T) {
+			require.Panics(t, func() {
+				_ = b.Failure().String()
+			})
+		})
+		return
+	}
+	t.Run("String", func(t *testing.T) {
+		require.Equal(t, b.String, b.Builder.String())
+	})
+	t.Run("Query", func(t *testing.T) {
+		query, args := b.Builder.Query()
+		require.Equal(t, b.Query, query)
+		require.Equal(t, b.Args, args)
+	})
+	t.Run("NamedQuery", func(t *testing.T) {
+		query, args := b.Builder.NamedQuery()
+		require.Equal(t, b.NamedQuery, query)
+		require.Equal(t, b.NamedArgs, args)
 	})
 }
 
