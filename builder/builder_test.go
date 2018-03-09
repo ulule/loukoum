@@ -27,6 +27,7 @@ func (b *BuilderTest) Run(t *testing.T) {
 				_ = b.Failure()
 			})
 		})
+		return
 	}
 	t.Run("String", func(t *testing.T) {
 		if b.String != "" {
