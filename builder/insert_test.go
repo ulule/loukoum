@@ -17,43 +17,48 @@ var now = time.Now()
 
 var inserttests = []BuilderTest{
 	{
-		Name:    "Columns With columns",
-		Builder: loukoum.Insert("table").Columns("a", "b", "c"),
-		String:  "INSERT INTO table (a, b, c)",
+		Name:       "Columns With columns",
+		Builder:    loukoum.Insert("table").Columns("a", "b", "c"),
+		String:     "INSERT INTO table (a, b, c)",
+		Query:      "INSERT INTO table (a, b, c)",
+		NamedQuery: "INSERT INTO table (a, b, c)",
 	},
 	{
-		Name:    "Columns Without columns",
-		Builder: loukoum.Insert("table"),
-		String:  "INSERT INTO table",
+		Name:       "Columns Without columns",
+		Builder:    loukoum.Insert("table"),
+		String:     "INSERT INTO table",
+		Query:      "INSERT INTO table",
+		NamedQuery: "INSERT INTO table",
 	},
 	{
-		Name: "Values With columns A",
+		Name: "Values With columns",
 		Builder: loukoum.Insert("table").
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}),
-		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')",
+		String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')",
+		Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3)",
+		NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3)",
+		Args:       []interface{}{"va", "vb", "vc"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "va",
+			"arg_2": "vb",
+			"arg_3": "vc",
+		},
 	},
 	{
-		Name: "Values With Columns B",
-		Builder: loukoum.
-			Insert("table").
-			Columns("a", "b", "c").
-			Values("va", "vb", "vc"),
-		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')",
-	},
-	{
-		Name: "Values Without columns A",
+		Name: "Values Without columns",
 		Builder: loukoum.
 			Insert("table").
 			Values([]string{"va", "vb", "vc"}),
-		String: "INSERT INTO table VALUES ('va', 'vb', 'vc')",
-	},
-	{
-		Name: "Values Without columns B",
-		Builder: loukoum.
-			Insert("table").
-			Values("va", "vb", "vc"),
-		String: "INSERT INTO table VALUES ('va', 'vb', 'vc')",
+		String:     "INSERT INTO table VALUES ('va', 'vb', 'vc')",
+		Query:      "INSERT INTO table VALUES ($1, $2, $3)",
+		NamedQuery: "INSERT INTO table VALUES (:arg_1, :arg_2, :arg_3)",
+		Args:       []interface{}{"va", "vb", "vc"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "va",
+			"arg_2": "vb",
+			"arg_3": "vc",
+		},
 	},
 	{
 		Name: "OnConflict Do nothing without target",
@@ -66,6 +71,19 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
 			"ON CONFLICT DO NOTHING",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
+			"ON CONFLICT DO NOTHING",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
+			"ON CONFLICT DO NOTHING",
+		),
+		Args: []interface{}{"tech@ulule.com", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+		},
 	},
 	{
 		Name: "OnConflict Do nothing A",
@@ -78,6 +96,19 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
 			"ON CONFLICT (email) DO NOTHING",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
+			"ON CONFLICT (email) DO NOTHING",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
+			"ON CONFLICT (email) DO NOTHING",
+		),
+		Args: []interface{}{"tech@ulule.com", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+		},
 	},
 	{
 		Name: "OnConflict Do nothing B",
@@ -90,6 +121,19 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
 			"ON CONFLICT (email) DO NOTHING",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
+			"ON CONFLICT (email) DO NOTHING",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
+			"ON CONFLICT (email) DO NOTHING",
+		),
+		Args: []interface{}{"tech@ulule.com", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+		},
 	},
 	{
 		Name: "OnConflict Do nothing C",
@@ -102,6 +146,19 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
 			"ON CONFLICT (email, uuid) DO NOTHING",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
+			"ON CONFLICT (email, uuid) DO NOTHING",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
+			"ON CONFLICT (email, uuid) DO NOTHING",
+		),
+		Args: []interface{}{"tech@ulule.com", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+		},
 	},
 	{
 		Name: "OnConflict Do nothing D",
@@ -114,6 +171,19 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
 			"ON CONFLICT (email, uuid, reference) DO NOTHING",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
+			"ON CONFLICT (email, uuid, reference) DO NOTHING",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
+			"ON CONFLICT (email, uuid, reference) DO NOTHING",
+		),
+		Args: []interface{}{"tech@ulule.com", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+		},
 	},
 	{
 		Name: "OnConflict Do update A",
@@ -129,6 +199,20 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
 			"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = true",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
+			"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = $3",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
+			"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = :arg_3",
+		),
+		Args: []interface{}{"tech@ulule.com", true, true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+			"arg_3": true,
+		},
 	},
 	{
 		Name: "OnConflict Do update B",
@@ -144,6 +228,20 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
 			"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = true",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
+			"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = $3",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
+			"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = :arg_3",
+		),
+		Args: []interface{}{"tech@ulule.com", true, true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+			"arg_3": true,
+		},
 	},
 	{
 		Name: "OnConflict Do update C",
@@ -159,6 +257,20 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
 			"ON CONFLICT (email, uuid) DO UPDATE SET created_at = NOW(), enabled = true",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
+			"ON CONFLICT (email, uuid) DO UPDATE SET created_at = NOW(), enabled = $3",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
+			"ON CONFLICT (email, uuid) DO UPDATE SET created_at = NOW(), enabled = :arg_3",
+		),
+		Args: []interface{}{"tech@ulule.com", true, true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+			"arg_3": true,
+		},
 	},
 	{
 		Name: "OnConflict Corner case A",
@@ -240,7 +352,15 @@ var inserttests = []BuilderTest{
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
 			Returning("a"),
-		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a",
+		String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a",
+		Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING a",
+		NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING a",
+		Args:       []interface{}{"va", "vb", "vc"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "va",
+			"arg_2": "vb",
+			"arg_3": "vc",
+		},
 	},
 	{
 		Name: "Returning Many columns A",
@@ -249,7 +369,15 @@ var inserttests = []BuilderTest{
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
 			Returning("a", "b"),
-		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b",
+		String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b",
+		Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING a, b",
+		NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING a, b",
+		Args:       []interface{}{"va", "vb", "vc"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "va",
+			"arg_2": "vb",
+			"arg_3": "vc",
+		},
 	},
 	{
 		Name: "Returning Many columns B",
@@ -258,7 +386,15 @@ var inserttests = []BuilderTest{
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
 			Returning("a", "b", "c"),
-		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b, c",
+		String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b, c",
+		Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING a, b, c",
+		NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING a, b, c",
+		Args:       []interface{}{"va", "vb", "vc"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "va",
+			"arg_2": "vb",
+			"arg_3": "vc",
+		},
 	},
 	{
 		Name: "Returning With aliases A",
@@ -267,7 +403,15 @@ var inserttests = []BuilderTest{
 			Columns("a", "b", "c").
 			Values([]string{"va", "vb", "vc"}).
 			Returning(loukoum.Column("a").As("alias_a")),
-		String: "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a AS alias_a",
+		String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a AS alias_a",
+		Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING a AS alias_a",
+		NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING a AS alias_a",
+		Args:       []interface{}{"va", "vb", "vc"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "va",
+			"arg_2": "vb",
+			"arg_3": "vc",
+		},
 	},
 	{
 		Name: "Returning With aliases B",
@@ -280,6 +424,20 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
 			"RETURNING a AS alias_a, b AS alias_b",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (a, b, c) VALUES ($1, $2, $3) ",
+			"RETURNING a AS alias_a, b AS alias_b",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) ",
+			"RETURNING a AS alias_a, b AS alias_b",
+		),
+		Args: []interface{}{"va", "vb", "vc"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "va",
+			"arg_2": "vb",
+			"arg_3": "vc",
+		},
 	},
 	{
 		Name: "Returning With aliases C",
@@ -296,6 +454,20 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
 			"RETURNING a AS alias_a, b AS alias_b, c AS alias_c",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (a, b, c) VALUES ($1, $2, $3) ",
+			"RETURNING a AS alias_a, b AS alias_b, c AS alias_c",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) ",
+			"RETURNING a AS alias_a, b AS alias_b, c AS alias_c",
+		),
+		Args: []interface{}{"va", "vb", "vc"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "va",
+			"arg_2": "vb",
+			"arg_3": "vc",
+		},
 	},
 	{
 		Name: "Valuer pq.NullTime A",
@@ -307,6 +479,14 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
 			"true, ", format.Time(now), ")",
 		),
+		Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, $3)",
+		NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, :arg_3)",
+		Args:       []interface{}{"tech@ulule.com", true, now},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+			"arg_3": now,
+		},
 	},
 	{
 		Name: "Valuer pq.NullTime B",
@@ -318,6 +498,13 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
 			"true, NULL)",
 		),
+		Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NULL)",
+		NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NULL)",
+		Args:       []interface{}{"tech@ulule.com", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+		},
 	},
 	{
 		Name: "Valuer sql.NullString A",
@@ -325,7 +512,14 @@ var inserttests = []BuilderTest{
 			Insert("table").
 			Columns("email", "comment").
 			Values("tech@ulule.com", sql.NullString{String: "foobar", Valid: true}),
-		String: "INSERT INTO table (email, comment) VALUES ('tech@ulule.com', 'foobar')",
+		String:     "INSERT INTO table (email, comment) VALUES ('tech@ulule.com', 'foobar')",
+		Query:      "INSERT INTO table (email, comment) VALUES ($1, $2)",
+		NamedQuery: "INSERT INTO table (email, comment) VALUES (:arg_1, :arg_2)",
+		Args:       []interface{}{"tech@ulule.com", "foobar"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": "foobar",
+		},
 	},
 	{
 		Name: "Valuer sql.NullString B",
@@ -333,7 +527,13 @@ var inserttests = []BuilderTest{
 			Insert("table").
 			Columns("email", "comment").
 			Values("tech@ulule.com", sql.NullString{}),
-		String: "INSERT INTO table (email, comment) VALUES ('tech@ulule.com', NULL)",
+		String:     "INSERT INTO table (email, comment) VALUES ('tech@ulule.com', NULL)",
+		Query:      "INSERT INTO table (email, comment) VALUES ($1, NULL)",
+		NamedQuery: "INSERT INTO table (email, comment) VALUES (:arg_1, NULL)",
+		Args:       []interface{}{"tech@ulule.com"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+		},
 	},
 	{
 		Name: "Valuer sql.NullInt64 A",
@@ -341,7 +541,14 @@ var inserttests = []BuilderTest{
 			Insert("table").
 			Columns("email", "login").
 			Values("tech@ulule.com", sql.NullInt64{Int64: 30, Valid: true}),
-		String: "INSERT INTO table (email, login) VALUES ('tech@ulule.com', 30)",
+		String:     "INSERT INTO table (email, login) VALUES ('tech@ulule.com', 30)",
+		Query:      "INSERT INTO table (email, login) VALUES ($1, $2)",
+		NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, :arg_2)",
+		Args:       []interface{}{"tech@ulule.com", int64(30)},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": int64(30),
+		},
 	},
 	{
 		Name: "Valuer sql.NullInt64 B",
@@ -349,7 +556,13 @@ var inserttests = []BuilderTest{
 			Insert("table").
 			Columns("email", "login").
 			Values("tech@ulule.com", sql.NullInt64{}),
-		String: "INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)",
+		String:     "INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)",
+		Query:      "INSERT INTO table (email, login) VALUES ($1, NULL)",
+		NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, NULL)",
+		Args:       []interface{}{"tech@ulule.com"},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+		},
 	},
 	{
 		Name: "Set Variadic with Pair type",
@@ -364,6 +577,19 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (created_at, email, enabled) ",
 			"VALUES (NOW(), 'tech@ulule.com', true)",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), $1, $2)",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), :arg_1, :arg_2)",
+		),
+		Args: []interface{}{"tech@ulule.com", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+		},
 	},
 	{
 		Name: "Set Variadic with Map type",
@@ -377,6 +603,19 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (created_at, email, enabled) ",
 			"VALUES (NOW(), 'tech@ulule.com', true)",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), $1, $2)",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), :arg_1, :arg_2)",
+		),
+		Args: []interface{}{"tech@ulule.com", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+		},
 	},
 	{
 		Name: "Set Variadic with string / interface map",
@@ -390,6 +629,19 @@ var inserttests = []BuilderTest{
 			"INSERT INTO table (created_at, email, enabled) ",
 			"VALUES (NOW(), 'tech@ulule.com', true)",
 		),
+		Query: fmt.Sprint(
+			"INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), $1, $2)",
+		),
+		NamedQuery: fmt.Sprint(
+			"INSERT INTO table (created_at, email, enabled) ",
+			"VALUES (NOW(), :arg_1, :arg_2)",
+		),
+		Args: []interface{}{"tech@ulule.com", true},
+		NamedArgs: map[string]interface{}{
+			"arg_1": "tech@ulule.com",
+			"arg_2": true,
+		},
 	},
 }
 
