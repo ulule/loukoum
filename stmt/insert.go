@@ -20,7 +20,7 @@ func NewInsert() Insert {
 }
 
 // Write exposes statement as a SQL query.
-func (insert Insert) Write(ctx *types.Context) {
+func (insert Insert) Write(ctx types.Context) {
 	if insert.IsEmpty() {
 		panic("loukoum: an insert statement must have at least one column")
 	}

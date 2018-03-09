@@ -20,7 +20,7 @@ func NewOffset(start int64) Offset {
 }
 
 // Write exposes statement as a SQL query.
-func (offset Offset) Write(ctx *types.Context) {
+func (offset Offset) Write(ctx types.Context) {
 	if offset.IsEmpty() {
 		return
 	}

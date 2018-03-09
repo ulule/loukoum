@@ -19,7 +19,7 @@ func NewHaving(expression Expression) Having {
 }
 
 // Write exposes statement as a SQL query.
-func (having Having) Write(ctx *types.Context) {
+func (having Having) Write(ctx types.Context) {
 	if having.IsEmpty() {
 		panic("loukoum: a having clause expects at least one condition")
 	}

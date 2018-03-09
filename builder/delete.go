@@ -83,18 +83,23 @@ func (b Delete) Returning(values ...interface{}) Delete {
 
 // String returns the underlying query as a raw statement.
 func (b Delete) String() string {
-	return rawify(b.Prepare())
+	var ctx types.RawContext
+	b.query.Write(&ctx)
+	return ctx.Query()
 }
 
 // Prepare returns the underlying query as a named statement.
 func (b Delete) Prepare() (string, map[string]interface{}) {
-	ctx := types.NewContext()
-	b.query.Write(ctx)
+	var ctx types.NamedContext
+	b.query.Write(&ctx)
+	return ctx.Query(), ctx.Values()
+}
 
-	query := ctx.Query()
-	args := ctx.Values()
-
-	return query, args
+// Query returns the underlying query as a regular statement.
+func (b Delete) Query() (string, []interface{}) {
+	var ctx types.StdContext
+	b.query.Write(&ctx)
+	return ctx.Query(), ctx.Values()
 }
 
 // Statement returns underlying statement.

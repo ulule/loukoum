@@ -18,7 +18,7 @@ func NewInto(table Table) Into {
 }
 
 // Write exposes statement as a SQL query.
-func (into Into) Write(ctx *types.Context) {
+func (into Into) Write(ctx types.Context) {
 	ctx.Write(token.Into.String())
 	ctx.Write(" ")
 	into.Table.Write(ctx)

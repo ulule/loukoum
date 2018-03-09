@@ -18,7 +18,7 @@ func NewReturning(columns []Column) Returning {
 }
 
 // Write exposes statement as a SQL query.
-func (returning Returning) Write(ctx *types.Context) {
+func (returning Returning) Write(ctx types.Context) {
 	ctx.Write(token.Returning.String())
 	ctx.Write(" ")
 

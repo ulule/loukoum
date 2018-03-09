@@ -18,7 +18,7 @@ func NewWhere(expression Expression) Where {
 }
 
 // Write exposes statement as a SQL query.
-func (where Where) Write(ctx *types.Context) {
+func (where Where) Write(ctx types.Context) {
 	if where.IsEmpty() {
 		panic("loukoum: a where clause expects at least one condition")
 	}

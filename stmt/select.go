@@ -27,7 +27,7 @@ func NewSelect() Select {
 }
 
 // Write exposes statement as a SQL query.
-func (selekt Select) Write(ctx *types.Context) {
+func (selekt Select) Write(ctx types.Context) {
 	if selekt.IsEmpty() {
 		panic("loukoum: select statements must have at least one column")
 	}
@@ -37,7 +37,7 @@ func (selekt Select) Write(ctx *types.Context) {
 	selekt.writeTail(ctx)
 }
 
-func (selekt Select) writeHead(ctx *types.Context) {
+func (selekt Select) writeHead(ctx types.Context) {
 	if !selekt.Prefix.IsEmpty() {
 		selekt.Prefix.Write(ctx)
 		ctx.Write(" ")
@@ -65,7 +65,7 @@ func (selekt Select) writeHead(ctx *types.Context) {
 	}
 }
 
-func (selekt Select) writeMiddle(ctx *types.Context) {
+func (selekt Select) writeMiddle(ctx types.Context) {
 	for i := range selekt.Joins {
 		ctx.Write(" ")
 		selekt.Joins[i].Write(ctx)
@@ -87,7 +87,7 @@ func (selekt Select) writeMiddle(ctx *types.Context) {
 	}
 }
 
-func (selekt Select) writeTail(ctx *types.Context) {
+func (selekt Select) writeTail(ctx types.Context) {
 	if !selekt.OrderBy.IsEmpty() {
 		ctx.Write(" ")
 		selekt.OrderBy.Write(ctx)

@@ -185,7 +185,7 @@ func NewIdentifier(identifier string) Identifier {
 func (Identifier) expression() {}
 
 // Write exposes statement as a SQL query.
-func (identifier Identifier) Write(ctx *types.Context) {
+func (identifier Identifier) Write(ctx types.Context) {
 	ctx.Write(identifier.Identifier)
 }
 
@@ -330,7 +330,7 @@ func NewValueFromValuer(valuer driver.Valuer) Value {
 func (Value) expression() {}
 
 // Write exposes statement as a SQL query.
-func (value Value) Write(ctx *types.Context) {
+func (value Value) Write(ctx types.Context) {
 	if value.Value == nil {
 		ctx.Write("NULL")
 	} else {
@@ -489,7 +489,7 @@ func NewArrayFloat64(values []float64) Array {
 func (Array) expression() {}
 
 // Write exposes statement as a SQL query.
-func (array Array) Write(ctx *types.Context) {
+func (array Array) Write(ctx types.Context) {
 	for i := range array.Values {
 		if i != 0 {
 			ctx.Write(", ")
@@ -540,7 +540,7 @@ func NewRaw(value string) Raw {
 func (Raw) expression() {}
 
 // Write exposes statement as a SQL query.
-func (raw Raw) Write(ctx *types.Context) {
+func (raw Raw) Write(ctx types.Context) {
 	ctx.Write(raw.Value)
 }
 

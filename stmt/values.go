@@ -18,7 +18,7 @@ func NewValues(values Expression) Values {
 }
 
 // Write exposes statement as a SQL query.
-func (values Values) Write(ctx *types.Context) {
+func (values Values) Write(ctx types.Context) {
 	if values.IsEmpty() {
 		return
 	}

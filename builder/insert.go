@@ -135,18 +135,23 @@ func (b Insert) Set(args ...interface{}) Insert {
 
 // String returns the underlying query as a raw statement.
 func (b Insert) String() string {
-	return rawify(b.Prepare())
+	var ctx types.RawContext
+	b.insert.Write(&ctx)
+	return ctx.Query()
 }
 
 // Prepare returns the underlying query as a named statement.
 func (b Insert) Prepare() (string, map[string]interface{}) {
-	ctx := types.NewContext()
-	b.insert.Write(ctx)
+	var ctx types.NamedContext
+	b.insert.Write(&ctx)
+	return ctx.Query(), ctx.Values()
+}
 
-	query := ctx.Query()
-	args := ctx.Values()
-
-	return query, args
+// Query returns the underlying query as a regular statement.
+func (b Insert) Query() (string, []interface{}) {
+	var ctx types.StdContext
+	b.insert.Write(&ctx)
+	return ctx.Query(), ctx.Values()
 }
 
 // Statement returns underlying statement.

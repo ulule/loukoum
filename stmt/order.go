@@ -19,7 +19,7 @@ func NewOrder(expression string, kind types.OrderType) Order {
 }
 
 // Write exposes statement as a SQL query.
-func (order Order) Write(ctx *types.Context) {
+func (order Order) Write(ctx types.Context) {
 	if order.IsEmpty() {
 		return
 	}

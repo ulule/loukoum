@@ -18,7 +18,7 @@ func NewOrderBy(orders []Order) OrderBy {
 }
 
 // Write exposes statement as a SQL query.
-func (order OrderBy) Write(ctx *types.Context) {
+func (order OrderBy) Write(ctx types.Context) {
 	if order.IsEmpty() {
 		return
 	}

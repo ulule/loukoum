@@ -19,7 +19,7 @@ func NewDelete() Delete {
 }
 
 // Write exposes statement as a SQL query.
-func (delete Delete) Write(ctx *types.Context) {
+func (delete Delete) Write(ctx types.Context) {
 	if delete.IsEmpty() {
 		panic("loukoum: a delete statement must have a table")
 	}
