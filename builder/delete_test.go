@@ -24,6 +24,13 @@ var deletetests = []BuilderTest{
 		NamedQuery: "DELETE FROM ONLY table",
 	},
 	{
+		Name:       "Only",
+		Builder:    loukoum.Delete(loukoum.Table("table")).Only(),
+		String:     "DELETE FROM ONLY table",
+		Query:      "DELETE FROM ONLY table",
+		NamedQuery: "DELETE FROM ONLY table",
+	},
+	{
 		Name:       "Table statement",
 		Builder:    loukoum.Delete(loukoum.Table("table")),
 		String:     "DELETE FROM table",
