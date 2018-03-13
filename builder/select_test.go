@@ -673,42 +673,6 @@ func TestSelect_WhereIn(t *testing.T) {
 			Where(loukoum.Condition("id").In(
 				loukoum.Select("id").
 					From("table").
-					Where(loukoum.Condition("id").Equal(1)).
-					Statement(),
-			))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = :arg_1)))", stmt)
-		is.Len(args, 1)
-		is.Equal(1, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = 1)))", query.String())
-	}
-	{
-		query := loukoum.
-			Select("id").
-			From("table").
-			Where(loukoum.Condition("id").NotIn(
-				loukoum.Select("id").
-					From("table").
-					Where(loukoum.Condition("id").Equal(1)).
-					Statement(),
-			))
-
-		stmt, args := query.NamedQuery()
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = :arg_1)))", stmt)
-		is.Len(args, 1)
-		is.Equal(1, args["arg_1"])
-
-		is.Equal("SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))", query.String())
-	}
-	{
-		query := loukoum.
-			Select("id").
-			From("table").
-			Where(loukoum.Condition("id").In(
-				loukoum.Select("id").
-					From("table").
 					Where(loukoum.Condition("id").Equal(1)),
 			))
 

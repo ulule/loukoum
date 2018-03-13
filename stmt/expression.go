@@ -33,7 +33,12 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 	case driver.Valuer:
 		return NewValueFromValuer(value)
 	case StatementEncoder:
-		return NewValue(value.Statement())
+		stmt := value.Statement()
+		expression, ok := stmt.(Expression)
+		if !ok {
+			panic(fmt.Sprintf("cannot use {%+v}[%T] as loukoum Expression", value, value))
+		}
+		return expression
 	case Int64Encoder:
 		return NewValue(value.Int64())
 	case BoolEncoder:
@@ -525,12 +530,12 @@ var _ Expression = Array{}
 // Raw
 // ----------------------------------------------------------------------------
 
-// Raw is an raw expression value.
+// Raw is a raw expression value.
 type Raw struct {
 	Value string
 }
 
-// NewRaw returns an raw expression value.
+// NewRaw returns a raw expression value.
 func NewRaw(value string) Raw {
 	return Raw{
 		Value: value,
@@ -551,3 +556,41 @@ func (raw Raw) IsEmpty() bool {
 
 // Ensure that Raw is an Expression
 var _ Expression = Raw{}
+
+// ----------------------------------------------------------------------------
+// Wrapper
+// ----------------------------------------------------------------------------
+
+// Wrapper encapsulates an expression between parenthesis.
+type Wrapper struct {
+	Value Expression
+}
+
+// NewWrapper returns a new Wrapper expression when it's required.
+func NewWrapper(arg Expression) Expression {
+	switch value := arg.(type) {
+	case Select:
+		return &Wrapper{
+			Value: value,
+		}
+	default:
+		return arg
+	}
+}
+
+func (Wrapper) expression() {}
+
+// Write exposes statement as a SQL query.
+func (wrapper Wrapper) Write(ctx types.Context) {
+	ctx.Write("(")
+	wrapper.Value.Write(ctx)
+	ctx.Write(")")
+}
+
+// IsEmpty returns true if statement is undefined.
+func (wrapper Wrapper) IsEmpty() bool {
+	return wrapper.Value.IsEmpty()
+}
+
+// Ensure that Wrapper is an Expression
+var _ Expression = Wrapper{}

@@ -468,6 +468,22 @@ func TestUpdate_Set_Valuer(t *testing.T) {
 	}
 }
 
+func TestUpdate_Set_Subquery(t *testing.T) {
+	is := require.New(t)
+
+	{
+		query := loukoum.Update("test1").
+			Set(loukoum.Pair("count",
+				loukoum.Select("COALESCE(COUNT(*), 0)").
+					From("test2").
+					Where(loukoum.Condition("disabled").Equal(false)),
+			))
+
+		is.Equal(fmt.Sprint("UPDATE test1 SET count = (SELECT COALESCE(COUNT(*), 0)",
+			" FROM test2 WHERE (disabled = false))"), query.String())
+	}
+}
+
 func TestUpdate_Set_Using(t *testing.T) {
 	is := require.New(t)
 
@@ -518,7 +534,7 @@ func TestUpdate_Set_Using(t *testing.T) {
 			Using(
 				loukoum.Select("a", "b", "c").
 					From("table").
-					Where(loukoum.Condition("disabled").Equal(false)).Statement(),
+					Where(loukoum.Condition("disabled").Equal(false)),
 			)
 
 		is.Equal("UPDATE table SET (a, b, c) = (SELECT a, b, c FROM table WHERE (disabled = false))", query.String())
