@@ -225,14 +225,14 @@ func MergeSet(set stmt.Set, args []interface{}) stmt.Set {
 			}
 		case map[string]interface{}:
 			for k, v := range value {
-				set.Pairs.Add(ToColumn(k), stmt.NewExpression(v))
+				set.Pairs.Add(ToColumn(k), stmt.NewWrapper(stmt.NewExpression(v)))
 			}
 		case types.Map:
 			for k, v := range value {
-				set.Pairs.Add(ToColumn(k), stmt.NewExpression(v))
+				set.Pairs.Add(ToColumn(k), stmt.NewWrapper(stmt.NewExpression(v)))
 			}
 		case types.Pair:
-			set.Pairs.Add(ToColumn(value.Key), stmt.NewExpression(value.Value))
+			set.Pairs.Add(ToColumn(value.Key), stmt.NewWrapper(stmt.NewExpression(value.Value)))
 		default:
 			panic(fmt.Sprintf("loukoum: cannot use %T as pair", value))
 		}
