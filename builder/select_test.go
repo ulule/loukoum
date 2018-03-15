@@ -77,7 +77,7 @@ func TestSelect_From(t *testing.T) {
 func TestSelect_Join(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{
-			Name: "Simple",
+			Name: "Inner",
 			Builders: []builder.Builder{
 				loukoum.
 					Select("a", "b", "c").
@@ -91,6 +91,14 @@ func TestSelect_Join(t *testing.T) {
 					Select("a", "b", "c").
 					From("test1").
 					Join("test2", "test1.id = test2.fk_id", loukoum.InnerJoin),
+				loukoum.
+					Select("a", "b", "c").
+					From("test1").
+					Join("test2", "ON test1.id = test2.fk_id"),
+				loukoum.
+					Select("a", "b", "c").
+					From("test1").
+					Join("test2", "ON test1.id = test2.fk_id", loukoum.InnerJoin),
 			},
 			SameQuery: "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
 		},
@@ -111,20 +119,13 @@ func TestSelect_Join(t *testing.T) {
 			SameQuery: "SELECT a, b, c FROM test2 RIGHT JOIN test4 ON test4.gid = test2.id",
 		},
 		{
-			Name: "Inner",
-			Builder: loukoum.
-				Select("a", "b", "c").
-				From("test5").
-				Join("test3", "ON test3.id = test5.fk_id", loukoum.InnerJoin),
-			SameQuery: "SELECT a, b, c FROM test5 INNER JOIN test3 ON test3.id = test5.fk_id",
-		},
-		{
 			Name: "Two",
 			Builders: []builder.Builder{
 				loukoum.
 					Select("a", "b", "c").
 					From("test2").
-					Join("test4", "test4.gid = test2.id").Join("test3", "test4.uid = test3.id"),
+					Join("test4", "test4.gid = test2.id").
+					Join("test3", "test4.uid = test3.id"),
 				loukoum.
 					Select("a", "b", "c").
 					From("test2").
