@@ -71,7 +71,10 @@ func TestDelete_Using(t *testing.T) {
 }
 
 func TestDelete_Where(t *testing.T) {
-	when, _ := time.Parse(time.RFC3339, "2017-11-23T17:47:27+01:00")
+	when, err := time.Parse(time.RFC3339, "2017-11-23T17:47:27+01:00")
+	if err != nil {
+		t.Fatal(err)
+	}
 	RunBuilderTests(t, []BuilderTest{
 		{
 			Name:       "Simple",

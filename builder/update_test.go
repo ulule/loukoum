@@ -10,7 +10,6 @@ import (
 
 	"github.com/ulule/loukoum"
 	"github.com/ulule/loukoum/builder"
-	"github.com/ulule/loukoum/format"
 )
 
 func TestUpdate_Set_Undefined(t *testing.T) {
@@ -372,19 +371,22 @@ func TestUpdate_Set_MapAndPair_LastWriteWins(t *testing.T) {
 }
 
 func TestUpdate_Set_Valuer(t *testing.T) {
-	now := time.Now()
+	when, err := time.Parse(time.RFC3339, "2017-11-23T17:47:27+01:00")
+	if err != nil {
+		t.Fatal(err)
+	}
 	RunBuilderTests(t, []BuilderTest{
 		{
 			Name:       "pq.NullTime not null",
-			Builder:    loukoum.Update("table").Set(loukoum.Map{"created_at": pq.NullTime{Time: now, Valid: true}}),
-			String:     fmt.Sprint("UPDATE table SET created_at = ", format.Time(now)),
+			Builder:    loukoum.Update("table").Set(loukoum.Map{"created_at": pq.NullTime{Time: when, Valid: true}}),
+			String:     "UPDATE table SET created_at = '2017-11-23 16:47:27+00'",
 			Query:      "UPDATE table SET created_at = $1",
 			NamedQuery: "UPDATE table SET created_at = :arg_1",
-			Args:       []interface{}{now},
+			Args:       []interface{}{when},
 		},
 		{
 			Name:      "pq.NullTime null",
-			Builder:   loukoum.Update("table").Set(loukoum.Map{"created_at": pq.NullTime{Time: now, Valid: false}}),
+			Builder:   loukoum.Update("table").Set(loukoum.Map{"created_at": pq.NullTime{Time: when, Valid: false}}),
 			SameQuery: "UPDATE table SET created_at = NULL",
 		},
 		{

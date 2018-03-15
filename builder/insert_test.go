@@ -10,7 +10,6 @@ import (
 
 	"github.com/ulule/loukoum"
 	"github.com/ulule/loukoum/builder"
-	"github.com/ulule/loukoum/format"
 )
 
 func TestInsert_Columns(t *testing.T) {
@@ -397,21 +396,24 @@ func TestInsert_Returning(t *testing.T) {
 }
 
 func TestInsert_Valuer(t *testing.T) {
-	now := time.Now()
+	when, err := time.Parse(time.RFC3339, "2017-11-23T17:47:27+01:00")
+	if err != nil {
+		t.Fatal(err)
+	}
 	RunBuilderTests(t, []BuilderTest{
 		{
 			Name: "pq.NullTime not null",
 			Builder: loukoum.
 				Insert("table").
 				Columns("email", "enabled", "created_at").
-				Values("tech@ulule.com", true, pq.NullTime{Time: now, Valid: true}),
+				Values("tech@ulule.com", true, pq.NullTime{Time: when, Valid: true}),
 			String: fmt.Sprint(
 				"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
-				"true, ", format.Time(now), ")",
+				"true, '2017-11-23 16:47:27+00')",
 			),
 			Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, $3)",
 			NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, :arg_3)",
-			Args:       []interface{}{"tech@ulule.com", true, now},
+			Args:       []interface{}{"tech@ulule.com", true, when},
 		},
 		{
 			Name: "pq.NullTime null",
