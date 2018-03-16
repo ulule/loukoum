@@ -2,6 +2,7 @@ package format
 
 import (
 	"bytes"
+	"database/sql/driver"
 	"encoding/hex"
 	"fmt"
 	"strconv"
@@ -10,6 +11,10 @@ import (
 
 // Value formats the given value.
 func Value(arg interface{}) string { // nolint: gocyclo
+	if arg == nil {
+		return "NULL"
+	}
+
 	switch value := arg.(type) {
 	case string:
 		return String(value)
@@ -17,6 +22,12 @@ func Value(arg interface{}) string { // nolint: gocyclo
 		return Bytes(value)
 	case time.Time:
 		return Time(value)
+	case driver.Valuer:
+		v, err := value.Value()
+		if err != nil {
+			panic("loukoum: was not able to retrieve valuer value")
+		}
+		return Value(v)
 	case int:
 		return Int(int64(value))
 	case int8:

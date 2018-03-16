@@ -31,7 +31,7 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 	case *time.Time:
 		return NewValue(*value)
 	case driver.Valuer:
-		return NewValueFromValuer(value)
+		return NewValue(value)
 	case StatementEncoder:
 		stmt := value.Statement()
 		expression, ok := stmt.(Expression)
@@ -149,7 +149,7 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 		case *time.Time:
 			array.AddValue(NewValue(*value))
 		case driver.Valuer:
-			array.AddValue(NewValueFromValuer(value))
+			array.AddValue(NewValue(value))
 		case Raw:
 			array.AddRaw(value)
 		case StatementEncoder:
@@ -316,20 +316,6 @@ func NewValue(value interface{}) Value {
 	return Value{
 		Value: value,
 	}
-}
-
-// NewValueFromValuer returns the underlying valuer value.
-func NewValueFromValuer(valuer driver.Valuer) Value {
-	v, err := valuer.Value()
-	if err != nil {
-		panic("loukoum: was not able to retrieve valuer value")
-	}
-
-	if v == nil {
-		return NewValue(nil)
-	}
-
-	return NewValue(v)
 }
 
 func (Value) expression() {}

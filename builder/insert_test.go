@@ -413,7 +413,7 @@ func TestInsert_Valuer(t *testing.T) {
 			),
 			Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, $3)",
 			NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, :arg_3)",
-			Args:       []interface{}{"tech@ulule.com", true, when},
+			Args:       []interface{}{"tech@ulule.com", true, pq.NullTime{Time: when, Valid: true}},
 		},
 		{
 			Name: "pq.NullTime null",
@@ -425,9 +425,9 @@ func TestInsert_Valuer(t *testing.T) {
 				"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
 				"true, NULL)",
 			),
-			Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NULL)",
-			NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NULL)",
-			Args:       []interface{}{"tech@ulule.com", true},
+			Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, $3)",
+			NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, :arg_3)",
+			Args:       []interface{}{"tech@ulule.com", true, pq.NullTime{}},
 		},
 		{
 			Name: "sql.NullString not null",
@@ -438,7 +438,7 @@ func TestInsert_Valuer(t *testing.T) {
 			String:     "INSERT INTO table (email, comment) VALUES ('tech@ulule.com', 'foobar')",
 			Query:      "INSERT INTO table (email, comment) VALUES ($1, $2)",
 			NamedQuery: "INSERT INTO table (email, comment) VALUES (:arg_1, :arg_2)",
-			Args:       []interface{}{"tech@ulule.com", "foobar"},
+			Args:       []interface{}{"tech@ulule.com", sql.NullString{String: "foobar", Valid: true}},
 		},
 		{
 			Name: "sql.NullString null",
@@ -447,9 +447,9 @@ func TestInsert_Valuer(t *testing.T) {
 				Columns("email", "comment").
 				Values("tech@ulule.com", sql.NullString{}),
 			String:     "INSERT INTO table (email, comment) VALUES ('tech@ulule.com', NULL)",
-			Query:      "INSERT INTO table (email, comment) VALUES ($1, NULL)",
-			NamedQuery: "INSERT INTO table (email, comment) VALUES (:arg_1, NULL)",
-			Args:       []interface{}{"tech@ulule.com"},
+			Query:      "INSERT INTO table (email, comment) VALUES ($1, $2)",
+			NamedQuery: "INSERT INTO table (email, comment) VALUES (:arg_1, :arg_2)",
+			Args:       []interface{}{"tech@ulule.com", sql.NullString{}},
 		},
 		{
 			Name: "sql.NullInt64 not null",
@@ -460,7 +460,7 @@ func TestInsert_Valuer(t *testing.T) {
 			String:     "INSERT INTO table (email, login) VALUES ('tech@ulule.com', 30)",
 			Query:      "INSERT INTO table (email, login) VALUES ($1, $2)",
 			NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, :arg_2)",
-			Args:       []interface{}{"tech@ulule.com", int64(30)},
+			Args:       []interface{}{"tech@ulule.com", sql.NullInt64{Int64: 30, Valid: true}},
 		},
 		{
 			Name: "sql.NullInt64 null",
@@ -469,9 +469,9 @@ func TestInsert_Valuer(t *testing.T) {
 				Columns("email", "login").
 				Values("tech@ulule.com", sql.NullInt64{}),
 			String:     "INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)",
-			Query:      "INSERT INTO table (email, login) VALUES ($1, NULL)",
-			NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, NULL)",
-			Args:       []interface{}{"tech@ulule.com"},
+			Query:      "INSERT INTO table (email, login) VALUES ($1, $2)",
+			NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, :arg_2)",
+			Args:       []interface{}{"tech@ulule.com", sql.NullInt64{}},
 		},
 	})
 }
