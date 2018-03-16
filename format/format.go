@@ -49,7 +49,7 @@ func Value(arg interface{}) string { // nolint: gocyclo
 }
 
 // String formats the given string.
-func String(value string) string { // nolint: errcheck
+func String(value string) string {
 	buffer := &bytes.Buffer{}
 	writeRune(buffer, '\'')
 	for _, char := range value {
