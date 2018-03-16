@@ -6,9 +6,9 @@ import (
 	lk "github.com/ulule/loukoum"
 )
 
-// News model
+// News model.
 type News struct {
-	ID          int64
+	ID          int64       `db:"id"`
 	Status      string      `db:"status"`
 	PublishedAt pq.NullTime `db:"deleted_at"`
 	DeletedAt   pq.NullTime `db:"deleted_at"`
@@ -25,12 +25,13 @@ func PublishNews(db *sqlx.DB, news News) (News, error) {
 		And(lk.Condition("deleted_at").IsNull(true)).
 		Returning("published_at")
 
+	// query: UPDATE news SET published_at = NOW(), status = :arg_1 WHERE ((id = :arg_2) AND (deleted_at IS NULL))
+	//        RETURNING published_at
+	//  args: map[string]interface{}{
+	//            "arg_1": string("published"),
+	//            "arg_2": int64(news.ID),
+	//        }
 	query, args := builder.NamedQuery()
-	// query: UPDATE news SET published_at = NOW(), status = :arg_1 WHERE ((id = :arg_2) AND (deleted_at IS NULL)) RETURNING published_at
-	// args: (map[string]interface {}) (len=2) {
-	//  (string) (len=5) "arg_1": (string) (len=9) "published",
-	//  (string) (len=5) "arg_2": (int) news.ID
-	// }
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
