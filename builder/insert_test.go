@@ -61,6 +61,15 @@ func TestInsert_Values(t *testing.T) {
 			NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW())",
 			Args:       []interface{}{"tech@ulule.com", true},
 		},
+		{
+			Name: "With byte slice",
+			Builder: loukoum.Insert("table").
+				Set(loukoum.Pair("data", []byte{1, 2, 3})),
+			String:     "INSERT INTO table (data) VALUES (decode('010203', 'hex'))",
+			Query:      "INSERT INTO table (data) VALUES ($1)",
+			NamedQuery: "INSERT INTO table (data) VALUES (:arg_1)",
+			Args:       []interface{}{[]byte{1, 2, 3}},
+		},
 	})
 }
 
