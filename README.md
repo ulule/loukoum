@@ -385,6 +385,8 @@ func DeleteUser(db *sqlx.DB, user User) error {
 
 See [examples](examples/named) directory for more information.
 
+> **NOTE:** For `database/sql`, see [standard](examples/standard).
+
 ## Inspiration
 
 * [squirrel](https://github.com/Masterminds/squirrel)
