@@ -225,6 +225,9 @@ func (b Select) Prefix(prefix interface{}) Select {
 }
 
 // String returns the underlying query as a raw statement.
+// This function should be used for debugging since it doesn't escape anything and is completely
+// vulnerable to SQL injection.
+// You should use either NamedQuery() or Query()...
 func (b Select) String() string {
 	var ctx types.RawContext
 	b.query.Write(&ctx)

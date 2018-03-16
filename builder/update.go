@@ -96,6 +96,9 @@ func (b Update) Returning(values ...interface{}) Update {
 }
 
 // String returns the underlying query as a raw statement.
+// This function should be used for debugging since it doesn't escape anything and is completely
+// vulnerable to SQL injection.
+// You should use either NamedQuery() or Query()...
 func (b Update) String() string {
 	var ctx types.RawContext
 	b.query.Write(&ctx)
