@@ -99,6 +99,9 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 		case driver.Valuer:
 			return NewExpression(value)
 
+		case Raw:
+			return NewExpression(value)
+
 		case Select:
 			return NewExpression(value)
 
