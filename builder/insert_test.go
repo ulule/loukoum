@@ -74,6 +74,9 @@ func TestInsert_Values(t *testing.T) {
 				loukoum.Insert("table").
 					Columns("data").
 					Values([]byte{1, 2, 3}),
+				loukoum.Insert("table").
+					Columns("data").
+					Values([][]byte{{1, 2, 3}}),
 			},
 			String:     "INSERT INTO table (data) VALUES (decode('010203', 'hex'))",
 			Query:      "INSERT INTO table (data) VALUES ($1)",

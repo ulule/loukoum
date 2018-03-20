@@ -296,6 +296,10 @@ func toArray(value interface{}) Array { // nolint: gocyclo
 		for _, v := range values {
 			array.Append(v)
 		}
+	case [][]byte:
+		for _, v := range values {
+			array.Append(v)
+		}
 	case []Expression:
 		for _, v := range values {
 			array.Append(v)
