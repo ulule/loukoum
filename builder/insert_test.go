@@ -53,9 +53,14 @@ func TestInsert_Values(t *testing.T) {
 		},
 		{
 			Name: "With raw values",
-			Builder: loukoum.Insert("table").
-				Columns("email", "enabled", "created_at").
-				Values("tech@ulule.com", true, loukoum.Raw("NOW()")),
+			Builders: []builder.Builder{
+				loukoum.Insert("table").
+					Columns("email", "enabled", "created_at").
+					Values("tech@ulule.com", true, loukoum.Raw("NOW()")),
+				loukoum.Insert("table").
+					Columns("email", "enabled", "created_at").
+					Values([]interface{}{"tech@ulule.com", true, loukoum.Raw("NOW()")}),
+			},
 			String:     "INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW())",
 			Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW())",
 			NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW())",
