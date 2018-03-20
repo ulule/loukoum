@@ -593,6 +593,12 @@ func TestSelect_WhereIn(t *testing.T) {
 			Args:       []interface{}{"read"},
 		},
 		{
+			Name: "In Raw",
+			Builder: loukoum.Select("name").From("users").
+				Where(loukoum.Condition("id").In(loukoum.Raw("?"))),
+			SameQuery: "SELECT name FROM users WHERE (id IN (?))",
+		},
+		{
 			Name: "In subquery",
 			Builder: loukoum.
 				Select("id").
