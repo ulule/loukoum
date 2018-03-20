@@ -122,9 +122,7 @@ func (b Insert) Set(args ...interface{}) Insert {
 	pairs := ToSet(args).Pairs
 	columns, expressions := pairs.Values()
 
-	array := stmt.NewArray()
-	array.AddValues(expressions)
-
+	array := stmt.NewArrayExpression(expressions)
 	values := stmt.NewValues(array)
 
 	b.insert.Columns = columns

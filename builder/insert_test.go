@@ -53,13 +53,35 @@ func TestInsert_Values(t *testing.T) {
 		},
 		{
 			Name: "With raw values",
-			Builder: loukoum.Insert("table").
-				Columns("email", "enabled", "created_at").
-				Values("tech@ulule.com", true, loukoum.Raw("NOW()")),
+			Builders: []builder.Builder{
+				loukoum.Insert("table").
+					Columns("email", "enabled", "created_at").
+					Values("tech@ulule.com", true, loukoum.Raw("NOW()")),
+				loukoum.Insert("table").
+					Columns("email", "enabled", "created_at").
+					Values([]interface{}{"tech@ulule.com", true, loukoum.Raw("NOW()")}),
+			},
 			String:     "INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW())",
 			Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW())",
 			NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW())",
 			Args:       []interface{}{"tech@ulule.com", true},
+		},
+		{
+			Name: "With byte slice",
+			Builders: []builder.Builder{
+				loukoum.Insert("table").
+					Set(loukoum.Pair("data", []byte{1, 2, 3})),
+				loukoum.Insert("table").
+					Columns("data").
+					Values([]byte{1, 2, 3}),
+				loukoum.Insert("table").
+					Columns("data").
+					Values([][]byte{{1, 2, 3}}),
+			},
+			String:     "INSERT INTO table (data) VALUES (decode('010203', 'hex'))",
+			Query:      "INSERT INTO table (data) VALUES ($1)",
+			NamedQuery: "INSERT INTO table (data) VALUES (:arg_1)",
+			Args:       []interface{}{[]byte{1, 2, 3}},
 		},
 	})
 }
