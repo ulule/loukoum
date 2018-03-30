@@ -323,6 +323,52 @@ func TestSelect_WhereEqual(t *testing.T) {
 			NamedQuery: "SELECT id FROM table WHERE (disabled != :arg_1)",
 			Args:       []interface{}{false},
 		},
+		{
+			Name: "Equal Subquery",
+			Builder: loukoum.
+				Select("id").
+				From("news").
+				Where(loukoum.Condition("user_id").Equal(
+					loukoum.Select("id").From("users").
+						Where(loukoum.Condition("public_id").Equal("01C9TZXM678JR3GFZE1Y6494G3")),
+				)),
+			String: fmt.Sprint(
+				"SELECT id FROM news WHERE (user_id = (SELECT id FROM users WHERE ",
+				"(public_id = '01C9TZXM678JR3GFZE1Y6494G3')))",
+			),
+			Query: fmt.Sprint(
+				"SELECT id FROM news WHERE (user_id = (SELECT id FROM users WHERE ",
+				"(public_id = $1)))",
+			),
+			NamedQuery: fmt.Sprint(
+				"SELECT id FROM news WHERE (user_id = (SELECT id FROM users WHERE ",
+				"(public_id = :arg_1)))",
+			),
+			Args: []interface{}{"01C9TZXM678JR3GFZE1Y6494G3"},
+		},
+		{
+			Name: "Not Equal Subquery",
+			Builder: loukoum.
+				Select("id").
+				From("news").
+				Where(loukoum.Condition("user_id").NotEqual(
+					loukoum.Select("id").From("users").
+						Where(loukoum.Condition("public_id").Equal("01C9TZXM678JR3GFZE1Y6494G3")),
+				)),
+			String: fmt.Sprint(
+				"SELECT id FROM news WHERE (user_id != (SELECT id FROM users WHERE ",
+				"(public_id = '01C9TZXM678JR3GFZE1Y6494G3')))",
+			),
+			Query: fmt.Sprint(
+				"SELECT id FROM news WHERE (user_id != (SELECT id FROM users WHERE ",
+				"(public_id = $1)))",
+			),
+			NamedQuery: fmt.Sprint(
+				"SELECT id FROM news WHERE (user_id != (SELECT id FROM users WHERE ",
+				"(public_id = :arg_1)))",
+			),
+			Args: []interface{}{"01C9TZXM678JR3GFZE1Y6494G3"},
+		},
 	})
 }
 
@@ -353,7 +399,7 @@ func TestSelect_WhereIs(t *testing.T) {
 func TestSelect_WhereGreaterThan(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{
-			Name: "Greater than 4",
+			Name: "Greater than 2",
 			Builder: loukoum.
 				Select("id").
 				From("table").
@@ -375,12 +421,58 @@ func TestSelect_WhereGreaterThan(t *testing.T) {
 			Args:       []interface{}{4},
 		},
 		{
-			Name: "Greater than raw now",
+			Name: "Greater than or equal to raw now",
 			Builder: loukoum.
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("updated_at").GreaterThanOrEqual(loukoum.Raw("NOW()"))),
 			SameQuery: "SELECT id FROM table WHERE (updated_at >= NOW())",
+		},
+		{
+			Name: "Greater than subquery",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(loukoum.Condition("counter").GreaterThan(
+					loukoum.Select("counter").From("table").
+						Where(loukoum.Condition("id").Equal(6598)),
+				)),
+			String: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter > (SELECT counter FROM table WHERE ",
+				"(id = 6598)))",
+			),
+			Query: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter > (SELECT counter FROM table WHERE ",
+				"(id = $1)))",
+			),
+			NamedQuery: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter > (SELECT counter FROM table WHERE ",
+				"(id = :arg_1)))",
+			),
+			Args: []interface{}{6598},
+		},
+		{
+			Name: "Greater than or equal to subquery",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(loukoum.Condition("counter").GreaterThanOrEqual(
+					loukoum.Select("counter").From("table").
+						Where(loukoum.Condition("id").Equal(6598)),
+				)),
+			String: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter >= (SELECT counter FROM table WHERE ",
+				"(id = 6598)))",
+			),
+			Query: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter >= (SELECT counter FROM table WHERE ",
+				"(id = $1)))",
+			),
+			NamedQuery: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter >= (SELECT counter FROM table WHERE ",
+				"(id = :arg_1)))",
+			),
+			Args: []interface{}{6598},
 		},
 	})
 }
@@ -408,6 +500,60 @@ func TestSelect_WhereLessThan(t *testing.T) {
 			Query:      "SELECT id FROM table WHERE (count <= $1)",
 			NamedQuery: "SELECT id FROM table WHERE (count <= :arg_1)",
 			Args:       []interface{}{6},
+		},
+		{
+			Name: "Less than or equal to raw now",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(loukoum.Condition("updated_at").LessThanOrEqual(loukoum.Raw("NOW()"))),
+			SameQuery: "SELECT id FROM table WHERE (updated_at <= NOW())",
+		},
+		{
+			Name: "Less than subquery",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(loukoum.Condition("counter").LessThan(
+					loukoum.Select("counter").From("table").
+						Where(loukoum.Condition("id").Equal(6598)),
+				)),
+			String: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter < (SELECT counter FROM table WHERE ",
+				"(id = 6598)))",
+			),
+			Query: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter < (SELECT counter FROM table WHERE ",
+				"(id = $1)))",
+			),
+			NamedQuery: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter < (SELECT counter FROM table WHERE ",
+				"(id = :arg_1)))",
+			),
+			Args: []interface{}{6598},
+		},
+		{
+			Name: "Less than or equal to subquery",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(loukoum.Condition("counter").LessThanOrEqual(
+					loukoum.Select("counter").From("table").
+						Where(loukoum.Condition("id").Equal(6598)),
+				)),
+			String: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter <= (SELECT counter FROM table WHERE ",
+				"(id = 6598)))",
+			),
+			Query: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter <= (SELECT counter FROM table WHERE ",
+				"(id = $1)))",
+			),
+			NamedQuery: fmt.Sprint(
+				"SELECT id FROM table WHERE (counter <= (SELECT counter FROM table WHERE ",
+				"(id = :arg_1)))",
+			),
+			Args: []interface{}{6598},
 		},
 	})
 }
