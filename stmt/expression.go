@@ -82,13 +82,13 @@ func (identifier Identifier) IsEmpty() bool {
 // Equal performs an "equal" comparison.
 func (identifier Identifier) Equal(value interface{}) InfixExpression {
 	operator := NewComparisonOperator(types.Equal)
-	return NewInfixExpression(identifier, operator, NewExpression(value))
+	return NewInfixExpression(identifier, operator, NewWrapper(NewExpression(value)))
 }
 
 // NotEqual performs a "not equal" comparison.
 func (identifier Identifier) NotEqual(value interface{}) InfixExpression {
 	operator := NewComparisonOperator(types.NotEqual)
-	return NewInfixExpression(identifier, operator, NewExpression(value))
+	return NewInfixExpression(identifier, operator, NewWrapper(NewExpression(value)))
 }
 
 // Is performs a "is" comparison.
@@ -114,25 +114,25 @@ func (identifier Identifier) IsNull(value bool) InfixExpression {
 // GreaterThan performs a "greater than" comparison.
 func (identifier Identifier) GreaterThan(value interface{}) InfixExpression {
 	operator := NewComparisonOperator(types.GreaterThan)
-	return NewInfixExpression(identifier, operator, NewExpression(value))
+	return NewInfixExpression(identifier, operator, NewWrapper(NewExpression(value)))
 }
 
 // GreaterThanOrEqual performs a "greater than or equal to" comparison.
 func (identifier Identifier) GreaterThanOrEqual(value interface{}) InfixExpression {
 	operator := NewComparisonOperator(types.GreaterThanOrEqual)
-	return NewInfixExpression(identifier, operator, NewExpression(value))
+	return NewInfixExpression(identifier, operator, NewWrapper(NewExpression(value)))
 }
 
 // LessThan performs a "less than" comparison.
 func (identifier Identifier) LessThan(value interface{}) InfixExpression {
 	operator := NewComparisonOperator(types.LessThan)
-	return NewInfixExpression(identifier, operator, NewExpression(value))
+	return NewInfixExpression(identifier, operator, NewWrapper(NewExpression(value)))
 }
 
 // LessThanOrEqual performs a "less than or equal to" comparison.
 func (identifier Identifier) LessThanOrEqual(value interface{}) InfixExpression {
 	operator := NewComparisonOperator(types.LessThanOrEqual)
-	return NewInfixExpression(identifier, operator, NewExpression(value))
+	return NewInfixExpression(identifier, operator, NewWrapper(NewExpression(value)))
 }
 
 // In performs a "in" condition.
