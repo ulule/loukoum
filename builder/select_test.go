@@ -777,6 +777,33 @@ func TestSelect_WhereIn(t *testing.T) {
 	})
 }
 
+func TestSelect_WhereExists(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "Exists",
+			Builder: loukoum.
+				Select("id").
+				From("users").
+				Where(loukoum.Condition("deleted_at").IsNull(true)).
+				And(loukoum.Exists(loukoum.Select("1").From("news").Where(
+					loukoum.Condition("news.created_at").GreaterThan(loukoum.Raw("users.created_at"))),
+				)),
+			String: fmt.Sprint(
+				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
+				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > users.created_at))))",
+			),
+			Query: fmt.Sprint(
+				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
+				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > users.created_at))))",
+			),
+			NamedQuery: fmt.Sprint(
+				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
+				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > users.created_at))))",
+			),
+		},
+	})
+}
+
 func TestSelect_GroupBy(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{
