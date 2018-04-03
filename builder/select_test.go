@@ -774,6 +774,14 @@ func TestSelect_WhereIn(t *testing.T) {
 			NamedQuery: "SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = :arg_1)))",
 			Args:       []interface{}{1},
 		},
+		{
+			Name: "In empty slice",
+			Builder: loukoum.
+				Select("id").From("table").Where(
+				loukoum.Condition("id").In([]int{}),
+			),
+			SameQuery: "SELECT id FROM table WHERE (id IN ())",
+		},
 	})
 }
 
