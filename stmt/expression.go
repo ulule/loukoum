@@ -232,7 +232,7 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 	if len(values) == 1 {
 		return toArray(values[0])
 	}
-	var array Array
+	array := Array{}
 	for _, value := range values {
 		array.Append(value)
 	}
@@ -242,7 +242,11 @@ func NewArrayExpression(values ...interface{}) Expression { // nolint: gocyclo
 // toArray tries to cast the value to a slice.
 // It returns a single element Array otherwise.
 func toArray(value interface{}) Array { // nolint: gocyclo
-	var array Array
+	array := Array{}
+	if value == nil {
+		return array
+	}
+
 	switch values := value.(type) {
 	case []string:
 		for _, v := range values {

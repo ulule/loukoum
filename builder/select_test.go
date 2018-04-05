@@ -782,6 +782,14 @@ func TestSelect_WhereIn(t *testing.T) {
 			),
 			SameQuery: "SELECT id FROM table WHERE (id IN ())",
 		},
+		{
+			Name: "In nil slice",
+			Builder: loukoum.
+				Select("id").From("table").Where(
+				loukoum.Condition("id").In(nil),
+			),
+			SameQuery: "SELECT id FROM table WHERE (id IN ())",
+		},
 	})
 }
 
