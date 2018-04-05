@@ -393,6 +393,10 @@ See [examples](examples/named) directory for more information.
 * [goqu](https://github.com/doug-martin/goqu)
 * [sqlabble](https://github.com/minodisk/sqlabble)
 
+## Thanks
+
+* [Ilia Choly](https://github.com/icholy)
+
 ## License
 
 This is Free Software, released under the [`MIT License`][software-license-url].
