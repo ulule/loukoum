@@ -786,20 +786,21 @@ func TestSelect_WhereExists(t *testing.T) {
 				From("users").
 				Where(loukoum.Condition("deleted_at").IsNull(true)).
 				And(loukoum.Exists(loukoum.Select("1").From("news").Where(
-					loukoum.Condition("news.created_at").GreaterThan(loukoum.Raw("users.created_at"))),
+					loukoum.Condition("news.created_at").GreaterThan(2)),
 				)),
 			String: fmt.Sprint(
 				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
-				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > users.created_at))))",
+				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > 2))))",
 			),
 			Query: fmt.Sprint(
 				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
-				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > users.created_at))))",
+				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > $1))))",
 			),
 			NamedQuery: fmt.Sprint(
 				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
-				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > users.created_at))))",
+				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > :arg_1))))",
 			),
+			Args: []interface{}{2},
 		},
 	})
 }
