@@ -387,6 +387,12 @@ See [examples](examples/named) directory for more information.
 
 > **NOTE:** For `database/sql`, see [standard](examples/standard).
 
+## Migration
+
+### Migrating from v1.x.x
+
+ * Change `Prepare()` to `NamedQuery()` for [builder.Builder](https://github.com/ulule/loukoum/blob/d6ee7eac818ec74889870fa82dff411ea266463b/builder/builder.go#L19) interface.
+
 ## Inspiration
 
 * [squirrel](https://github.com/Masterminds/squirrel)
