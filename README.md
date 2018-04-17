@@ -74,13 +74,15 @@ func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
 		).
 		Returning("id")
 
-	query, args := builder.Prepare()
-	// query: INSERT INTO comments (created_at, email, message, status) VALUES (NOW(), :arg_1, :arg_2, :arg_3) RETURNING id
-	// args: (map[string]interface {}) (len=3) {
-	// (string) (len=5) "arg_1": (string) comment.Email,
-	// (string) (len=5) "arg_2": (string) comment.Message,
-	// (string) (len=5) "arg_3": (string) "waiting"
-	// }
+	// query: INSERT INTO comments (created_at, email, message, status, user_id)
+	//        VALUES (NOW(), :arg_1, :arg_2, :arg_3, :arg_4) RETURNING id
+	//  args: map[string]interface{}{
+	//            "arg_1": string(comment.Email),
+	//            "arg_2": string(comment.Message),
+	//            "arg_3": string("waiting"),
+	//            "arg_4": string(comment.UserID),
+	//        }
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -109,27 +111,32 @@ func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
 			lk.Pair("email", comment.Email),
 			lk.Pair("status", "waiting"),
 			lk.Pair("message", comment.Message),
+			lk.Pair("user_id", comment.UserID),
 			lk.Pair("created_at", lk.Raw("NOW()")),
 		).
 		OnConflict("email", lk.DoUpdate(
 			lk.Pair("message", comment.Message),
+			lk.Pair("user_id", comment.UserID),
 			lk.Pair("status", "waiting"),
 			lk.Pair("created_at", lk.Raw("NOW()")),
 			lk.Pair("deleted_at", nil),
 		)).
-		Returning("id")
+		Returning("id, created_at")
 
-	query, args := builder.Prepare()
-	// query: INSERT INTO comments (created_at, email, message, status) VALUES (
-	//		NOW(), :arg_1, :arg_2, :arg_3
-	// ) ON CONFLICT (email) DO UPDATE SET created_at = NOW(), deleted_at = NULL, message = :arg_4, status = :arg_5 RETURNING id
-	// args: (map[string]interface {}) (len=5) {
-	// (string) (len=5) "arg_1": (string) comment.Email,
-	// (string) (len=5) "arg_2": (string) comment.Message,
-	// (string) (len=5) "arg_3": (string) "waiting",
-	// (string) (len=5) "arg_4": (string) comment.Message,
-	// (string) (len=5) "arg_5": (string) "waiting"
-	// }
+	// query: INSERT INTO comments (created_at, email, message, status, user_id)
+	//        VALUES (NOW(), :arg_1, :arg_2, :arg_3, :arg_4)
+	//        ON CONFLICT (email) DO UPDATE SET created_at = NOW(), deleted_at = NULL, message = :arg_5,
+	//        status = :arg_6, user_id = :arg_7 RETURNING id, created_at
+	//  args: map[string]interface{}{
+	//            "arg_1": string(comment.Email),
+	//            "arg_2": string(comment.Message),
+	//            "arg_3": string("waiting"),
+	//            "arg_4": string(comment.UserID),
+	//            "arg_5": string(comment.Message),
+	//            "arg_6": string("waiting"),
+	//            "arg_7": string(comment.UserID),
+	//        }
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -170,12 +177,13 @@ func PublishNews(db *sqlx.DB, news News) (News, error) {
 		And(lk.Condition("deleted_at").IsNull(true)).
 		Returning("published_at")
 
-	query, args := builder.Prepare()
-	// query: UPDATE news SET published_at = NOW(), status = :arg_1 WHERE ((id = :arg_2) AND (deleted_at IS NULL)) RETURNING published_at
-	// args: (map[string]interface {}) (len=2) {
-	//  (string) (len=5) "arg_1": (string) (len=9) "published",
-	//  (string) (len=5) "arg_2": (int) news.ID
-	// }
+	// query: UPDATE news SET published_at = NOW(), status = :arg_1 WHERE ((id = :arg_2) AND (deleted_at IS NULL))
+	//        RETURNING published_at
+	//  args: map[string]interface{}{
+	//            "arg_1": string("published"),
+	//            "arg_2": int64(news.ID),
+	//        }
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -218,17 +226,19 @@ func FindUsers(db *sqlx.DB) ([]User, error) {
 		From("users").
 		Where(lk.Condition("deleted_at").IsNull(true))
 
-	users := []User{}
-
 	// query: SELECT id, first_name, last_name, email FROM users WHERE (deleted_at IS NULL)
-	// args: map[string]interface{}{}
-	query, args := builder.Prepare()
+	//  args: map[string]interface{}{
+	//
+	//        }
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
+
+	users := []User{}
 
 	err = stmt.Select(&users, args)
 	if err != nil {
@@ -250,13 +260,21 @@ func FindStaffComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 	builder := lk.Select("id", "email", "status", "user_id", "message", "created_at").
 		From("comments").
 		Where(lk.Condition("deleted_at").IsNull(true)).
-		Where(lk.Condition("user_id").In(lk.Select("id").From("users").Where(lk.Condition("is_staff").Is(true))))
+		Where(
+			lk.Condition("user_id").In(
+				lk.Select("id").
+					From("users").
+					Where(lk.Condition("is_staff").Equal(true)),
+			),
+		)
 
-	// query: SELECT id, email, status, user_id, message, created_at FROM comments WHERE ((deleted_at IS NULL) AND (user_id IN (SELECT id FROM users WHERE (is_staff IS :arg_1))))
-	// args: (map[string]interface {}) (len=1) {
-	// (string) (len=5) "arg_1": (bool) true
-	// }
-	query, args := builder.Prepare()
+	// query: SELECT id, email, status, user_id, message, created_at
+	//        FROM comments WHERE ((deleted_at IS NULL) AND
+	//        (user_id IN (SELECT id FROM users WHERE (is_staff = :arg_1))))
+	//  args: map[string]interface{}{
+	//            "arg_1": bool(true),
+	//        }
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -268,7 +286,7 @@ func FindStaffComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 
 	err = stmt.Select(&comments, args)
 	if err != nil {
-		return comments, err
+		return nil, err
 	}
 
 	return comments, nil
@@ -302,15 +320,22 @@ In this scenario we will use an `INNER JOIN` but loukoum also supports `LEFT JOI
 ```go
 // FindComments retrieves comments by users.
 func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
-	builder := lk.Select("id", "email", "status", "user_id", "message", "created_at").
+	builder := lk.
+		Select(
+			"comments.id", "comments.email", "comments.status",
+			"comments.user_id", "comments.message", "comments.created_at",
+		).
 		From("comments").
 		Join(lk.Table("users"), lk.On("comments.user_id", "users.id")).
-		Where(lk.Condition("deleted_at").IsNull(true))
+		Where(lk.Condition("comments.deleted_at").IsNull(true))
 
-	// query: SELECT id, email, status, user_id, message, created_at FROM comments INNER JOIN users ON comments.user_id = users.id WHERE (deleted_at IS NULL)
-	// args: (map[string]interface {}) {
-	// }
-	query, args := builder.Prepare()
+	// query: SELECT comments.id, comments.email, comments.status, comments.user_id, comments.message,
+	//        comments.created_at FROM comments INNER JOIN users ON comments.user_id = users.id
+	//        WHERE (comments.deleted_at IS NULL)
+	//  args: map[string]interface{}{
+	//
+	//        }
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -322,7 +347,7 @@ func FindComments(db *sqlx.DB, comment Comment) ([]Comment, error) {
 
 	err = stmt.Select(&comments, args)
 	if err != nil {
-		return comments, err
+		return nil, err
 	}
 
 	return comments, nil
@@ -339,11 +364,12 @@ func DeleteUser(db *sqlx.DB, user User) error {
 	builder := lk.Delete("users").
 		Where(lk.Condition("id").Equal(user.ID))
 
-	query, args := builder.Prepare()
+
 	// query: DELETE FROM users WHERE (id = :arg_1)
-	// args: (map[string]interface {}) (len=1) {
-	//  (string) (len=5) "arg_1": (int) user.ID
-	// }
+	//  args: map[string]interface{}{
+	//            "arg_1": int64(user.ID),
+	//        }
+	query, args := builder.NamedQuery()
 
 	stmt, err := db.PrepareNamed(query)
 	if err != nil {
@@ -357,13 +383,25 @@ func DeleteUser(db *sqlx.DB, user User) error {
 }
 ```
 
-See [examples](examples) directory for more information.
+See [examples](examples/named) directory for more information.
+
+> **NOTE:** For `database/sql`, see [standard](examples/standard).
+
+## Migration
+
+### Migrating from v1.x.x
+
+ * Change `Prepare()` to `NamedQuery()` for [builder.Builder](https://github.com/ulule/loukoum/blob/d6ee7eac818ec74889870fa82dff411ea266463b/builder/builder.go#L19) interface.
 
 ## Inspiration
 
 * [squirrel](https://github.com/Masterminds/squirrel)
 * [goqu](https://github.com/doug-martin/goqu)
 * [sqlabble](https://github.com/minodisk/sqlabble)
+
+## Thanks
+
+* [Ilia Choly](https://github.com/icholy)
 
 ## License
 

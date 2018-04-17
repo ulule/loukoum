@@ -32,7 +32,7 @@ func NewNotIn(identifier Identifier, value Expression) In {
 func (In) expression() {}
 
 // Write exposes statement as a SQL query.
-func (in In) Write(ctx *types.Context) {
+func (in In) Write(ctx types.Context) {
 	if in.IsEmpty() {
 		panic("loukoum: expression is undefined")
 	}
@@ -42,13 +42,15 @@ func (in In) Write(ctx *types.Context) {
 	ctx.Write(" ")
 	in.Operator.Write(ctx)
 	ctx.Write(" (")
-	in.Value.Write(ctx)
+	if !in.Value.IsEmpty() {
+		in.Value.Write(ctx)
+	}
 	ctx.Write("))")
 }
 
 // IsEmpty returns true if statement is undefined.
 func (in In) IsEmpty() bool {
-	return in.Identifier.IsEmpty() || in.Operator.IsEmpty() || in.Value == nil || in.Value.IsEmpty()
+	return in.Identifier.IsEmpty() || in.Operator.IsEmpty() || in.Value == nil
 }
 
 // And creates a new InfixExpression using given Expression.

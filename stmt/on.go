@@ -20,7 +20,7 @@ func NewOn(left, right Column) On {
 }
 
 // Write exposes statement as a SQL query.
-func (on On) Write(ctx *types.Context) {
+func (on On) Write(ctx types.Context) {
 	ctx.Write(token.On.String())
 	ctx.Write(" ")
 	ctx.Write(on.Left.Name)

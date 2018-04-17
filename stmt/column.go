@@ -51,7 +51,7 @@ func (column Column) Desc() Order {
 }
 
 // Write exposes statement as a SQL query.
-func (column Column) Write(ctx *types.Context) {
+func (column Column) Write(ctx types.Context) {
 	ctx.Write(column.Name)
 	if column.Alias != "" {
 		ctx.Write(" ")

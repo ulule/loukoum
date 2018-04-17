@@ -82,19 +82,27 @@ func (b Delete) Returning(values ...interface{}) Delete {
 }
 
 // String returns the underlying query as a raw statement.
+// This function should be used for debugging since it doesn't escape anything and is completely
+// vulnerable to SQL injection.
+// You should use either NamedQuery() or Query()...
 func (b Delete) String() string {
-	return rawify(b.Prepare())
+	var ctx types.RawContext
+	b.query.Write(&ctx)
+	return ctx.Query()
 }
 
-// Prepare returns the underlying query as a named statement.
-func (b Delete) Prepare() (string, map[string]interface{}) {
-	ctx := types.NewContext()
-	b.query.Write(ctx)
+// NamedQuery returns the underlying query as a named statement.
+func (b Delete) NamedQuery() (string, map[string]interface{}) {
+	var ctx types.NamedContext
+	b.query.Write(&ctx)
+	return ctx.Query(), ctx.Values()
+}
 
-	query := ctx.Query()
-	args := ctx.Values()
-
-	return query, args
+// Query returns the underlying query as a regular statement.
+func (b Delete) Query() (string, []interface{}) {
+	var ctx types.StdContext
+	b.query.Write(&ctx)
+	return ctx.Query(), ctx.Values()
 }
 
 // Statement returns underlying statement.

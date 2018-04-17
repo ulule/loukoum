@@ -20,7 +20,7 @@ func NewSet() Set {
 }
 
 // Write exposes statement as a SQL query.
-func (set Set) Write(ctx *types.Context) {
+func (set Set) Write(ctx types.Context) {
 	ctx.Write(token.Set.String())
 	ctx.Write(" ")
 	set.Pairs.Write(ctx)
@@ -150,7 +150,7 @@ func (pairs PairContainer) Values() ([]Column, []Expression) {
 }
 
 // Write exposes statement as a SQL query.
-func (pairs PairContainer) Write(ctx *types.Context) {
+func (pairs PairContainer) Write(ctx types.Context) {
 	if pairs.IsEmpty() {
 		panic("loukoum: values for SET clause are required")
 	}
@@ -163,7 +163,7 @@ func (pairs PairContainer) Write(ctx *types.Context) {
 }
 
 // WriteAssociative exposes statement as a SQL query using a key-value syntax.
-func (pairs PairContainer) WriteAssociative(ctx *types.Context) {
+func (pairs PairContainer) WriteAssociative(ctx types.Context) {
 	columns, expressions := pairs.Values()
 
 	for i := range columns {
@@ -178,7 +178,7 @@ func (pairs PairContainer) WriteAssociative(ctx *types.Context) {
 }
 
 // WriteArray exposes statement as a SQL query using a column-list syntax.
-func (pairs PairContainer) WriteArray(ctx *types.Context) {
+func (pairs PairContainer) WriteArray(ctx types.Context) {
 	ctx.Write("(")
 	for i := range pairs.Columns {
 		if i != 0 {

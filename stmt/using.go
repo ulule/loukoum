@@ -18,7 +18,7 @@ func NewUsing(tables []Table) Using {
 }
 
 // Write exposes statement as a SQL query.
-func (using Using) Write(ctx *types.Context) {
+func (using Using) Write(ctx types.Context) {
 	if using.IsEmpty() {
 		return
 	}

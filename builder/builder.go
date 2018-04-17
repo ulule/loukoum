@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ulule/loukoum/format"
 	"github.com/ulule/loukoum/stmt"
 	"github.com/ulule/loukoum/types"
 )
@@ -14,22 +13,16 @@ import (
 // Builder defines a generic methods available for Select, Insert, Update and Delete builders.
 type Builder interface {
 	// String returns the underlying query as a raw statement.
+	// This function should be used for debugging since it doesn't escape anything and is completely
+	// vulnerable to SQL injection.
+	// You should use either NamedQuery() or Query()...
 	String() string
-	// Prepare returns the underlying query as a named statement.
-	Prepare() (string, map[string]interface{})
+	// NamedQuery returns the underlying query as a named statement.
+	NamedQuery() (string, map[string]interface{})
+	// Query returns the underlying query as a regular statement.
+	Query() (string, []interface{})
 	// Statement returns underlying statement.
 	Statement() stmt.Statement
-}
-
-// rawify will replace given arguments in query to obtain a human readable statement.
-// Be advised, this function is not optimized, use with caution.
-func rawify(query string, args map[string]interface{}) string {
-	for key, arg := range args {
-		key = fmt.Sprint(":", key)
-		value := format.Value(arg)
-		query = strings.Replace(query, key, value, 1)
-	}
-	return query
 }
 
 // ToColumn takes an empty interfaces and returns a Column instance.
@@ -235,14 +228,14 @@ func MergeSet(set stmt.Set, args []interface{}) stmt.Set {
 			}
 		case map[string]interface{}:
 			for k, v := range value {
-				set.Pairs.Add(ToColumn(k), stmt.NewExpression(v))
+				set.Pairs.Add(ToColumn(k), stmt.NewWrapper(stmt.NewExpression(v)))
 			}
 		case types.Map:
 			for k, v := range value {
-				set.Pairs.Add(ToColumn(k), stmt.NewExpression(v))
+				set.Pairs.Add(ToColumn(k), stmt.NewWrapper(stmt.NewExpression(v)))
 			}
 		case types.Pair:
-			set.Pairs.Add(ToColumn(value.Key), stmt.NewExpression(value.Value))
+			set.Pairs.Add(ToColumn(value.Key), stmt.NewWrapper(stmt.NewExpression(value.Value)))
 		default:
 			panic(fmt.Sprintf("loukoum: cannot use %T as pair", value))
 		}

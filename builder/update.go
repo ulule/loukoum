@@ -96,14 +96,26 @@ func (b Update) Returning(values ...interface{}) Update {
 }
 
 // String returns the underlying query as a raw statement.
+// This function should be used for debugging since it doesn't escape anything and is completely
+// vulnerable to SQL injection.
+// You should use either NamedQuery() or Query()...
 func (b Update) String() string {
-	return rawify(b.Prepare())
+	var ctx types.RawContext
+	b.query.Write(&ctx)
+	return ctx.Query()
 }
 
-// Prepare returns the underlying query as a named statement.
-func (b Update) Prepare() (string, map[string]interface{}) {
-	ctx := types.NewContext()
-	b.query.Write(ctx)
+// NamedQuery returns the underlying query as a named statement.
+func (b Update) NamedQuery() (string, map[string]interface{}) {
+	var ctx types.NamedContext
+	b.query.Write(&ctx)
+	return ctx.Query(), ctx.Values()
+}
+
+// Query returns the underlying query as a regular statement.
+func (b Update) Query() (string, []interface{}) {
+	var ctx types.StdContext
+	b.query.Write(&ctx)
 	return ctx.Query(), ctx.Values()
 }
 

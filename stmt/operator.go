@@ -35,7 +35,7 @@ func NewLogicalOperator(operator types.LogicalOperator) LogicalOperator {
 func (LogicalOperator) operator() {}
 
 // Write exposes statement as a SQL query.
-func (operator LogicalOperator) Write(ctx *types.Context) {
+func (operator LogicalOperator) Write(ctx types.Context) {
 	ctx.Write(operator.Operator.String())
 }
 
@@ -62,7 +62,7 @@ func NewComparisonOperator(operator types.ComparisonOperator) ComparisonOperator
 func (ComparisonOperator) operator() {}
 
 // Write exposes statement as a SQL query.
-func (operator ComparisonOperator) Write(ctx *types.Context) {
+func (operator ComparisonOperator) Write(ctx types.Context) {
 	ctx.Write(operator.Operator.String())
 }
 

@@ -18,7 +18,7 @@ func NewGroupBy(columns []Column) GroupBy {
 }
 
 // Write exposes statement as a SQL query.
-func (group GroupBy) Write(ctx *types.Context) {
+func (group GroupBy) Write(ctx types.Context) {
 	ctx.Write(token.Group.String())
 	ctx.Write(" ")
 	ctx.Write(token.By.String())

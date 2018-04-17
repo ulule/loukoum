@@ -31,7 +31,7 @@ func (table Table) As(alias string) Table {
 }
 
 // Write exposes statement as a SQL query.
-func (table Table) Write(ctx *types.Context) {
+func (table Table) Write(ctx types.Context) {
 	ctx.Write(table.Name)
 	if table.Alias != "" {
 		ctx.Write(" ")

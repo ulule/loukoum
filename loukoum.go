@@ -76,6 +76,11 @@ func Raw(value string) stmt.Raw {
 	return stmt.NewRaw(value)
 }
 
+// Exists is a wrapper to create a new Exists expression.
+func Exists(value interface{}) stmt.Exists {
+	return stmt.NewExists(value)
+}
+
 // Insert starts an InsertBuilder using the given table as into clause.
 func Insert(into interface{}) builder.Insert {
 	return builder.NewInsert().Into(into)
