@@ -1153,6 +1153,62 @@ func TestSelect_Offset(t *testing.T) {
 	})
 }
 
+func TestSelect_With(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "Count",
+			Builder: loukoum.
+				Select("AVG(COUNT)").
+				From("members").
+				With(loukoum.With("members",
+					loukoum.Select("COUNT(*)").
+						From("table").
+						Where(loukoum.Condition("deleted_at").IsNull(true)).
+						GroupBy("group_id"),
+				)),
+			SameQuery: fmt.Sprint(
+				"WITH members AS (SELECT COUNT(*) FROM table WHERE (deleted_at IS NULL) GROUP BY group_id) ",
+				"SELECT AVG(COUNT) FROM members",
+			),
+		},
+		{
+			Name: "Sum",
+			Builder: loukoum.
+				Select("SUM(project.amount_raised - withdrawn.amount)").
+				From("project").
+				Join("withdrawn", loukoum.On("withdrawn.project_id", "project.id"), loukoum.LeftJoin).
+				With(loukoum.With("withdrawn",
+					loukoum.Select("SUM(amount) AS amount", "project_id").
+						From("withdrawal").
+						GroupBy("project_id"),
+				)).
+				Where(loukoum.Condition("project.amount_raised").GreaterThan(0)).
+				Where(loukoum.Condition("project.deleted_at").IsNull(true)).
+				Where(loukoum.Condition("project.amount_raised").GreaterThan(loukoum.Raw("withdrawn.amount"))),
+
+			String: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id WHERE (((project.amount_raised > 0) ",
+				"AND (project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			Query: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id WHERE (((project.amount_raised > $1) ",
+				"AND (project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			NamedQuery: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id WHERE (((project.amount_raised > :arg_1) ",
+				"AND (project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			Args: []interface{}{0},
+		},
+	})
+}
+
 func TestSelect_Extra(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{
