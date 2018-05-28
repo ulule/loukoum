@@ -271,6 +271,8 @@ func handleSelectJoin(args []interface{}) stmt.Join {
 		join = parser.MustParseJoin(value)
 	case stmt.On:
 		join = stmt.NewInnerJoin(table, value)
+	case stmt.InfixExpression:
+		join = stmt.NewInnerJoin(table, value)
 	default:
 		panic(fmt.Sprintf("loukoum: cannot use %T as condition for join clause", args[1]))
 	}

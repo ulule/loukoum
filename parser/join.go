@@ -75,6 +75,65 @@ func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 				right := stmt.NewColumn(e.Value)
 
 				join.Condition = stmt.NewOn(left, right)
+
+				for it.Is(token.And) || it.Is(token.Or) {
+					// We have an AND operator
+					if it.Is(token.And) {
+						e := it.Next()
+						if e.Type != token.And || !it.Is(token.Literal) {
+							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
+							return stmt.Join{}, err
+						}
+
+						// Left condition
+						e = it.Next()
+						left := stmt.NewColumn(e.Value)
+
+						// Check that we have a right condition
+						e = it.Next()
+						if e.Type != token.Equals || !it.Is(token.Literal) {
+							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
+							return stmt.Join{}, err
+						}
+
+						// Right condition
+						e = it.Next()
+						right := stmt.NewColumn(e.Value)
+
+						join.Condition = stmt.NewInfixExpression(
+							join.Condition, stmt.NewAndOperator(), stmt.NewOn(left, right),
+						)
+
+					}
+					// We have an OR operator
+					if it.Is(token.Or) {
+						e := it.Next()
+						if e.Type != token.Or || !it.Is(token.Literal) {
+							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
+							return stmt.Join{}, err
+						}
+
+						// Left condition
+						e = it.Next()
+						left := stmt.NewColumn(e.Value)
+
+						// Check that we have a right condition
+						e = it.Next()
+						if e.Type != token.Equals || !it.Is(token.Literal) {
+							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
+							return stmt.Join{}, err
+						}
+
+						// Right condition
+						e = it.Next()
+						right := stmt.NewColumn(e.Value)
+
+						join.Condition = stmt.NewInfixExpression(
+							join.Condition, stmt.NewOrOperator(), stmt.NewOn(left, right),
+						)
+					}
+				}
+
 				continue
 			}
 

@@ -119,7 +119,7 @@ func TestSelect_Join(t *testing.T) {
 			SameQuery: "SELECT a, b, c FROM test2 RIGHT JOIN test4 ON test4.gid = test2.id",
 		},
 		{
-			Name: "Two",
+			Name: "Two tables",
 			Builders: []builder.Builder{
 				loukoum.
 					Select("a", "b", "c").
@@ -140,6 +140,73 @@ func TestSelect_Join(t *testing.T) {
 			SameQuery: fmt.Sprint(
 				"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
 				"INNER JOIN test3 ON test4.uid = test3.id",
+			),
+		},
+		{
+			Name: "Two tables and two statements",
+			Builders: []builder.Builder{
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join("test4", "test4.gid = test2.id AND test4.d = test2.d").
+					Join("test3", "test4.uid = test3.id AND test3.e = test2.e"),
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join("test4", loukoum.And(loukoum.On("test4.gid", "test2.id"), loukoum.On("test4.d", "test2.d"))).
+					Join("test3", loukoum.And(loukoum.On("test4.uid", "test3.id"), loukoum.On("test3.e", "test2.e"))),
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join(loukoum.Table("test4"),
+						loukoum.On("test4.gid", "test2.id").And(loukoum.On("test4.d", "test2.d")),
+					).
+					Join(loukoum.Table("test3"),
+						loukoum.On("test4.uid", "test3.id").And(loukoum.On("test3.e", "test2.e")),
+					),
+			},
+			SameQuery: fmt.Sprint(
+				"SELECT a, b, c FROM test2 INNER JOIN test4 ON (test4.gid = test2.id AND test4.d = test2.d) ",
+				"INNER JOIN test3 ON (test4.uid = test3.id AND test3.e = test2.e)",
+			),
+		},
+		{
+			Name: "Two tables and three statements",
+			Builders: []builder.Builder{
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join("test4", "test4.gid = test2.id AND test4.d = test2.d OR test4.f = test2.f").
+					Join("test3", "test4.uid = test3.id OR test3.e = test2.e AND test3.g = test2.g"),
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join("test4", loukoum.Or(
+						loukoum.And(loukoum.On("test4.gid", "test2.id"), loukoum.On("test4.d", "test2.d")),
+						loukoum.On("test4.f", "test2.f"),
+					)).
+					Join("test3", loukoum.And(
+						loukoum.Or(loukoum.On("test4.uid", "test3.id"), loukoum.On("test3.e", "test2.e")),
+						loukoum.On("test3.g", "test2.g"),
+					)),
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join(loukoum.Table("test4"),
+						loukoum.On("test4.gid", "test2.id").
+							And(loukoum.On("test4.d", "test2.d")).
+							Or(loukoum.On("test4.f", "test2.f")),
+					).
+					Join(loukoum.Table("test3"),
+						loukoum.On("test4.uid", "test3.id").
+							Or(loukoum.On("test3.e", "test2.e")).
+							And(loukoum.On("test3.g", "test2.g")),
+					),
+			},
+			SameQuery: fmt.Sprint(
+				"SELECT a, b, c FROM test2 ",
+				"INNER JOIN test4 ON ((test4.gid = test2.id AND test4.d = test2.d) OR test4.f = test2.f) ",
+				"INNER JOIN test3 ON ((test4.uid = test3.id OR test3.e = test2.e) AND test3.g = test2.g)",
 			),
 		},
 	})

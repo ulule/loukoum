@@ -19,10 +19,22 @@ func NewOn(left, right Column) On {
 	}
 }
 
+func (On) expression() {}
+
+// And creates a new InfixExpression using given On statement.
+func (on On) And(value On) InfixExpression {
+	operator := NewAndOperator()
+	return NewInfixExpression(on, operator, value)
+}
+
+// Or creates a new InfixExpression using given On statement.
+func (on On) Or(value On) InfixExpression {
+	operator := NewOrOperator()
+	return NewInfixExpression(on, operator, value)
+}
+
 // Write exposes statement as a SQL query.
 func (on On) Write(ctx types.Context) {
-	ctx.Write(token.On.String())
-	ctx.Write(" ")
 	ctx.Write(on.Left.Name)
 	ctx.Write(" ")
 	ctx.Write(token.Equals.String())
@@ -35,5 +47,5 @@ func (on On) IsEmpty() bool {
 	return on.Left.IsEmpty() || on.Right.IsEmpty()
 }
 
-// Ensure that On is a Statement
-var _ Statement = On{}
+// Ensure that On is an Expression
+var _ Expression = On{}
