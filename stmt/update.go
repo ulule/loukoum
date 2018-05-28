@@ -7,6 +7,7 @@ import (
 
 // Update is the UPDATE statement.
 type Update struct {
+	With      With
 	Table     Table
 	Only      bool
 	From      From
@@ -27,6 +28,11 @@ func NewUpdate(table Table) Update {
 func (update Update) Write(ctx types.Context) {
 	if update.IsEmpty() {
 		panic("loukoum: an update statement must have a table and/or values")
+	}
+
+	if !update.With.IsEmpty() {
+		update.With.Write(ctx)
+		ctx.Write(" ")
 	}
 
 	ctx.Write(token.Update.String())

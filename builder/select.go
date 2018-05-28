@@ -114,6 +114,17 @@ func (b Select) join3(args []interface{}) Select {
 	return b
 }
 
+// With adds WITH clauses.
+func (b Select) With(args ...stmt.WithQuery) Select {
+	if !b.query.With.IsEmpty() {
+		panic("loukoum: select builder has with clause already defined")
+	}
+
+	b.query.With = stmt.NewWith(args)
+
+	return b
+}
+
 // Where adds WHERE clauses.
 func (b Select) Where(condition stmt.Expression) Select {
 	if b.query.Where.IsEmpty() {

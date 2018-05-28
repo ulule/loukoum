@@ -67,6 +67,7 @@ const (
 	Conflict  = Type("CONFLICT")
 	Do        = Type("DO")
 	Nothing   = Type("NOTHING")
+	With      = Type("WITH")
 )
 
 // A Token is defined by its type and a value.
@@ -111,6 +112,7 @@ var keywords = map[string]Type{
 	"CONFLICT":  Conflict,
 	"DO":        Do,
 	"NOTHING":   Nothing,
+	"WITH":      With,
 }
 
 // Lookup will try to map a statement to a keyword.
