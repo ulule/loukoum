@@ -8,6 +8,7 @@ import (
 // Select is a SELECT statement.
 type Select struct {
 	Prefix   Prefix
+	With     With
 	Distinct bool
 	Columns  []Column
 	From     From
@@ -40,6 +41,11 @@ func (selekt Select) Write(ctx types.Context) {
 func (selekt Select) writeHead(ctx types.Context) {
 	if !selekt.Prefix.IsEmpty() {
 		selekt.Prefix.Write(ctx)
+		ctx.Write(" ")
+	}
+
+	if !selekt.With.IsEmpty() {
+		selekt.With.Write(ctx)
 		ctx.Write(" ")
 	}
 

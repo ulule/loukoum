@@ -81,6 +81,11 @@ func Exists(value interface{}) stmt.Exists {
 	return stmt.NewExists(value)
 }
 
+// With is a wrapper to create a new WithQuery statement.
+func With(name string, value interface{}) stmt.WithQuery {
+	return stmt.NewWithQuery(name, value)
+}
+
 // Insert starts an InsertBuilder using the given table as into clause.
 func Insert(into interface{}) builder.Insert {
 	return builder.NewInsert().Into(into)

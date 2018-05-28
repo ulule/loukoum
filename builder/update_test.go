@@ -597,3 +597,37 @@ func TestUpdate_Returning(t *testing.T) {
 		},
 	})
 }
+
+func TestUpdate_With(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "Select distinct",
+			Builder: loukoum.
+				Update("users").
+				With(loukoum.With("contributors",
+					loukoum.Select("user_id").Distinct().
+						From("contribution").
+						Where(loukoum.Condition("deleted_at").IsNull(true)),
+				)).
+				Set(loukoum.Pair("newsletter_subscribed", true)).
+				From("contributors").
+				Where(loukoum.Condition("users.id").Equal(loukoum.Raw("contributors.user_id"))),
+			String: fmt.Sprint(
+				"WITH contributors AS (SELECT DISTINCT user_id FROM contribution WHERE (deleted_at IS NULL)) ",
+				"UPDATE users SET newsletter_subscribed = true FROM contributors ",
+				"WHERE (users.id = contributors.user_id)",
+			),
+			Query: fmt.Sprint(
+				"WITH contributors AS (SELECT DISTINCT user_id FROM contribution WHERE (deleted_at IS NULL)) ",
+				"UPDATE users SET newsletter_subscribed = $1 FROM contributors ",
+				"WHERE (users.id = contributors.user_id)",
+			),
+			NamedQuery: fmt.Sprint(
+				"WITH contributors AS (SELECT DISTINCT user_id FROM contribution WHERE (deleted_at IS NULL)) ",
+				"UPDATE users SET newsletter_subscribed = :arg_1 FROM contributors ",
+				"WHERE (users.id = contributors.user_id)",
+			),
+			Args: []interface{}{true},
+		},
+	})
+}
