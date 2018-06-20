@@ -53,12 +53,12 @@ func (b Update) Using(args ...interface{}) Update {
 
 // With adds WITH clauses.
 func (b Update) With(args ...stmt.WithQuery) Update {
-	if !b.query.With.IsEmpty() {
-		panic("loukoum: update builder has with clause already defined")
+	if b.query.With.IsEmpty() {
+		b.query.With = stmt.NewWith(args)
+		return b
 	}
 
-	b.query.With = stmt.NewWith(args)
-
+	b.query.With.Queries = append(b.query.With.Queries, args...)
 	return b
 }
 

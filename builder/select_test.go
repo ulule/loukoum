@@ -1089,7 +1089,7 @@ func TestSelect_Offset(t *testing.T) {
 func TestSelect_With(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{
-			Name: "Count",
+			Name: "Count with simple with statement",
 			Builder: loukoum.
 				Select("AVG(COUNT)").
 				From("members").
@@ -1105,7 +1105,7 @@ func TestSelect_With(t *testing.T) {
 			),
 		},
 		{
-			Name: "Sum",
+			Name: "Sum with simple with statement",
 			Builder: loukoum.
 				Select("SUM(project.amount_raised - withdrawn.amount)").
 				From("project").
@@ -1118,7 +1118,6 @@ func TestSelect_With(t *testing.T) {
 				Where(loukoum.Condition("project.amount_raised").GreaterThan(0)).
 				Where(loukoum.Condition("project.deleted_at").IsNull(true)).
 				Where(loukoum.Condition("project.amount_raised").GreaterThan(loukoum.Raw("withdrawn.amount"))),
-
 			String: fmt.Sprint(
 				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id) ",
 				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
@@ -1138,6 +1137,56 @@ func TestSelect_With(t *testing.T) {
 				"AND (project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
 			),
 			Args: []interface{}{0},
+		},
+		{
+			Name: "Multiple with statement",
+			Builder: loukoum.
+				Select("SUM(project.amount_raised - withdrawn.amount)").
+				From("project").
+				With(loukoum.With("withdrawn",
+					loukoum.Select("SUM(amount) AS amount", "project_id").
+						From("withdrawal").
+						GroupBy("project_id"),
+				)).
+				With(loukoum.With("contributions",
+					loukoum.Select("COUNT(*) AS count", "project_id").
+						From("contribution").
+						GroupBy("project_id"),
+				)).
+				Join("withdrawn", loukoum.On("withdrawn.project_id", "project.id"), loukoum.LeftJoin).
+				Join("contributions", loukoum.On("contributions.project_id", "project.id"), loukoum.LeftJoin).
+				Where(loukoum.Condition("project.amount_raised").GreaterThan(0)).
+				Where(loukoum.Condition("contributions.count").GreaterThan(10)).
+				Where(loukoum.Condition("project.deleted_at").IsNull(true)).
+				Where(loukoum.Condition("project.amount_raised").GreaterThan(loukoum.Raw("withdrawn.amount"))),
+			String: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id), ",
+				"contributions AS (SELECT COUNT(*) AS count, project_id FROM contribution GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id ",
+				"LEFT JOIN contributions ON contributions.project_id = project.id ",
+				"WHERE ((((project.amount_raised > 0) AND (contributions.count > 10)) AND ",
+				"(project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			Query: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id), ",
+				"contributions AS (SELECT COUNT(*) AS count, project_id FROM contribution GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id ",
+				"LEFT JOIN contributions ON contributions.project_id = project.id ",
+				"WHERE ((((project.amount_raised > $1) AND (contributions.count > $2)) AND ",
+				"(project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			NamedQuery: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id), ",
+				"contributions AS (SELECT COUNT(*) AS count, project_id FROM contribution GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id ",
+				"LEFT JOIN contributions ON contributions.project_id = project.id ",
+				"WHERE ((((project.amount_raised > :arg_1) AND (contributions.count > :arg_2)) AND ",
+				"(project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			Args: []interface{}{0, 10},
 		},
 	})
 }
