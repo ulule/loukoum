@@ -601,7 +601,7 @@ func TestUpdate_Returning(t *testing.T) {
 func TestUpdate_With(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{
-			Name: "Select distinct",
+			Name: "Simple with statement with select distinct",
 			Builder: loukoum.
 				Update("users").
 				With(loukoum.With("contributors",
@@ -626,6 +626,46 @@ func TestUpdate_With(t *testing.T) {
 				"WITH contributors AS (SELECT DISTINCT user_id FROM contribution WHERE (deleted_at IS NULL)) ",
 				"UPDATE users SET newsletter_subscribed = :arg_1 FROM contributors ",
 				"WHERE (users.id = contributors.user_id)",
+			),
+			Args: []interface{}{true},
+		},
+		{
+			Name: "Multiple with statements with select distinct",
+			Builder: loukoum.
+				Update("users").
+				With(loukoum.With("contributors",
+					loukoum.Select("user_id").Distinct().
+						From("contribution").
+						Where(loukoum.Condition("deleted_at").IsNull(true)),
+				)).
+				With(loukoum.With("commentators",
+					loukoum.Select("user_id").Distinct().
+						From("comment").
+						Where(loukoum.Condition("deleted_at").IsNull(true)),
+				)).
+				Set(loukoum.Pair("newsletter_subscribed", true)).
+				Where(loukoum.Condition("users.id").In(loukoum.Select("user_id").From("contributors"))).
+				Or(loukoum.Condition("users.id").In(loukoum.Select("user_id").From("commentators"))),
+			String: fmt.Sprint(
+				"WITH contributors AS (SELECT DISTINCT user_id FROM contribution WHERE (deleted_at IS NULL)), ",
+				"commentators AS (SELECT DISTINCT user_id FROM comment WHERE (deleted_at IS NULL)) ",
+				"UPDATE users SET newsletter_subscribed = true ",
+				"WHERE ((users.id IN (SELECT user_id FROM contributors)) ",
+				"OR (users.id IN (SELECT user_id FROM commentators)))",
+			),
+			Query: fmt.Sprint(
+				"WITH contributors AS (SELECT DISTINCT user_id FROM contribution WHERE (deleted_at IS NULL)), ",
+				"commentators AS (SELECT DISTINCT user_id FROM comment WHERE (deleted_at IS NULL)) ",
+				"UPDATE users SET newsletter_subscribed = $1 ",
+				"WHERE ((users.id IN (SELECT user_id FROM contributors)) ",
+				"OR (users.id IN (SELECT user_id FROM commentators)))",
+			),
+			NamedQuery: fmt.Sprint(
+				"WITH contributors AS (SELECT DISTINCT user_id FROM contribution WHERE (deleted_at IS NULL)), ",
+				"commentators AS (SELECT DISTINCT user_id FROM comment WHERE (deleted_at IS NULL)) ",
+				"UPDATE users SET newsletter_subscribed = :arg_1 ",
+				"WHERE ((users.id IN (SELECT user_id FROM contributors)) ",
+				"OR (users.id IN (SELECT user_id FROM commentators)))",
 			),
 			Args: []interface{}{true},
 		},
