@@ -43,8 +43,18 @@ func Table(name string) stmt.Table {
 }
 
 // On is a wrapper to create a new On statement.
-func On(left string, right string) stmt.On {
-	return stmt.NewOn(stmt.NewColumn(left), stmt.NewColumn(right))
+func On(left string, right string) stmt.OnClause {
+	return stmt.NewOnClause(stmt.NewColumn(left), stmt.NewColumn(right))
+}
+
+// AndOn is a wrapper to create a new On statement using an infix expression.
+func AndOn(left stmt.OnExpression, right stmt.OnExpression) stmt.OnExpression {
+	return stmt.NewInfixOnExpression(left, stmt.NewLogicalOperator(types.And), right)
+}
+
+// OrOn is a wrapper to create a new On statement using an infix expression.
+func OrOn(left stmt.OnExpression, right stmt.OnExpression) stmt.OnExpression {
+	return stmt.NewInfixOnExpression(left, stmt.NewLogicalOperator(types.Or), right)
 }
 
 // Condition is a wrapper to create a new Identifier statement.

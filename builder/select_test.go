@@ -153,8 +153,8 @@ func TestSelect_Join(t *testing.T) {
 				loukoum.
 					Select("a", "b", "c").
 					From("test2").
-					Join("test4", loukoum.And(loukoum.On("test4.gid", "test2.id"), loukoum.On("test4.d", "test2.d"))).
-					Join("test3", loukoum.And(loukoum.On("test4.uid", "test3.id"), loukoum.On("test3.e", "test2.e"))),
+					Join("test4", loukoum.AndOn(loukoum.On("test4.gid", "test2.id"), loukoum.On("test4.d", "test2.d"))).
+					Join("test3", loukoum.AndOn(loukoum.On("test4.uid", "test3.id"), loukoum.On("test3.e", "test2.e"))),
 				loukoum.
 					Select("a", "b", "c").
 					From("test2").
@@ -181,12 +181,12 @@ func TestSelect_Join(t *testing.T) {
 				loukoum.
 					Select("a", "b", "c").
 					From("test2").
-					Join("test4", loukoum.Or(
-						loukoum.And(loukoum.On("test4.gid", "test2.id"), loukoum.On("test4.d", "test2.d")),
+					Join("test4", loukoum.OrOn(
+						loukoum.AndOn(loukoum.On("test4.gid", "test2.id"), loukoum.On("test4.d", "test2.d")),
 						loukoum.On("test4.f", "test2.f"),
 					)).
-					Join("test3", loukoum.And(
-						loukoum.Or(loukoum.On("test4.uid", "test3.id"), loukoum.On("test3.e", "test2.e")),
+					Join("test3", loukoum.AndOn(
+						loukoum.OrOn(loukoum.On("test4.uid", "test3.id"), loukoum.On("test3.e", "test2.e")),
 						loukoum.On("test3.g", "test2.g"),
 					)),
 				loukoum.
