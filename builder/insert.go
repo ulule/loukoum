@@ -25,20 +25,7 @@ func (b Insert) Into(into interface{}) Insert {
 		panic("loukoum: insert builder has into clause already defined")
 	}
 
-	switch value := into.(type) {
-	case string:
-		b.insert.Into = stmt.NewInto(stmt.NewTable(value))
-	case stmt.Into:
-		b.insert.Into = value
-	case stmt.Table:
-		b.insert.Into = stmt.NewInto(value)
-	default:
-		panic(fmt.Sprintf("loukoum: cannot use %T as into clause", into))
-	}
-
-	if b.insert.Into.IsEmpty() {
-		panic("loukoum: the given into clause is undefined")
-	}
+	b.insert.Into = ToInto(into)
 
 	return b
 }
