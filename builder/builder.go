@@ -25,6 +25,30 @@ type Builder interface {
 	Statement() stmt.Statement
 }
 
+// IsSelectBuilder returns if given builder is of type "Select"
+func IsSelectBuilder(builder Builder) bool {
+	_, ok := builder.(*Select)
+	return ok
+}
+
+// IsInsertBuilder returns if given builder is of type "Insert"
+func IsInsertBuilder(builder Builder) bool {
+	_, ok := builder.(*Insert)
+	return ok
+}
+
+// IsUpdateBuilder returns if given builder is of type "Insert"
+func IsUpdateBuilder(builder Builder) bool {
+	_, ok := builder.(*Update)
+	return ok
+}
+
+// IsDeleteeBuilder returns if given builder is of type "Insert"
+func IsDeleteeBuilder(builder Builder) bool {
+	_, ok := builder.(*Delete)
+	return ok
+}
+
 // ToColumn takes an empty interfaces and returns a Column instance.
 func ToColumn(arg interface{}) stmt.Column {
 	column := stmt.Column{}
