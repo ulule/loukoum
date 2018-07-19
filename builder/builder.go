@@ -25,6 +25,30 @@ type Builder interface {
 	Statement() stmt.Statement
 }
 
+// IsSelectBuilder returns true if given builder is of type "Select"
+func IsSelectBuilder(builder Builder) bool {
+	_, ok := builder.(*Select)
+	return ok
+}
+
+// IsInsertBuilder returns true if given builder is of type "Insert"
+func IsInsertBuilder(builder Builder) bool {
+	_, ok := builder.(*Insert)
+	return ok
+}
+
+// IsUpdateBuilder returns true if given builder is of type "Insert"
+func IsUpdateBuilder(builder Builder) bool {
+	_, ok := builder.(*Update)
+	return ok
+}
+
+// IsDeleteeBuilder returns true if given builder is of type "Insert"
+func IsDeleteeBuilder(builder Builder) bool {
+	_, ok := builder.(*Delete)
+	return ok
+}
+
 // ToColumn takes an empty interfaces and returns a Column instance.
 func ToColumn(arg interface{}) stmt.Column {
 	column := stmt.Column{}
@@ -143,6 +167,28 @@ func ToFrom(arg interface{}) stmt.From {
 	}
 
 	return from
+}
+
+// ToInto takes an empty interfaces and returns a Into instance.
+func ToInto(arg interface{}) stmt.Into {
+	into := stmt.Into{}
+
+	switch value := arg.(type) {
+	case string:
+		into = stmt.NewInto(stmt.NewTable(value))
+	case stmt.Into:
+		into = value
+	case stmt.Table:
+		into = stmt.NewInto(value)
+	default:
+		panic(fmt.Sprintf("loukoum: cannot use %T as into clause", arg))
+	}
+
+	if into.IsEmpty() {
+		panic("loukoum: given into clause is undefined")
+	}
+
+	return into
 }
 
 // ToSuffix takes an empty interfaces and returns a Suffix instance.

@@ -43,8 +43,8 @@ func TestNextToken(t *testing.T) {
 
 	// Scenario #1: Check EOF on empty source
 	tests = append(tests, LexScenario{
-		``,
-		[]token.Token{
+		Input: ``,
+		Tokens: []token.Token{
 			token.New(token.EOF, ""),
 			token.New(token.EOF, ""),
 			token.New(token.EOF, ""),
@@ -62,10 +62,10 @@ func TestNextToken(t *testing.T) {
 
 	// Scenario #2: A simple SELECT query
 	tests = append(tests, LexScenario{
-		`
+		Input: `
 			SELECT * FROM foobar WHERE id = 2;
 		`,
-		[]token.Token{
+		Tokens: []token.Token{
 			token.New(token.Select, "SELECT"),
 			token.New(token.Asterisk, "*"),
 			token.New(token.From, "FROM"),
@@ -80,10 +80,10 @@ func TestNextToken(t *testing.T) {
 
 	// Scenario #3: Another simple SELECT query with multiples columns
 	tests = append(tests, LexScenario{
-		`
+		Input: `
 			SELECT a,b,c FROM foobar;
 		`,
-		[]token.Token{
+		Tokens: []token.Token{
 			token.New(token.Select, "SELECT"),
 			token.New(token.Literal, "a"),
 			token.New(token.Comma, ","),
@@ -98,10 +98,10 @@ func TestNextToken(t *testing.T) {
 
 	// Scenario #4: Detect if newline is ignored
 	tests = append(tests, LexScenario{
-		`
+		Input: `
 			SELECT a, b, c FROM foobar
 		`,
-		[]token.Token{
+		Tokens: []token.Token{
 			token.New(token.Select, "SELECT"),
 			token.New(token.Literal, "a"),
 			token.New(token.Comma, ","),
@@ -115,8 +115,8 @@ func TestNextToken(t *testing.T) {
 
 	// Scenario #5: Detect if EOF is ignored
 	tests = append(tests, LexScenario{
-		`SELECT a, b, c FROM foobar`,
-		[]token.Token{
+		Input: `SELECT a, b, c FROM foobar`,
+		Tokens: []token.Token{
 			token.New(token.Select, "SELECT"),
 			token.New(token.Literal, "a"),
 			token.New(token.Comma, ","),
@@ -130,8 +130,8 @@ func TestNextToken(t *testing.T) {
 
 	// Scenario #6: A subquery using an INNER JOIN
 	tests = append(tests, LexScenario{
-		`INNER JOIN test2 ON test2.id = test.fk_id`,
-		[]token.Token{
+		Input: `INNER JOIN test2 ON test2.id = test.fk_id`,
+		Tokens: []token.Token{
 			token.New(token.Inner, "INNER"),
 			token.New(token.Join, "JOIN"),
 			token.New(token.Literal, "test2"),
@@ -144,8 +144,8 @@ func TestNextToken(t *testing.T) {
 
 	// Scenario #7: A simple delete query
 	tests = append(tests, LexScenario{
-		`DELETE FROM test2 WHERE id = 5`,
-		[]token.Token{
+		Input: `DELETE FROM test2 WHERE id = 5`,
+		Tokens: []token.Token{
 			token.New(token.Delete, "DELETE"),
 			token.New(token.From, "FROM"),
 			token.New(token.Literal, "test2"),
