@@ -25,25 +25,25 @@ type Builder interface {
 	Statement() stmt.Statement
 }
 
-// IsSelectBuilder returns if given builder is of type "Select"
+// IsSelectBuilder returns true if given builder is of type "Select"
 func IsSelectBuilder(builder Builder) bool {
 	_, ok := builder.(*Select)
 	return ok
 }
 
-// IsInsertBuilder returns if given builder is of type "Insert"
+// IsInsertBuilder returns true if given builder is of type "Insert"
 func IsInsertBuilder(builder Builder) bool {
 	_, ok := builder.(*Insert)
 	return ok
 }
 
-// IsUpdateBuilder returns if given builder is of type "Insert"
+// IsUpdateBuilder returns true if given builder is of type "Insert"
 func IsUpdateBuilder(builder Builder) bool {
 	_, ok := builder.(*Update)
 	return ok
 }
 
-// IsDeleteeBuilder returns if given builder is of type "Insert"
+// IsDeleteeBuilder returns true if given builder is of type "Insert"
 func IsDeleteeBuilder(builder Builder) bool {
 	_, ok := builder.(*Delete)
 	return ok
