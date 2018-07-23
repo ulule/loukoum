@@ -15,7 +15,7 @@ import (
 var ErrSelectInvalidCondition = fmt.Errorf("select condition is invalid")
 
 // Parse will try to parse given query as a statement.
-func parseSelect(it *lexer.Iteratee) (stmt.Select, error) {
+func parseSelect(it *lexer.Iteratee) (stmt.Select, error) { // nolint: gocyclo
 	if !it.Is(token.Select) {
 		return stmt.Select{}, errors.WithStack(ErrSelectInvalidCondition)
 	}
@@ -82,7 +82,7 @@ func parseSelect(it *lexer.Iteratee) (stmt.Select, error) {
 	return query, nil
 }
 
-func parseFrom(it *lexer.Iteratee) (stmt.From, error) {
+func parseFrom(it *lexer.Iteratee) (stmt.From, error) { // nolint: gocyclo
 	if !it.Is(token.From) && !it.Is(token.Literal) && !it.Is(token.Only) {
 		return stmt.From{}, errors.WithStack(ErrSelectInvalidCondition)
 	}
