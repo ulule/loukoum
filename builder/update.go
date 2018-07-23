@@ -51,6 +51,17 @@ func (b Update) Using(args ...interface{}) Update {
 	return b
 }
 
+// With adds WITH clauses.
+func (b Update) With(args ...stmt.WithQuery) Update {
+	if b.query.With.IsEmpty() {
+		b.query.With = stmt.NewWith(args)
+		return b
+	}
+
+	b.query.With.Queries = append(b.query.With.Queries, args...)
+	return b
+}
+
 // Where adds WHERE clauses.
 func (b Update) Where(condition stmt.Expression) Update {
 	if b.query.Where.IsEmpty() {
@@ -100,22 +111,22 @@ func (b Update) Returning(values ...interface{}) Update {
 // vulnerable to SQL injection.
 // You should use either NamedQuery() or Query()...
 func (b Update) String() string {
-	var ctx types.RawContext
-	b.query.Write(&ctx)
+	ctx := &types.RawContext{}
+	b.query.Write(ctx)
 	return ctx.Query()
 }
 
 // NamedQuery returns the underlying query as a named statement.
 func (b Update) NamedQuery() (string, map[string]interface{}) {
-	var ctx types.NamedContext
-	b.query.Write(&ctx)
+	ctx := &types.NamedContext{}
+	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 
 // Query returns the underlying query as a regular statement.
 func (b Update) Query() (string, []interface{}) {
-	var ctx types.StdContext
-	b.query.Write(&ctx)
+	ctx := &types.StdContext{}
+	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 

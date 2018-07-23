@@ -119,7 +119,7 @@ func TestSelect_Join(t *testing.T) {
 			SameQuery: "SELECT a, b, c FROM test2 RIGHT JOIN test4 ON test4.gid = test2.id",
 		},
 		{
-			Name: "Two",
+			Name: "Two tables",
 			Builders: []builder.Builder{
 				loukoum.
 					Select("a", "b", "c").
@@ -140,6 +140,73 @@ func TestSelect_Join(t *testing.T) {
 			SameQuery: fmt.Sprint(
 				"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
 				"INNER JOIN test3 ON test4.uid = test3.id",
+			),
+		},
+		{
+			Name: "Two tables and two statements",
+			Builders: []builder.Builder{
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join("test4", "test4.gid = test2.id AND test4.d = test2.d").
+					Join("test3", "test4.uid = test3.id AND test3.e = test2.e"),
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join("test4", loukoum.AndOn(loukoum.On("test4.gid", "test2.id"), loukoum.On("test4.d", "test2.d"))).
+					Join("test3", loukoum.AndOn(loukoum.On("test4.uid", "test3.id"), loukoum.On("test3.e", "test2.e"))),
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join(loukoum.Table("test4"),
+						loukoum.On("test4.gid", "test2.id").And(loukoum.On("test4.d", "test2.d")),
+					).
+					Join(loukoum.Table("test3"),
+						loukoum.On("test4.uid", "test3.id").And(loukoum.On("test3.e", "test2.e")),
+					),
+			},
+			SameQuery: fmt.Sprint(
+				"SELECT a, b, c FROM test2 INNER JOIN test4 ON (test4.gid = test2.id AND test4.d = test2.d) ",
+				"INNER JOIN test3 ON (test4.uid = test3.id AND test3.e = test2.e)",
+			),
+		},
+		{
+			Name: "Two tables and three statements",
+			Builders: []builder.Builder{
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join("test4", "test4.gid = test2.id AND test4.d = test2.d OR test4.f = test2.f").
+					Join("test3", "test4.uid = test3.id OR test3.e = test2.e AND test3.g = test2.g"),
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join("test4", loukoum.OrOn(
+						loukoum.AndOn(loukoum.On("test4.gid", "test2.id"), loukoum.On("test4.d", "test2.d")),
+						loukoum.On("test4.f", "test2.f"),
+					)).
+					Join("test3", loukoum.AndOn(
+						loukoum.OrOn(loukoum.On("test4.uid", "test3.id"), loukoum.On("test3.e", "test2.e")),
+						loukoum.On("test3.g", "test2.g"),
+					)),
+				loukoum.
+					Select("a", "b", "c").
+					From("test2").
+					Join(loukoum.Table("test4"),
+						loukoum.On("test4.gid", "test2.id").
+							And(loukoum.On("test4.d", "test2.d")).
+							Or(loukoum.On("test4.f", "test2.f")),
+					).
+					Join(loukoum.Table("test3"),
+						loukoum.On("test4.uid", "test3.id").
+							Or(loukoum.On("test3.e", "test2.e")).
+							And(loukoum.On("test3.g", "test2.g")),
+					),
+			},
+			SameQuery: fmt.Sprint(
+				"SELECT a, b, c FROM test2 ",
+				"INNER JOIN test4 ON ((test4.gid = test2.id AND test4.d = test2.d) OR test4.f = test2.f) ",
+				"INNER JOIN test3 ON ((test4.uid = test3.id OR test3.e = test2.e) AND test3.g = test2.g)",
 			),
 		},
 	})
@@ -1082,6 +1149,111 @@ func TestSelect_Offset(t *testing.T) {
 			Failure: func() builder.Builder {
 				return loukoum.Select("name").From("user").Offset(-700)
 			},
+		},
+	})
+}
+
+func TestSelect_With(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "Count with simple with statement",
+			Builder: loukoum.
+				Select("AVG(COUNT)").
+				From("members").
+				With(loukoum.With("members",
+					loukoum.Select("COUNT(*)").
+						From("table").
+						Where(loukoum.Condition("deleted_at").IsNull(true)).
+						GroupBy("group_id"),
+				)),
+			SameQuery: fmt.Sprint(
+				"WITH members AS (SELECT COUNT(*) FROM table WHERE (deleted_at IS NULL) GROUP BY group_id) ",
+				"SELECT AVG(COUNT) FROM members",
+			),
+		},
+		{
+			Name: "Sum with simple with statement",
+			Builder: loukoum.
+				Select("SUM(project.amount_raised - withdrawn.amount)").
+				From("project").
+				Join("withdrawn", loukoum.On("withdrawn.project_id", "project.id"), loukoum.LeftJoin).
+				With(loukoum.With("withdrawn",
+					loukoum.Select("SUM(amount) AS amount", "project_id").
+						From("withdrawal").
+						GroupBy("project_id"),
+				)).
+				Where(loukoum.Condition("project.amount_raised").GreaterThan(0)).
+				Where(loukoum.Condition("project.deleted_at").IsNull(true)).
+				Where(loukoum.Condition("project.amount_raised").GreaterThan(loukoum.Raw("withdrawn.amount"))),
+			String: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id WHERE (((project.amount_raised > 0) ",
+				"AND (project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			Query: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id WHERE (((project.amount_raised > $1) ",
+				"AND (project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			NamedQuery: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id WHERE (((project.amount_raised > :arg_1) ",
+				"AND (project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			Args: []interface{}{0},
+		},
+		{
+			Name: "Multiple with statement",
+			Builder: loukoum.
+				Select("SUM(project.amount_raised - withdrawn.amount)").
+				From("project").
+				With(loukoum.With("withdrawn",
+					loukoum.Select("SUM(amount) AS amount", "project_id").
+						From("withdrawal").
+						GroupBy("project_id"),
+				)).
+				With(loukoum.With("contributions",
+					loukoum.Select("COUNT(*) AS count", "project_id").
+						From("contribution").
+						GroupBy("project_id"),
+				)).
+				Join("withdrawn", loukoum.On("withdrawn.project_id", "project.id"), loukoum.LeftJoin).
+				Join("contributions", loukoum.On("contributions.project_id", "project.id"), loukoum.LeftJoin).
+				Where(loukoum.Condition("project.amount_raised").GreaterThan(0)).
+				Where(loukoum.Condition("contributions.count").GreaterThan(10)).
+				Where(loukoum.Condition("project.deleted_at").IsNull(true)).
+				Where(loukoum.Condition("project.amount_raised").GreaterThan(loukoum.Raw("withdrawn.amount"))),
+			String: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id), ",
+				"contributions AS (SELECT COUNT(*) AS count, project_id FROM contribution GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id ",
+				"LEFT JOIN contributions ON contributions.project_id = project.id ",
+				"WHERE ((((project.amount_raised > 0) AND (contributions.count > 10)) AND ",
+				"(project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			Query: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id), ",
+				"contributions AS (SELECT COUNT(*) AS count, project_id FROM contribution GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id ",
+				"LEFT JOIN contributions ON contributions.project_id = project.id ",
+				"WHERE ((((project.amount_raised > $1) AND (contributions.count > $2)) AND ",
+				"(project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			NamedQuery: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id), ",
+				"contributions AS (SELECT COUNT(*) AS count, project_id FROM contribution GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id ",
+				"LEFT JOIN contributions ON contributions.project_id = project.id ",
+				"WHERE ((((project.amount_raised > :arg_1) AND (contributions.count > :arg_2)) AND ",
+				"(project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			Args: []interface{}{0, 10},
 		},
 	})
 }

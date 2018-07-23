@@ -86,22 +86,22 @@ func (b Delete) Returning(values ...interface{}) Delete {
 // vulnerable to SQL injection.
 // You should use either NamedQuery() or Query()...
 func (b Delete) String() string {
-	var ctx types.RawContext
-	b.query.Write(&ctx)
+	ctx := &types.RawContext{}
+	b.query.Write(ctx)
 	return ctx.Query()
 }
 
 // NamedQuery returns the underlying query as a named statement.
 func (b Delete) NamedQuery() (string, map[string]interface{}) {
-	var ctx types.NamedContext
-	b.query.Write(&ctx)
+	ctx := &types.NamedContext{}
+	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 
 // Query returns the underlying query as a regular statement.
 func (b Delete) Query() (string, []interface{}) {
-	var ctx types.StdContext
-	b.query.Write(&ctx)
+	ctx := &types.StdContext{}
+	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 

@@ -114,6 +114,17 @@ func (b Select) join3(args []interface{}) Select {
 	return b
 }
 
+// With adds WITH clauses.
+func (b Select) With(args ...stmt.WithQuery) Select {
+	if b.query.With.IsEmpty() {
+		b.query.With = stmt.NewWith(args)
+		return b
+	}
+
+	b.query.With.Queries = append(b.query.With.Queries, args...)
+	return b
+}
+
 // Where adds WHERE clauses.
 func (b Select) Where(condition stmt.Expression) Select {
 	if b.query.Where.IsEmpty() {
@@ -229,22 +240,22 @@ func (b Select) Prefix(prefix interface{}) Select {
 // vulnerable to SQL injection.
 // You should use either NamedQuery() or Query()...
 func (b Select) String() string {
-	var ctx types.RawContext
-	b.query.Write(&ctx)
+	ctx := &types.RawContext{}
+	b.query.Write(ctx)
 	return ctx.Query()
 }
 
 // NamedQuery returns the underlying query as a named statement.
 func (b Select) NamedQuery() (string, map[string]interface{}) {
-	var ctx types.NamedContext
-	b.query.Write(&ctx)
+	ctx := &types.NamedContext{}
+	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 
 // Query returns the underlying query as a regular statement.
 func (b Select) Query() (string, []interface{}) {
-	var ctx types.StdContext
-	b.query.Write(&ctx)
+	ctx := &types.StdContext{}
+	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 
@@ -269,7 +280,9 @@ func handleSelectJoin(args []interface{}) stmt.Join {
 	switch value := args[1].(type) {
 	case string:
 		join = parser.MustParseJoin(value)
-	case stmt.On:
+	case stmt.OnClause:
+		join = stmt.NewInnerJoin(table, value)
+	case stmt.InfixOnExpression:
 		join = stmt.NewInnerJoin(table, value)
 	default:
 		panic(fmt.Sprintf("loukoum: cannot use %T as condition for join clause", args[1]))
