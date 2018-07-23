@@ -156,5 +156,22 @@ func TestNextToken(t *testing.T) {
 		},
 	})
 
+	// Scenario #8: A simple update query
+	tests = append(tests, LexScenario{
+		Input: `UPDATE test4 SET enabled = false WHERE status = 'disabled'`,
+		Tokens: []token.Token{
+			token.New(token.Update, "UPDATE"),
+			token.New(token.Literal, "test4"),
+			token.New(token.Set, "SET"),
+			token.New(token.Literal, "enabled"),
+			token.New(token.Equals, "="),
+			token.New(token.Literal, "false"),
+			token.New(token.Where, "WHERE"),
+			token.New(token.Literal, "status"),
+			token.New(token.Equals, "="),
+			token.New(token.Literal, "'disabled'"),
+		},
+	})
+
 	execute(t, tests)
 }

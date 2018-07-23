@@ -25,6 +25,10 @@ func (it Iteratee) Is(next token.Type) bool {
 
 // Next returns the next token.
 func (it *Iteratee) Next() token.Token {
+	if !it.HasNext() {
+		return token.New(token.EOF, "")
+	}
+
 	element := it.list[it.cursor]
 	it.cursor++
 	return element

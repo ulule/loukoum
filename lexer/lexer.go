@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"io"
 
+	"github.com/pkg/errors"
+
 	"github.com/ulule/loukoum/token"
 )
 
@@ -17,7 +19,8 @@ const (
 // A Lexer will return a list of Token from a reader.
 type Lexer struct {
 	input  *bufio.Reader
-	e0, en rune // current/next rune in reader
+	e0, en rune  // current/next rune in reader
+	err    error // error while reading
 }
 
 // New return a new Lexer from given source.
@@ -39,9 +42,7 @@ func (l *Lexer) read() rune {
 	e, _, err := l.input.ReadRune()
 
 	if err != nil && err != io.EOF {
-		//l.error(err.Error())
-		// TODO FIX ME
-		panic(err)
+		l.error(errors.WithStack(err))
 	}
 
 	if err == io.EOF {
@@ -52,6 +53,10 @@ func (l *Lexer) read() rune {
 
 	l.en = e
 	return l.e0
+}
+
+func (l *Lexer) error(err error) {
+	l.err = err
 }
 
 // current return the current rune in reader.
@@ -78,8 +83,16 @@ func (l *Lexer) Iterator() *Iteratee {
 	return &Iteratee{list: list}
 }
 
+// Err will returns the error, if any, that was encountered during reading.
+func (l *Lexer) Err() error {
+	return l.err
+}
+
 // Next will return the next token on reader.
 func (l *Lexer) Next() token.Token {
+	if l.err != nil {
+		return l.getToken(token.Illegal)
+	}
 
 	l.skipWhitespace()
 
@@ -134,11 +147,18 @@ func (l *Lexer) getDelimiterToken() (token.Token, bool) {
 	case ',':
 		return l.getToken(token.Comma), true
 	case ':':
+		if isLetter(l.next()) || isDigit(l.next()) {
+			return l.getEscapedValue(), true
+		}
 		return l.getToken(token.Colon), true
+	case '$':
+		return l.getEscapedValue(), true
 	case '(':
 		return l.getToken(token.LParen), true
 	case ')':
 		return l.getToken(token.RParen), true
+	case '\'':
+		return l.getString(), true
 	default:
 		return token.Token{}, false
 	}
@@ -168,6 +188,32 @@ func (l *Lexer) getIdentifier() token.Token {
 	return t
 }
 
+func (l *Lexer) getString() token.Token {
+	t := token.Token{}
+	v, ok := l.readString()
+
+	t.Value = v
+	t.Type = token.Literal
+	if !ok {
+		t.Type = token.Illegal
+	}
+
+	return t
+}
+
+func (l *Lexer) getEscapedValue() token.Token {
+	t := token.Token{}
+	v, ok := l.readEscapedValue()
+
+	t.Value = v
+	t.Type = token.Literal
+	if !ok {
+		t.Type = token.Illegal
+	}
+
+	return t
+}
+
 func (l *Lexer) skipWhitespace() {
 	for isWhitespace(l.current()) {
 		l.read()
@@ -184,6 +230,86 @@ func (l *Lexer) readIdentifier() (string, bool) {
 	}
 
 	return string(buffer), true
+}
+
+func (l *Lexer) readEscapedValue() (string, bool) {
+
+	buffer := []rune{l.current()}
+	l.read()
+
+	for isLetter(l.current()) || isDigit(l.current()) {
+		buffer = append(buffer, l.current())
+		l.read()
+	}
+
+	return string(buffer), true
+}
+
+func (l *Lexer) readString() (string, bool) {
+
+	buffer := []rune{}
+	failure := false
+
+	l.read()
+	buffer = append(buffer, '\'')
+
+	for l.current() != '\'' && l.current() != '\n' && l.current() != eof {
+
+		s, ok := l.escape('\'')
+		if !ok {
+			failure = true
+		}
+
+		buffer = append(buffer, s)
+		l.read()
+	}
+
+	buffer = append(buffer, '\'')
+	s := string(buffer)
+
+	if l.current() != '\'' {
+		l.error(errors.New("string not terminated"))
+		return "\"" + s, false
+	}
+
+	l.read()
+	return s, !failure
+}
+
+// nolint: gocyclo
+func (l *Lexer) escape(quote rune) (rune, bool) {
+
+	c := l.current()
+	if c != '\\' {
+		return c, true
+	}
+
+	switch l.next() {
+	case 'n':
+		c = '\n'
+	case '\\':
+		c = '\\'
+	case 'a':
+		c = '\a'
+	case 'b':
+		c = '\b'
+	case 'f':
+		c = '\f'
+	case 'r':
+		c = '\r'
+	case 't':
+		c = '\t'
+	case 'v':
+		c = '\v'
+	case quote:
+		c = quote
+	default:
+		l.error(errors.Errorf("unknown escape sequence: \\%s", l.next()))
+		return c, false
+	}
+
+	l.read()
+	return c, true
 }
 
 func isLetter(e rune) bool {
