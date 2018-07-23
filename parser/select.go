@@ -106,7 +106,7 @@ func parseFrom(it *lexer.Iteratee) (stmt.From, error) {
 			if it.Is(token.As) {
 				e = it.Next()
 				if !it.Is(token.Literal) {
-					break
+					return stmt.From{}, errors.WithStack(ErrSelectInvalidCondition)
 				}
 				e = it.Next()
 				alias = strings.TrimSpace(e.Value)
@@ -116,7 +116,7 @@ func parseFrom(it *lexer.Iteratee) (stmt.From, error) {
 			return query, nil
 
 		default:
-			break
+			return stmt.From{}, errors.WithStack(ErrSelectInvalidCondition)
 		}
 	}
 
