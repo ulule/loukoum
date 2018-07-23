@@ -20,10 +20,27 @@ func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 	lexer := lexer.New(strings.NewReader(subquery))
 	it := lexer.Iterator()
 
-	join := stmt.Join{
+	join, err := parseJoin(it, stmt.Join{
 		Type: types.InnerJoin,
+	})
+	if err != nil {
+		return stmt.Join{}, errors.Wrapf(err, "given query cannot be parsed: %s", subquery)
 	}
 
+	return join, nil
+}
+
+// MustParseJoin will execute ParseJoin and panic on error.
+func MustParseJoin(subquery string) stmt.Join {
+	join, err := ParseJoin(subquery)
+	if err != nil {
+		panic(fmt.Sprintf("loukoum: %s", err))
+	}
+	return join
+}
+
+func parseJoin(it *lexer.Iteratee, join stmt.Join) (stmt.Join, error) { // nolint: gocyclo
+	parenIdent := 0
 	for it.HasNext() {
 		e := it.Next()
 
@@ -66,8 +83,7 @@ func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 				// Check that we have a right condition
 				e = it.Next()
 				if e.Type != token.Equals || !it.Is(token.Literal) {
-					err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
-					return stmt.Join{}, err
+					return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
 				}
 
 				// Right condition
@@ -76,13 +92,20 @@ func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 
 				join.Condition = stmt.NewOnClause(left, right)
 
+				for it.Is(token.RParen) {
+					it.Next()
+					parenIdent--
+					if parenIdent < 0 {
+						return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+					}
+				}
+
 				for it.Is(token.And) || it.Is(token.Or) {
 					// We have an AND operator
 					if it.Is(token.And) {
 						e := it.Next()
 						if e.Type != token.And || !it.Is(token.Literal) {
-							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
-							return stmt.Join{}, err
+							return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
 						}
 
 						// Left condition
@@ -92,8 +115,7 @@ func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 						// Check that we have a right condition
 						e = it.Next()
 						if e.Type != token.Equals || !it.Is(token.Literal) {
-							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
-							return stmt.Join{}, err
+							return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
 						}
 
 						// Right condition
@@ -102,13 +124,19 @@ func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 
 						join.Condition = join.Condition.And(stmt.NewOnClause(left, right))
 
+						for it.Is(token.RParen) {
+							it.Next()
+							parenIdent--
+							if parenIdent < 0 {
+								return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+							}
+						}
 					}
 					// We have an OR operator
 					if it.Is(token.Or) {
 						e := it.Next()
 						if e.Type != token.Or || !it.Is(token.Literal) {
-							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
-							return stmt.Join{}, err
+							return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
 						}
 
 						// Left condition
@@ -118,8 +146,7 @@ func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 						// Check that we have a right condition
 						e = it.Next()
 						if e.Type != token.Equals || !it.Is(token.Literal) {
-							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
-							return stmt.Join{}, err
+							return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
 						}
 
 						// Right condition
@@ -127,28 +154,35 @@ func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 						right := stmt.NewColumn(e.Value)
 
 						join.Condition = join.Condition.Or(stmt.NewOnClause(left, right))
+						for it.Is(token.RParen) {
+							it.Next()
+							parenIdent--
+							if parenIdent < 0 {
+								return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+							}
+						}
 					}
 				}
 
-				continue
+				return join, nil
 			}
 
-		case token.On, token.LParen, token.RParen:
+		case token.On:
 			continue
+
+		case token.LParen:
+			parenIdent++
+
+		case token.RParen:
+			parenIdent--
+			if parenIdent < 0 {
+				return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+			}
+
+		default:
+			return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
 		}
-
-		// Ignore invalid token and stop iterating.
-		break
 	}
 
-	return join, nil
-}
-
-// MustParseJoin will execute ParseJoin and panic on error.
-func MustParseJoin(subquery string) stmt.Join {
-	join, err := ParseJoin(subquery)
-	if err != nil {
-		panic(fmt.Sprintf("loukoum: %s", err))
-	}
-	return join
+	return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
 }

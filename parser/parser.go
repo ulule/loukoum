@@ -17,11 +17,11 @@ func Parse(query string) (stmt.Statement, error) { // nolint: gocyclo
 	it := lexer.Iterator()
 
 	if it.Is(token.Select) {
-		st, err := parseSelect(it)
+		q, err := parseSelect(it)
 		if err != nil {
 			return nil, errors.Wrapf(err, "given query cannot be parsed: %s", query)
 		}
-		return st, nil
+		return q, nil
 	}
 
 	for it.HasNext() {
