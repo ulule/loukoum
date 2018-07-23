@@ -37,14 +37,14 @@ func IsInsertBuilder(builder Builder) bool {
 	return ok
 }
 
-// IsUpdateBuilder returns true if given builder is of type "Insert"
+// IsUpdateBuilder returns true if given builder is of type "Update"
 func IsUpdateBuilder(builder Builder) bool {
 	_, ok := builder.(*Update)
 	return ok
 }
 
-// IsDeleteeBuilder returns true if given builder is of type "Insert"
-func IsDeleteeBuilder(builder Builder) bool {
+// IsDeleteBuilder returns true if given builder is of type "Delete"
+func IsDeleteBuilder(builder Builder) bool {
 	_, ok := builder.(*Delete)
 	return ok
 }
