@@ -16,7 +16,7 @@ var ErrAnalyzer = fmt.Errorf("analyze was incomplete")
 // AnalyzerOption defines what should be analyzed while scanning statements.
 type AnalyzerOption struct {
 	// Operation inspects what operation (or command) is performed.
-	// Exemple: INSERT, UPDATE, SELECT, DELETE, etc...
+	// Example: INSERT, UPDATE, SELECT, DELETE, etc...
 	Operation bool
 	// Table inspects what table will handle the given statement.
 	Table bool
@@ -36,7 +36,7 @@ func (o AnalyzerOption) Continue(result AnalyzerResult) bool {
 // AnalyzerResult is the result produces by an analyzer with the given options.
 type AnalyzerResult struct {
 	// Operation defines the operation (or command).
-	// Exemple: INSERT, UPDATE, SELECT, DELETE, etc...
+	// Example: INSERT, UPDATE, SELECT, DELETE, etc...
 	Operation string
 	// Table defines the table of given statement.
 	Table string
