@@ -163,7 +163,7 @@ func parseWhereCondition(it *lexer.Iteratee, name string) (stmt.Expression, erro
 	}
 }
 
-func parseWrappedWhereCondition(it *lexer.Iteratee, level int) (stmt.Expression, error) {
+func parseWrappedWhereCondition(it *lexer.Iteratee, level int) (stmt.Expression, error) { // nolint: gocyclo
 	var conditions stmt.Expression
 	for it.HasNext() {
 		e := it.Next()

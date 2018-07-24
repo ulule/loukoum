@@ -140,7 +140,7 @@ func (l *Lexer) getOperatorToken() (token.Token, bool) {
 	}
 }
 
-func (l *Lexer) getDelimiterToken() (token.Token, bool) {
+func (l *Lexer) getDelimiterToken() (token.Token, bool) { // nolint: gocyclo
 	switch l.current() {
 	case ';':
 		return l.getToken(token.Semicolon), true
