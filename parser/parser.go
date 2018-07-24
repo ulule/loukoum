@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -22,11 +21,6 @@ func Parse(query string) (stmt.Statement, error) { // nolint: gocyclo
 			return nil, errors.Wrapf(err, "given query cannot be parsed: %s", query)
 		}
 		return q, nil
-	}
-
-	for it.HasNext() {
-		e := it.Next()
-		fmt.Println(e)
 	}
 
 	return nil, nil

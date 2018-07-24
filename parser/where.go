@@ -23,8 +23,6 @@ func parseWhere(it *lexer.Iteratee) (stmt.Where, error) { // nolint: gocyclo
 
 	for it.HasNext() {
 		e := it.Next()
-		// TODO Remove debug
-		fmt.Println("::3", e)
 		switch e.Type {
 		case token.Where:
 			continue
@@ -161,7 +159,6 @@ func parseWrappedWhereCondition(it *lexer.Iteratee, level int) (stmt.Expression,
 	var conditions stmt.Expression
 	for it.HasNext() {
 		e := it.Next()
-		fmt.Println("::4", level, e)
 		switch e.Type {
 		case token.LParen:
 

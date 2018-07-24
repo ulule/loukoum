@@ -33,3 +33,11 @@ func (it *Iteratee) Next() token.Token {
 	it.cursor++
 	return element
 }
+
+// Rewind returns to the last token.
+func (it *Iteratee) Rewind() {
+	it.cursor--
+	if it.cursor < 0 {
+		it.cursor = 0
+	}
+}
