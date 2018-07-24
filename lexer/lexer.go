@@ -91,7 +91,7 @@ func (l *Lexer) Err() error {
 // Next will return the next token on reader.
 func (l *Lexer) Next() token.Token {
 	if l.err != nil {
-		return l.getToken(token.Illegal)
+		return l.getToken(token.EOF)
 	}
 
 	l.skipWhitespace()
