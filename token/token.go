@@ -68,6 +68,7 @@ const (
 	Do        = Type("DO")
 	Nothing   = Type("NOTHING")
 	With      = Type("WITH")
+	Recursive = Type("RECURSIVE")
 )
 
 // A Token is defined by its type and a value.
@@ -113,6 +114,7 @@ var keywords = map[string]Type{
 	"DO":        Do,
 	"NOTHING":   Nothing,
 	"WITH":      With,
+	"RECURSIVE": Recursive,
 }
 
 // Lookup will try to map a statement to a keyword.

@@ -23,7 +23,7 @@ type AnalyzerOption struct {
 }
 
 // Continue determines if we should keep scanning statements, or if we have everything we need.
-func (o AnalyzerOption) Continue(result AnalyzerResult) bool {
+func (o AnalyzerOption) Continue(result *AnalyzerResult) bool {
 	if o.Operation && result.Operation == "" {
 		return true
 	}
@@ -43,18 +43,16 @@ type AnalyzerResult struct {
 }
 
 // Analyze will analyzes given query with options.
-func Analyze(query string, option AnalyzerOption) (AnalyzerResult, error) { // nolint: gocyclo
+func Analyze(query string, option AnalyzerOption) (*AnalyzerResult, error) { // nolint: gocyclo
 	lexer := lexer.New(strings.NewReader(query))
 	it := lexer.Iterator()
 
 	mode := token.Illegal
-	result := AnalyzerResult{}
+	result := &AnalyzerResult{}
 
 	if !option.Continue(result) {
 		return result, nil
 	}
-
-	// NOTE (novln): Not working with "WITH" statements...
 
 	for it.HasNext() {
 		e := it.Next()
@@ -155,6 +153,19 @@ func Analyze(query string, option AnalyzerOption) (AnalyzerResult, error) { // n
 				}
 			}
 
+		case token.With:
+			if it.Is(token.Recursive) {
+				it.Next()
+			}
+			if !onAnalyzeWithQuery(it, result) {
+				return onAnalyzeError(query)
+			}
+			for it.Is(token.Comma) {
+				it.Next()
+				if !onAnalyzeWithQuery(it, result) {
+					return onAnalyzeError(query)
+				}
+			}
 		}
 	}
 
@@ -165,6 +176,42 @@ func Analyze(query string, option AnalyzerOption) (AnalyzerResult, error) { // n
 	return result, nil
 }
 
-func onAnalyzeError(query string) (AnalyzerResult, error) {
-	return AnalyzerResult{}, errors.Wrapf(ErrAnalyzer, "parsing error with: %s", query)
+func onAnalyzeError(query string) (*AnalyzerResult, error) {
+	return nil, errors.Wrapf(ErrAnalyzer, "parsing error with: %s", query)
+}
+
+// onAnalyzeWithQuery will consumes current "WITH" query in iteratee.
+func onAnalyzeWithQuery(it *lexer.Iteratee, result *AnalyzerResult) bool {
+	e := it.Next()
+	if e.Type != token.Literal {
+		return false
+	}
+	for it.Is(token.Literal) {
+		it.Next()
+		if it.Is(token.Comma) {
+			it.Next()
+		}
+	}
+	e = it.Next()
+	if e.Type != token.As {
+		return false
+	}
+	e = it.Next()
+	if e.Type != token.LParen {
+		return false
+	}
+	level := 1
+	for it.HasNext() {
+		e = it.Next()
+		if e.Type == token.LParen {
+			level++
+		}
+		if e.Type == token.RParen {
+			level--
+		}
+		if level == 0 {
+			return true
+		}
+	}
+	return level == 0
 }

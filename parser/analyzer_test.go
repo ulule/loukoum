@@ -152,12 +152,67 @@ func TestAnalyze(t *testing.T) {
 				Table:     "table",
 			},
 		},
+		{
+			// Scenario #12
+			Query: fmt.Sprint(
+				"WITH contributors AS (SELECT DISTINCT user_id FROM contribution WHERE (deleted_at IS NULL)) ",
+				"UPDATE users SET newsletter_subscribed = true FROM contributors ",
+				"WHERE (users.id = contributors.user_id)",
+			),
+			Option: parser.AnalyzerOption{
+				Operation: true,
+				Table:     true,
+			},
+			Expected: parser.AnalyzerResult{
+				Operation: "UPDATE",
+				Table:     "users",
+			},
+		},
+		{
+			// Scenario #13
+			Query: fmt.Sprint(
+				"WITH contributors AS (SELECT DISTINCT user_id FROM contribution WHERE (deleted_at IS NULL)), ",
+				"commentators AS (SELECT DISTINCT user_id FROM comment WHERE (deleted_at IS NULL)) ",
+				"UPDATE users SET newsletter_subscribed = true ",
+				"WHERE ((users.id IN (SELECT user_id FROM contributors)) ",
+				"OR (users.id IN (SELECT user_id FROM commentators)))",
+			),
+			Option: parser.AnalyzerOption{
+				Operation: true,
+				Table:     true,
+			},
+			Expected: parser.AnalyzerResult{
+				Operation: "UPDATE",
+				Table:     "users",
+			},
+		},
+		{
+			// Scenario #14
+			Query: fmt.Sprint(
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id), ",
+				"contributions AS (SELECT COUNT(*) AS count, project_id FROM contribution GROUP BY project_id) ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
+				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id ",
+				"LEFT JOIN contributions ON contributions.project_id = project.id ",
+				"WHERE ((((project.amount_raised > 0) AND (contributions.count > 10)) AND ",
+				"(project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+			),
+			Option: parser.AnalyzerOption{
+				Operation: true,
+				Table:     true,
+			},
+			Expected: parser.AnalyzerResult{
+				Operation: "SELECT",
+				Table:     "project",
+			},
+		},
 	}
 
 	for i, scenario := range scenarios {
 		message := fmt.Sprintf("scenario #%d", (i + 1))
 		result, err := parser.Analyze(scenario.Query, scenario.Option)
 		is.NoError(err, message)
-		is.NotEmpty(result, message)
+		is.NotNil(result, message)
+		is.Equal(scenario.Expected, *result, message)
 	}
 }
