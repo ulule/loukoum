@@ -40,10 +40,8 @@ func MustParseJoin(subquery string) stmt.Join {
 }
 
 func parseJoin(it *lexer.Iteratee, join stmt.Join) (stmt.Join, error) { // nolint: gocyclo
-	parenIdent := 0
 	for it.HasNext() {
 		e := it.Next()
-
 		switch e.Type {
 		// Parse join type
 		case token.Join:
@@ -77,112 +75,187 @@ func parseJoin(it *lexer.Iteratee, join stmt.Join) (stmt.Join, error) { // nolin
 			// Parse join condition
 			if it.Is(token.Equals) {
 
-				// Left condition
-				left := stmt.NewColumn(e.Value)
-
-				// Check that we have a right condition
-				e = it.Next()
-				if e.Type != token.Equals || !it.Is(token.Literal) {
-					return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+				condition, err := parseJoinCondition(it, e.Value)
+				if err != nil {
+					return stmt.Join{}, err
 				}
 
-				// Right condition
-				e = it.Next()
-				right := stmt.NewColumn(e.Value)
+				join.Condition = condition
 
-				join.Condition = stmt.NewOnClause(left, right)
-
-				for it.Is(token.RParen) {
-					it.Next()
-					parenIdent--
-					if parenIdent < 0 {
-						return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
-					}
-				}
-
-				for it.Is(token.And) || it.Is(token.Or) {
-					// We have an AND operator
-					if it.Is(token.And) {
-						e := it.Next()
-						if e.Type != token.And || !it.Is(token.Literal) {
-							return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
-						}
-
-						// Left condition
-						e = it.Next()
-						left := stmt.NewColumn(e.Value)
-
-						// Check that we have a right condition
-						e = it.Next()
-						if e.Type != token.Equals || !it.Is(token.Literal) {
-							return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
-						}
-
-						// Right condition
-						e = it.Next()
-						right := stmt.NewColumn(e.Value)
-
-						join.Condition = join.Condition.And(stmt.NewOnClause(left, right))
-
-						for it.Is(token.RParen) {
-							it.Next()
-							parenIdent--
-							if parenIdent < 0 {
-								return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
-							}
-						}
-					}
-					// We have an OR operator
-					if it.Is(token.Or) {
-						e := it.Next()
-						if e.Type != token.Or || !it.Is(token.Literal) {
-							return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
-						}
-
-						// Left condition
-						e = it.Next()
-						left := stmt.NewColumn(e.Value)
-
-						// Check that we have a right condition
-						e = it.Next()
-						if e.Type != token.Equals || !it.Is(token.Literal) {
-							return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
-						}
-
-						// Right condition
-						e = it.Next()
-						right := stmt.NewColumn(e.Value)
-
-						join.Condition = join.Condition.Or(stmt.NewOnClause(left, right))
-						for it.Is(token.RParen) {
-							it.Next()
-							parenIdent--
-							if parenIdent < 0 {
-								return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
-							}
-						}
-					}
-				}
-
-				return join, nil
+				return parseListJoinCondition(it, join)
 			}
 
 		case token.On:
 			continue
 
 		case token.LParen:
-			parenIdent++
+			op, err := parseWrappedJoinCondition(it, 0)
+			if err != nil {
+				return stmt.Join{}, err
+			}
 
-		case token.RParen:
-			parenIdent--
-			if parenIdent < 0 {
+			e = it.Next()
+			if e.Type != token.RParen {
 				return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
 			}
+
+			join.Condition = op
+			return parseListJoinCondition(it, join)
 
 		default:
 			return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
 		}
 	}
 
-	return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+	return join, nil
+}
+
+func parseJoinCondition(it *lexer.Iteratee, name string) (stmt.OnClause, error) {
+	name = strings.TrimSpace(name)
+	if !it.HasNext() {
+		return stmt.OnClause{}, errors.WithStack(ErrJoinInvalidCondition)
+	}
+
+	// Left condition
+	left := stmt.NewColumn(name)
+
+	// Check that we have a right condition
+	e := it.Next()
+	if e.Type != token.Equals || !it.Is(token.Literal) {
+		return stmt.OnClause{}, errors.WithStack(ErrJoinInvalidCondition)
+	}
+
+	// Right condition
+	e = it.Next()
+	right := stmt.NewColumn(e.Value)
+
+	condition := stmt.NewOnClause(left, right)
+	return condition, nil
+}
+
+func parseWrappedJoinCondition(it *lexer.Iteratee, level int) (stmt.OnExpression, error) { // nolint: gocyclo
+	var conditions stmt.OnExpression
+	for it.HasNext() {
+		e := it.Next()
+		switch e.Type {
+		case token.LParen:
+
+			val, err := parseWrappedJoinCondition(it, level+1)
+			if err != nil {
+				return nil, err
+			}
+			if !it.Is(token.RParen) {
+				return nil, errors.WithStack(ErrJoinInvalidCondition)
+			}
+
+			it.Next()
+			if conditions == nil {
+				conditions = val
+			}
+			if it.Is(token.RParen) {
+				return conditions, nil
+			}
+
+		case token.Or:
+			if !it.Is(token.LParen) && !it.Is(token.Literal) {
+				return nil, errors.WithStack(ErrJoinInvalidCondition)
+			}
+
+			right, err := parseWrappedJoinCondition(it, level+1)
+			if err != nil {
+				return nil, err
+			}
+
+			left := conditions
+			operator := stmt.NewOrOperator()
+			conditions = stmt.NewInfixOnExpression(left, operator, right)
+
+			if it.Is(token.RParen) {
+				return conditions, nil
+			}
+
+		case token.And:
+			if !it.Is(token.LParen) && !it.Is(token.Literal) {
+				return nil, errors.WithStack(ErrJoinInvalidCondition)
+			}
+
+			right, err := parseWrappedJoinCondition(it, level+1)
+			if err != nil {
+				return nil, err
+			}
+
+			left := conditions
+			operator := stmt.NewAndOperator()
+			conditions = stmt.NewInfixOnExpression(left, operator, right)
+
+			if it.Is(token.RParen) {
+				return conditions, nil
+			}
+
+		case token.Literal:
+			val, err := parseJoinCondition(it, e.Value)
+			if err != nil {
+				return nil, err
+			}
+			if conditions == nil {
+				conditions = val
+			}
+			if it.Is(token.RParen) {
+				return conditions, nil
+			}
+		}
+	}
+	return nil, errors.WithStack(ErrJoinInvalidCondition)
+}
+
+func parseListJoinCondition(it *lexer.Iteratee, join stmt.Join) (stmt.Join, error) { // nolint: gocyclo
+	for it.Is(token.And) || it.Is(token.Or) {
+		// We have an AND operator
+		if it.Is(token.And) {
+			e := it.Next()
+			if e.Type != token.And || !it.HasNext() {
+				return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+			}
+			e = it.Next()
+			if e.Type == token.Literal {
+				condition, err := parseJoinCondition(it, e.Value)
+				if err != nil {
+					return stmt.Join{}, err
+				}
+				join.Condition = join.Condition.And(condition)
+			} else if e.Type == token.LParen {
+				conditions, err := parseWrappedJoinCondition(it, 0)
+				if err != nil {
+					return stmt.Join{}, err
+				}
+				join.Condition = join.Condition.And(conditions)
+			} else {
+				return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+			}
+		}
+		// We have an OR operator
+		if it.Is(token.Or) {
+			e := it.Next()
+			if e.Type != token.Or || !it.HasNext() {
+				return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+			}
+			e = it.Next()
+			if e.Type == token.Literal {
+				condition, err := parseJoinCondition(it, e.Value)
+				if err != nil {
+					return stmt.Join{}, err
+				}
+				join.Condition = join.Condition.Or(condition)
+			} else if e.Type == token.LParen {
+				conditions, err := parseWrappedJoinCondition(it, 0)
+				if err != nil {
+					return stmt.Join{}, err
+				}
+				join.Condition = join.Condition.Or(conditions)
+			} else {
+				return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+			}
+		}
+	}
+	return join, nil
 }

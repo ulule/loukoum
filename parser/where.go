@@ -118,16 +118,10 @@ func parseWhere(it *lexer.Iteratee) (stmt.Where, error) { // nolint: gocyclo
 			}
 
 			query.Condition = op
-			e = it.Next()
-			if e.Type == token.EOF {
+			if !it.HasNext() {
+				// TODO Fix
 				return query, nil
 			}
-
-		case token.RParen:
-			return stmt.Where{}, errors.WithStack(ErrWhereInvalidCondition)
-
-		case token.EOF:
-			return query, nil
 
 		default:
 			return stmt.Where{}, errors.WithStack(ErrWhereInvalidCondition)
