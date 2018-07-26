@@ -37,6 +37,7 @@ func parseFrom(it *lexer.Iteratee) (stmt.From, error) { // nolint: gocyclo
 
 			if it.Is(token.As) {
 				e = it.Next()
+				// We expect a litteral after to define table alias.
 				if !it.Is(token.Literal) {
 					return stmt.From{}, errors.WithStack(ErrFromInvalidCondition)
 				}
