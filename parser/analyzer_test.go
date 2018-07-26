@@ -224,6 +224,51 @@ func TestAnalyze(t *testing.T) {
 		{
 			// Scenario #16
 			Query: fmt.Sprint(
+				"DELETE FROM table\n",
+				"WHERE id = 1",
+			),
+			Option: parser.AnalyzerOption{
+				Operation: true,
+				Table:     true,
+			},
+			Expected: parser.AnalyzerResult{
+				Operation: "DELETE",
+				Table:     "table",
+			},
+		},
+		{
+			// Scenario #17
+			Query: fmt.Sprint(
+				"INSERT INTO table (email, enabled, created_at)\n",
+				"VALUES ('tech@ulule.com', true, NOW())",
+			),
+			Option: parser.AnalyzerOption{
+				Operation: true,
+				Table:     true,
+			},
+			Expected: parser.AnalyzerResult{
+				Operation: "INSERT",
+				Table:     "table",
+			},
+		},
+		{
+			// Scenario #18
+			Query: fmt.Sprint(
+				"UPDATE table\n",
+				"SET a = 1, foo = 2",
+			),
+			Option: parser.AnalyzerOption{
+				Operation: true,
+				Table:     true,
+			},
+			Expected: parser.AnalyzerResult{
+				Operation: "UPDATE",
+				Table:     "table",
+			},
+		},
+		{
+			// Scenario #19
+			Query: fmt.Sprint(
 				"SELECT f.a, f.b, f.c FROM foobar f",
 			),
 			Option: parser.AnalyzerOption{
