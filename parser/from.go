@@ -43,6 +43,10 @@ func parseFrom(it *lexer.Iteratee) (stmt.From, error) { // nolint: gocyclo
 				e = it.Next()
 				alias = strings.TrimSpace(e.Value)
 			}
+			if it.Is(token.Literal) {
+				e = it.Next()
+				alias = strings.TrimSpace(e.Value)
+			}
 
 			query.Table = stmt.NewTableAlias(table, alias)
 			return query, nil

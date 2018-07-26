@@ -206,6 +206,35 @@ func TestAnalyze(t *testing.T) {
 				Table:     "project",
 			},
 		},
+		{
+			// Scenario #15
+			Query: fmt.Sprint(
+				"SELECT a, b, c \n",
+				"FROM foobar",
+			),
+			Option: parser.AnalyzerOption{
+				Operation: true,
+				Table:     true,
+			},
+			Expected: parser.AnalyzerResult{
+				Operation: "SELECT",
+				Table:     "foobar",
+			},
+		},
+		{
+			// Scenario #16
+			Query: fmt.Sprint(
+				"SELECT f.a, f.b, f.c FROM foobar f",
+			),
+			Option: parser.AnalyzerOption{
+				Operation: true,
+				Table:     true,
+			},
+			Expected: parser.AnalyzerResult{
+				Operation: "SELECT",
+				Table:     "foobar",
+			},
+		},
 	}
 
 	for i, scenario := range scenarios {
