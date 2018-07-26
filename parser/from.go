@@ -40,8 +40,6 @@ func parseFrom(it *lexer.Iteratee) (stmt.From, error) { // nolint: gocyclo
 				if !it.Is(token.Literal) {
 					return stmt.From{}, errors.WithStack(ErrFromInvalidCondition)
 				}
-				e = it.Next()
-				alias = strings.TrimSpace(e.Value)
 			}
 			if it.Is(token.Literal) {
 				e = it.Next()
