@@ -280,6 +280,21 @@ func TestAnalyze(t *testing.T) {
 				Table:     "foobar",
 			},
 		},
+		{
+			// Scenario #20
+			Query: fmt.Sprint(
+				"SELECT profile.id, profile.user_id, ",
+				"FROM \"profile\"  WHERE (\"user_id\" IN ($1))",
+			),
+			Option: parser.AnalyzerOption{
+				Operation: true,
+				Table:     true,
+			},
+			Expected: parser.AnalyzerResult{
+				Operation: "SELECT",
+				Table:     "profile",
+			},
+		},
 	}
 
 	for i, scenario := range scenarios {

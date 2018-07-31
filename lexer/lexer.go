@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 
 	"github.com/pkg/errors"
@@ -157,11 +158,40 @@ func (l *Lexer) getDelimiterToken() (token.Token, bool) { // nolint: gocyclo
 		return l.getToken(token.LParen), true
 	case ')':
 		return l.getToken(token.RParen), true
+	case '"':
+		return l.unwrapDelimiter('"', l.getIdentifier), true
 	case '\'':
 		return l.getString(), true
 	default:
 		return token.Token{}, false
 	}
+}
+
+func (l *Lexer) unwrapDelimiter(delimiter rune, handler func() token.Token) token.Token {
+	if l.current() != delimiter {
+		l.error(errors.Errorf("identifier not started by %c", delimiter))
+		return token.Token{
+			Type:  token.Illegal,
+			Value: fmt.Sprintf("%c", l.current()),
+		}
+	}
+
+	l.read()
+	t := handler()
+	if t.Type == token.Illegal {
+		return t
+	}
+
+	if l.current() != delimiter {
+		l.error(errors.New("identifier not terminated"))
+		return token.Token{
+			Type:  token.Illegal,
+			Value: fmt.Sprintf("%c", l.current()),
+		}
+	}
+
+	l.read()
+	return t
 }
 
 func (l *Lexer) getDefaultToken() token.Token {
