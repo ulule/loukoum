@@ -860,10 +860,10 @@ func TestSelect_WhereIn(t *testing.T) {
 	})
 }
 
-func TestSelect_WhereExists(t *testing.T) {
+func TestSelect_Exists(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{
-			Name: "Exists",
+			Name: "Where clause",
 			Builder: loukoum.
 				Select("id").
 				From("users").
@@ -885,6 +885,12 @@ func TestSelect_WhereExists(t *testing.T) {
 			),
 			Args: []interface{}{2},
 		},
+		// TODO (novln): Implement this use case.
+		// {
+		// 	Name:      "Column clause",
+		// 	Builder:   loukoum.Select(loukoum.Exists(loukoum.Select("1"))),
+		// 	SameQuery: "SELECT EXISTS (SELECT 1)",
+		// },
 	})
 }
 
