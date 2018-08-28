@@ -13,6 +13,10 @@ const (
 	LeftJoin = types.LeftJoin
 	// RightJoin is used for "RIGHT JOIN" in join statement.
 	RightJoin = types.RightJoin
+	// LeftOuterJoin is used for "LEFT OUTER JOIN" in join statement.
+	LeftOuterJoin = types.LeftOuterJoin
+	// RightOuterJoin is used for "RIGHT OUTER JOIN" in join statement.
+	RightOuterJoin = types.RightOuterJoin
 	// Asc is used for "ORDER BY" statement.
 	Asc = types.Asc
 	// Desc is used for "ORDER BY" statement.
