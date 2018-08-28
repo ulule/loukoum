@@ -15,4 +15,8 @@ const (
 	LeftJoin = JoinType("LEFT JOIN")
 	// RightJoin has a "RIGHT JOIN" type.
 	RightJoin = JoinType("RIGHT JOIN")
+	// LeftOuterJoin has a "LEFT OUTER JOIN" type.
+	LeftOuterJoin = JoinType("LEFT OUTER JOIN")
+	// RightOuterJoin has a "RIGHT OUTER JOIN" type.
+	RightOuterJoin = JoinType("RIGHT OUTER JOIN")
 )

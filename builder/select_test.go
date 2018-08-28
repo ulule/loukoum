@@ -119,6 +119,22 @@ func TestSelect_Join(t *testing.T) {
 			SameQuery: "SELECT a, b, c FROM test2 RIGHT JOIN test4 ON test4.gid = test2.id",
 		},
 		{
+			Name: "Left Outer",
+			Builder: loukoum.
+				Select("a", "b", "c").
+				From("test1").
+				Join("test3", "test3.fkey = test1.id", loukoum.LeftOuterJoin),
+			SameQuery: "SELECT a, b, c FROM test1 LEFT OUTER JOIN test3 ON test3.fkey = test1.id",
+		},
+		{
+			Name: "Right Outer",
+			Builder: loukoum.
+				Select("a", "b", "c").
+				From("test1").
+				Join("test3", "test3.fkey = test1.id", loukoum.RightOuterJoin),
+			SameQuery: "SELECT a, b, c FROM test1 RIGHT OUTER JOIN test3 ON test3.fkey = test1.id",
+		},
+		{
 			Name: "Two tables",
 			Builders: []builder.Builder{
 				loukoum.
