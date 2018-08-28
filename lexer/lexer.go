@@ -172,7 +172,7 @@ func (l *Lexer) unwrapDelimiter(delimiter rune, handler func() token.Token) toke
 		l.error(errors.Errorf("identifier not started by %c", delimiter))
 		return token.Token{
 			Type:  token.Illegal,
-			Value: fmt.Sprintf("%c", l.current()),
+			Value: string(l.current()),
 		}
 	}
 
