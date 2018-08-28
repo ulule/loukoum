@@ -57,6 +57,34 @@ func TestParseJoin(t *testing.T) {
 		is.Equal("test.group_id", on.Right.Name)
 		is.Empty(on.Right.Alias)
 	}
+	{
+		query, err := parser.ParseJoin("LEFT OUTER JOIN project AS p1 ON (user.id = project.user_id)")
+		is.NoError(err)
+		is.Equal(types.LeftOuterJoin, query.Type)
+		is.Equal("project", query.Table.Name)
+		is.Equal("p1", query.Table.Alias)
+		on, ok := query.Condition.(stmt.OnClause)
+		is.True(ok)
+		is.NotEmpty(on)
+		is.Equal("user.id", on.Left.Name)
+		is.Empty(on.Left.Alias)
+		is.Equal("project.user_id", on.Right.Name)
+		is.Empty(on.Right.Alias)
+	}
+	{
+		query, err := parser.ParseJoin("RIGHT OUTER JOIN foobar As f1 ON (foobar.group_id = test.group_id);")
+		is.NoError(err)
+		is.Equal(types.RightOuterJoin, query.Type)
+		is.Equal("foobar", query.Table.Name)
+		is.Equal("f1", query.Table.Alias)
+		on, ok := query.Condition.(stmt.OnClause)
+		is.True(ok)
+		is.NotEmpty(on)
+		is.Equal("foobar.group_id", on.Left.Name)
+		is.Empty(on.Left.Alias)
+		is.Equal("test.group_id", on.Right.Name)
+		is.Empty(on.Right.Alias)
+	}
 
 	// Partials
 	{
@@ -181,6 +209,30 @@ func TestParseJoin(t *testing.T) {
 	// Invalid
 	{
 		query, err := parser.ParseJoin("INNER JOIN account ON (project.account_id = *)")
+		is.Error(err)
+		is.Equal(parser.ErrJoinInvalidCondition, errors.Cause(err))
+		is.Zero(query)
+	}
+	{
+		query, err := parser.ParseJoin("LEFT OUTER account ON (project.account_id = account.id)")
+		is.Error(err)
+		is.Equal(parser.ErrJoinInvalidCondition, errors.Cause(err))
+		is.Zero(query)
+	}
+	{
+		query, err := parser.ParseJoin("RIGHT OUTER account ON (project.account_id = account.id)")
+		is.Error(err)
+		is.Equal(parser.ErrJoinInvalidCondition, errors.Cause(err))
+		is.Zero(query)
+	}
+	{
+		query, err := parser.ParseJoin("LEFT OUTER account AS a1 (project.account_id = account.id)")
+		is.Error(err)
+		is.Equal(parser.ErrJoinInvalidCondition, errors.Cause(err))
+		is.Zero(query)
+	}
+	{
+		query, err := parser.ParseJoin("RIGHT OUTER account AS a1 (project.account_id = account.id)")
 		is.Error(err)
 		is.Equal(parser.ErrJoinInvalidCondition, errors.Cause(err))
 		is.Zero(query)

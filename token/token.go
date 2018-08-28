@@ -50,6 +50,7 @@ const (
 	As        = Type("AS")
 	Inner     = Type("INNER")
 	Cross     = Type("CROSS")
+	Outer     = Type("OUTER")
 	Left      = Type("LEFT")
 	Right     = Type("RIGHT")
 	Join      = Type("JOIN")
@@ -96,6 +97,7 @@ var keywords = map[string]Type{
 	"AS":        As,
 	"INNER":     Inner,
 	"CROSS":     Cross,
+	"OUTER":     Outer,
 	"LEFT":      Left,
 	"RIGHT":     Right,
 	"JOIN":      Join,

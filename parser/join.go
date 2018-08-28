@@ -58,10 +58,28 @@ func parseJoin(it *lexer.Iteratee, join stmt.Join) (stmt.Join, error) { // nolin
 				join.Type = types.LeftJoin
 				continue
 			}
+			if it.Is(token.Outer) {
+				e = it.Next()
+				if !it.Is(token.Join) {
+					return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+				}
+				e = it.Next()
+				join.Type = types.LeftOuterJoin
+				continue
+			}
 		case token.Right:
 			if it.Is(token.Join) {
 				it.Next()
 				join.Type = types.RightJoin
+				continue
+			}
+			if it.Is(token.Outer) {
+				e = it.Next()
+				if !it.Is(token.Join) {
+					return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+				}
+				e = it.Next()
+				join.Type = types.RightOuterJoin
 				continue
 			}
 		case token.Literal:
@@ -69,6 +87,22 @@ func parseJoin(it *lexer.Iteratee, join stmt.Join) (stmt.Join, error) { // nolin
 			if it.Is(token.On) {
 				it.Next()
 				join.Table = stmt.NewTable(e.Value)
+				continue
+			}
+
+			// Parse join table with alias
+			if it.Is(token.As) {
+				t := e
+				it.Next()
+				if !it.Is(token.Literal) {
+					return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+				}
+				a := it.Next()
+				if !it.Is(token.On) {
+					return stmt.Join{}, errors.WithStack(ErrJoinInvalidCondition)
+				}
+				it.Next()
+				join.Table = stmt.NewTableAlias(t.Value, a.Value)
 				continue
 			}
 
