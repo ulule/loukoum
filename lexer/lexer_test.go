@@ -173,5 +173,20 @@ func TestNextToken(t *testing.T) {
 		},
 	})
 
+	// Scenario #9: A query with identifier in quote
+	tests = append(tests, LexScenario{
+		Input: `SELECT id FROM "test2" WHERE "status" = 'disabled'`,
+		Tokens: []token.Token{
+			token.New(token.Select, "SELECT"),
+			token.New(token.Literal, "id"),
+			token.New(token.From, "FROM"),
+			token.New(token.Literal, "test2"),
+			token.New(token.Where, "WHERE"),
+			token.New(token.Literal, "status"),
+			token.New(token.Equals, "="),
+			token.New(token.Literal, "'disabled'"),
+		},
+	})
+
 	execute(t, tests)
 }
