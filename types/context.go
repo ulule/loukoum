@@ -1,8 +1,8 @@
 package types
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/ulule/loukoum/format"
 )
@@ -15,7 +15,7 @@ type Context interface {
 
 // RawContext embeds values directly in the query.
 type RawContext struct {
-	buffer bytes.Buffer
+	buffer strings.Builder
 }
 
 // Write appends given subquery in context's buffer.

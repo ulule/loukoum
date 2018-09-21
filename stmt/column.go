@@ -66,5 +66,7 @@ func (column Column) IsEmpty() bool {
 	return column.Name == ""
 }
 
-// Ensure that Column is a Statement
-var _ Statement = Column{}
+func (Column) selectExpression() {}
+
+// Ensure that Column is a SelectExpression.
+var _ SelectExpression = Column{}
