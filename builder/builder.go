@@ -116,6 +116,62 @@ func ToColumns(values []interface{}) []stmt.Column { // nolint: gocyclo
 	return columns
 }
 
+// ToSelectExpressions takes a list of empty interfaces and returns a slice of SelectExpression instance.
+func ToSelectExpressions(values []interface{}) []stmt.SelectExpression { // nolint: gocyclo
+	// If values is a slice, we try to use recursion to obtain a slice of Column.
+	if len(values) == 1 {
+		switch array := values[0].(type) {
+		case []stmt.SelectExpression:
+			return array
+		case []stmt.Column:
+			expressions := make([]stmt.SelectExpression, 0, len(values))
+			for i := range array {
+				if array[i].IsEmpty() {
+					panic("loukoum: given column is undefined")
+				}
+				expressions = append(expressions, array[i])
+			}
+			return expressions
+		case []string:
+			expressions := make([]stmt.SelectExpression, 0, len(values))
+			for i := range array {
+				expressions = append(expressions, stmt.NewColumn(array[i]))
+			}
+			return expressions
+		}
+	}
+
+	columns := make([]stmt.SelectExpression, 0, len(values))
+
+	for i := range values {
+		switch value := values[i].(type) {
+		case stmt.SelectExpression:
+			if value.IsEmpty() {
+				panic("loukoum: given column is undefined")
+			}
+			columns = append(columns, value)
+		case stmt.Column:
+			if value.IsEmpty() {
+				panic("loukoum: given column is undefined")
+			}
+			columns = append(columns, value)
+		case string:
+			array := strings.Split(value, ",")
+			for y := range array {
+				column := stmt.NewColumn(strings.TrimSpace(array[y]))
+				if column.IsEmpty() {
+					panic("loukoum: given column is undefined")
+				}
+				columns = append(columns, column)
+			}
+		default:
+			panic(fmt.Sprintf("loukoum: cannot use %T as column", values[i]))
+		}
+	}
+
+	return columns
+}
+
 // ToTable takes an empty interfaces and returns a Table instance.
 func ToTable(arg interface{}) stmt.Table {
 	table := stmt.Table{}

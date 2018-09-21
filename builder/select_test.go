@@ -9,7 +9,7 @@ import (
 	"github.com/ulule/loukoum/stmt"
 )
 
-func TestSelect(t *testing.T) {
+func TestSelect_Columns(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{
 			Name:      "Simple",
@@ -55,6 +55,71 @@ func TestSelect(t *testing.T) {
 				}),
 			},
 			SameQuery: "SELECT a, b, c",
+		},
+		{
+			Name:      "Exists expression",
+			Builder:   loukoum.Select(loukoum.Exists(loukoum.Select("1"))),
+			SameQuery: "SELECT EXISTS (SELECT 1)",
+		},
+		{
+			Name:      "Count expression",
+			Builder:   loukoum.Select(loukoum.Count("*")),
+			SameQuery: "SELECT COUNT(*)",
+		},
+		{
+			Name:      "Count expression with alias",
+			Builder:   loukoum.Select(loukoum.Count("*").As("counter")),
+			SameQuery: "SELECT COUNT(*) AS counter",
+		},
+		{
+			Name:      "Count expression with column",
+			Builder:   loukoum.Select(loukoum.Count("id")),
+			SameQuery: "SELECT COUNT(id)",
+		},
+		{
+			Name:      "Count expression with column and alias",
+			Builder:   loukoum.Select(loukoum.Count("id").As("counter")),
+			SameQuery: "SELECT COUNT(id) AS counter",
+		},
+		{
+			Name:      "Count expression with distinct and column",
+			Builder:   loukoum.Select(loukoum.Count("id").Distinct(true)),
+			SameQuery: "SELECT COUNT(DISTINCT id)",
+		},
+		{
+			Name:      "Count expression with distinct, column and alias",
+			Builder:   loukoum.Select(loukoum.Count("id").Distinct(true).As("counter")),
+			SameQuery: "SELECT COUNT(DISTINCT id) AS counter",
+		},
+		{
+			Name:      "Max expression with column",
+			Builder:   loukoum.Select(loukoum.Max("amount")),
+			SameQuery: "SELECT MAX(amount)",
+		},
+		{
+			Name:      "Max expression with column and alias",
+			Builder:   loukoum.Select(loukoum.Max("amount").As("max_amount")),
+			SameQuery: "SELECT MAX(amount) AS max_amount",
+		},
+		{
+			Name:      "Min expression with column",
+			Builder:   loukoum.Select(loukoum.Min("amount")),
+			SameQuery: "SELECT MIN(amount)",
+		},
+		{
+			Name:      "Min expression with column and alias",
+			Builder:   loukoum.Select(loukoum.Min("amount").As("min_amount")),
+			SameQuery: "SELECT MIN(amount) AS min_amount",
+		},
+		{
+			Name:      "Sum expression with column",
+			Builder:   loukoum.Select(loukoum.Sum("amount")),
+			SameQuery: "SELECT SUM(amount)",
+		},
+		{
+			Name:      "Sum expression with column and alias",
+			Builder:   loukoum.Select(loukoum.Sum("amount").As("sum_amount")),
+			SameQuery: "SELECT SUM(amount) AS sum_amount",
 		},
 	})
 }
@@ -901,12 +966,6 @@ func TestSelect_Exists(t *testing.T) {
 			),
 			Args: []interface{}{2},
 		},
-		// TODO (novln): Implement this use case.
-		// {
-		// 	Name:      "Column clause",
-		// 	Builder:   loukoum.Select(loukoum.Exists(loukoum.Select("1"))),
-		// 	SameQuery: "SELECT EXISTS (SELECT 1)",
-		// },
 	})
 }
 

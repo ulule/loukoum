@@ -47,13 +47,13 @@ func (expression InfixExpression) IsEmpty() bool {
 // And creates a new InfixExpression using given Expression.
 func (expression InfixExpression) And(value Expression) InfixExpression {
 	operator := NewAndOperator()
-	return NewInfixExpression(expression, operator, value)
+	return NewInfixExpression(expression, operator, NewWrapper(value))
 }
 
 // Or creates a new InfixExpression using given Expression.
 func (expression InfixExpression) Or(value Expression) InfixExpression {
 	operator := NewOrOperator()
-	return NewInfixExpression(expression, operator, value)
+	return NewInfixExpression(expression, operator, NewWrapper(value))
 }
 
 // Ensure that InfixExpression is an Expression
