@@ -368,7 +368,7 @@ func (raw Raw) Write(ctx types.Context) {
 
 // IsEmpty returns true if statement is undefined.
 func (raw Raw) IsEmpty() bool {
-	return false
+	return raw.Value == ""
 }
 
 // Ensure that Raw is an Expression
@@ -387,6 +387,10 @@ type Wrapper struct {
 func NewWrapper(arg Expression) Expression {
 	switch value := arg.(type) {
 	case Select:
+		return &Wrapper{
+			Value: value,
+		}
+	case Exists:
 		return &Wrapper{
 			Value: value,
 		}

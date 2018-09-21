@@ -68,6 +68,11 @@ const (
 	Do        = Type("DO")
 	Nothing   = Type("NOTHING")
 	With      = Type("WITH")
+	Exists    = Type("EXISTS")
+	Count     = Type("COUNT")
+	Max       = Type("MAX")
+	Min       = Type("MIN")
+	Sum       = Type("SUM")
 )
 
 // A Token is defined by its type and a value.
@@ -113,6 +118,11 @@ var keywords = map[string]Type{
 	"DO":        Do,
 	"NOTHING":   Nothing,
 	"WITH":      With,
+	"EXISTS":    Exists,
+	"COUNT":     Count,
+	"MAX":       Max,
+	"MIN":       Min,
+	"SUM":       Sum,
 }
 
 // Lookup will try to map a statement to a keyword.

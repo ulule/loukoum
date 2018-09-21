@@ -95,6 +95,26 @@ func Exists(value interface{}) stmt.Exists {
 	return stmt.NewExists(value)
 }
 
+// Count is a wrapper to create a new Count expression.
+func Count(value string) stmt.Count {
+	return stmt.NewCount(value)
+}
+
+// Max is a wrapper to create a new Max expression.
+func Max(value string) stmt.Max {
+	return stmt.NewMax(value)
+}
+
+// Min is a wrapper to create a new Min expression.
+func Min(value string) stmt.Min {
+	return stmt.NewMin(value)
+}
+
+// Sum is a wrapper to create a new Sum expression.
+func Sum(value string) stmt.Sum {
+	return stmt.NewSum(value)
+}
+
 // With is a wrapper to create a new WithQuery statement.
 func With(name string, value interface{}) stmt.WithQuery {
 	return stmt.NewWithQuery(name, value)
