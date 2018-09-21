@@ -26,14 +26,14 @@ func (b Select) Distinct() Select {
 
 // Columns adds result columns to the query.
 func (b Select) Columns(args ...interface{}) Select {
-	if len(b.query.Columns) != 0 {
+	if len(b.query.Expressions) != 0 {
 		panic("loukoum: select builder has columns already defined")
 	}
 	if len(args) == 0 {
 		args = []interface{}{"*"}
 	}
 
-	b.query.Columns = ToColumns(args)
+	b.query.Expressions = ToSelectExpressions(args)
 
 	return b
 }

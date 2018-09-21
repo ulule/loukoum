@@ -13,6 +13,10 @@ const (
 	LeftJoin = types.LeftJoin
 	// RightJoin is used for "RIGHT JOIN" in join statement.
 	RightJoin = types.RightJoin
+	// LeftOuterJoin is used for "LEFT OUTER JOIN" in join statement.
+	LeftOuterJoin = types.LeftOuterJoin
+	// RightOuterJoin is used for "RIGHT OUTER JOIN" in join statement.
+	RightOuterJoin = types.RightOuterJoin
 	// Asc is used for "ORDER BY" statement.
 	Asc = types.Asc
 	// Desc is used for "ORDER BY" statement.
@@ -89,6 +93,26 @@ func Raw(value string) stmt.Raw {
 // Exists is a wrapper to create a new Exists expression.
 func Exists(value interface{}) stmt.Exists {
 	return stmt.NewExists(value)
+}
+
+// Count is a wrapper to create a new Count expression.
+func Count(value string) stmt.Count {
+	return stmt.NewCount(value)
+}
+
+// Max is a wrapper to create a new Max expression.
+func Max(value string) stmt.Max {
+	return stmt.NewMax(value)
+}
+
+// Min is a wrapper to create a new Min expression.
+func Min(value string) stmt.Min {
+	return stmt.NewMin(value)
+}
+
+// Sum is a wrapper to create a new Sum expression.
+func Sum(value string) stmt.Sum {
+	return stmt.NewSum(value)
 }
 
 // With is a wrapper to create a new WithQuery statement.

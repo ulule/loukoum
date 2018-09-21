@@ -13,7 +13,7 @@ type Where struct {
 // NewWhere returns a new Where instance.
 func NewWhere(expression Expression) Where {
 	return Where{
-		Condition: expression,
+		Condition: NewWrapper(expression),
 	}
 }
 
@@ -41,7 +41,7 @@ func (where Where) And(right Expression) Where {
 
 	left := where.Condition
 	operator := NewAndOperator()
-	where.Condition = NewInfixExpression(left, operator, right)
+	where.Condition = NewInfixExpression(left, operator, NewWrapper(right))
 	return where
 }
 
@@ -53,7 +53,7 @@ func (where Where) Or(right Expression) Where {
 
 	left := where.Condition
 	operator := NewOrOperator()
-	where.Condition = NewInfixExpression(left, operator, right)
+	where.Condition = NewInfixExpression(left, operator, NewWrapper(right))
 	return where
 }
 

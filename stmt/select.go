@@ -5,21 +5,27 @@ import (
 	"github.com/ulule/loukoum/types"
 )
 
+// SelectExpression is a SQL expression for a SELECT statement.
+type SelectExpression interface {
+	Statement
+	selectExpression()
+}
+
 // Select is a SELECT statement.
 type Select struct {
-	Prefix   Prefix
-	With     With
-	Distinct bool
-	Columns  []Column
-	From     From
-	Joins    []Join
-	Where    Where
-	GroupBy  GroupBy
-	Having   Having
-	OrderBy  OrderBy
-	Limit    Limit
-	Offset   Offset
-	Suffix   Suffix
+	Prefix      Prefix
+	With        With
+	Distinct    bool
+	Expressions []SelectExpression
+	From        From
+	Joins       []Join
+	Where       Where
+	GroupBy     GroupBy
+	Having      Having
+	OrderBy     OrderBy
+	Limit       Limit
+	Offset      Offset
+	Suffix      Suffix
 }
 
 // NewSelect returns a new Select instance.
@@ -56,13 +62,13 @@ func (selekt Select) writeHead(ctx types.Context) {
 		ctx.Write(token.Distinct.String())
 	}
 
-	for i := range selekt.Columns {
+	for i := range selekt.Expressions {
 		if i == 0 {
 			ctx.Write(" ")
 		} else {
 			ctx.Write(", ")
 		}
-		selekt.Columns[i].Write(ctx)
+		selekt.Expressions[i].Write(ctx)
 	}
 
 	if !selekt.From.IsEmpty() {
@@ -117,7 +123,7 @@ func (selekt Select) writeTail(ctx types.Context) {
 
 // IsEmpty returns true if statement is undefined.
 func (selekt Select) IsEmpty() bool {
-	return len(selekt.Columns) == 0
+	return len(selekt.Expressions) == 0
 }
 
 func (Select) expression() {}
