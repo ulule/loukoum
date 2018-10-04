@@ -19,8 +19,7 @@ RUN apt-get -y update \
     && go get -u -v github.com/davecgh/go-spew/spew \
     && go get -u -v github.com/lib/pq \
     && go get -u -v github.com/jmoiron/sqlx \
-    && go get -u -v github.com/alecthomas/gometalinter \
-    && gometalinter --install \
+    && go get -u -v github.com/golangci/golangci-lint/cmd/golangci-lint \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
