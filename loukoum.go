@@ -95,6 +95,11 @@ func Exists(value interface{}) stmt.Exists {
 	return stmt.NewExists(value)
 }
 
+// NotExists is a wrapper to create a new NotExists expression.
+func NotExists(value interface{}) stmt.NotExists {
+	return stmt.NewNotExists(value)
+}
+
 // Count is a wrapper to create a new Count expression.
 func Count(value string) stmt.Count {
 	return stmt.NewCount(value)

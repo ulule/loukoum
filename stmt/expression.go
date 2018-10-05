@@ -394,6 +394,10 @@ func NewWrapper(arg Expression) Expression {
 		return &Wrapper{
 			Value: value,
 		}
+	case NotExists:
+		return &Wrapper{
+			Value: value,
+		}
 	default:
 		return arg
 	}
