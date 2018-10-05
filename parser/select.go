@@ -37,7 +37,7 @@ func parseSelect(it *lexer.Iteratee) (stmt.Select, error) { // nolint: gocyclo
 
 		case token.Asterisk:
 
-			query.Columns = append(query.Columns, stmt.NewColumn(strings.TrimSpace(e.Value)))
+			query.Expressions = append(query.Expressions, stmt.NewColumn(strings.TrimSpace(e.Value)))
 			if it.HasNext() && !it.Is(token.From) {
 				return stmt.Select{}, errors.WithStack(ErrSelectInvalidCondition)
 			}
@@ -60,7 +60,7 @@ func parseSelect(it *lexer.Iteratee) (stmt.Select, error) { // nolint: gocyclo
 				it.Next()
 			}
 
-			query.Columns = append(query.Columns, stmt.NewColumnAlias(column, alias))
+			query.Expressions = append(query.Expressions, stmt.NewColumnAlias(column, alias))
 
 			if it.HasNext() && !it.Is(token.From) && !it.Is(token.Literal) {
 				return stmt.Select{}, errors.WithStack(ErrSelectInvalidCondition)
