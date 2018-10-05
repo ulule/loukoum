@@ -69,6 +69,7 @@ const (
 	Do        = Type("DO")
 	Nothing   = Type("NOTHING")
 	With      = Type("WITH")
+	Not       = Type("NOT")
 	Recursive = Type("RECURSIVE")
 	Exists    = Type("EXISTS")
 	Count     = Type("COUNT")
@@ -121,6 +122,7 @@ var keywords = map[string]Type{
 	"DO":        Do,
 	"NOTHING":   Nothing,
 	"WITH":      With,
+	"NOT":       Not,
 	"RECURSIVE": Recursive,
 	"EXISTS":    Exists,
 	"COUNT":     Count,
