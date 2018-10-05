@@ -68,6 +68,7 @@ const (
 	Do        = Type("DO")
 	Nothing   = Type("NOTHING")
 	With      = Type("WITH")
+	Not       = Type("NOT")
 	Exists    = Type("EXISTS")
 	Count     = Type("COUNT")
 	Max       = Type("MAX")
@@ -118,6 +119,7 @@ var keywords = map[string]Type{
 	"DO":        Do,
 	"NOTHING":   Nothing,
 	"WITH":      With,
+	"NOT":       Not,
 	"EXISTS":    Exists,
 	"COUNT":     Count,
 	"MAX":       Max,
