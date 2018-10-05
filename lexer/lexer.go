@@ -334,7 +334,7 @@ func (l *Lexer) escape(quote rune) (rune, bool) {
 	case quote:
 		c = quote
 	default:
-		l.error(errors.Errorf("unknown escape sequence: \\%s", l.next()))
+		l.error(errors.Errorf("unknown escape sequence: \\%s", string(l.next())))
 		return c, false
 	}
 
