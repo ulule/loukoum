@@ -3,4 +3,4 @@
 SOURCE_DIRECTORY=$(dirname "${BASH_SOURCE[0]}")
 cd "${SOURCE_DIRECTORY}/.."
 
-go test -count=1 -v $(go list ./... | grep -v -E '\/(vendor|examples)\/')
+export GO111MODULE=on && go test -count=1 -v $(go list ./... | grep -v -E '\/(vendor|examples)\/')
