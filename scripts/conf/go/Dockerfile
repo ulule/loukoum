@@ -11,10 +11,6 @@ RUN apt-get -y update \
     && apt-get -y install git \
     && mkdir -p /go/src/github.com/golang \
     && cd /go/src/github.com/golang \
-    && git clone https://github.com/golang/dep.git \
-    && cd dep \
-    && git checkout tags/v0.4.1 \
-    && go get github.com/golang/dep/cmd/dep \
     && go get -u -v github.com/stretchr/testify/require \
     && go get -u -v github.com/davecgh/go-spew/spew \
     && go get -u -v github.com/lib/pq \
@@ -26,6 +22,6 @@ RUN apt-get -y update \
 
 COPY . /go/src/github.com/ulule/loukoum
 WORKDIR /go/src/github.com/ulule/loukoum
-RUN dep ensure
+RUN export GO111MODULE=on && go build ./...
 
 CMD /bin/bash
