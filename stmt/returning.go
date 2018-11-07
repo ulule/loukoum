@@ -3,8 +3,8 @@ package stmt
 import (
 	"sort"
 
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v2/token"
+	"github.com/ulule/loukoum/v2/types"
 )
 
 // Returning is a RETURNING clause.

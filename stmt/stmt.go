@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v2/types"
 )
 
 // Statement is the interface of the component which is the minimum unit constituting SQL.

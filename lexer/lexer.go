@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 
-	"github.com/ulule/loukoum/token"
+	"github.com/ulule/loukoum/v2/token"
 )
 
 const (

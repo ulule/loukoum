@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v2/token"
+	"github.com/ulule/loukoum/v2/types"
 )
 
 // Column is a column identifier.

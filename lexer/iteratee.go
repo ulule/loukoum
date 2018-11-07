@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"github.com/ulule/loukoum/token"
+	"github.com/ulule/loukoum/v2/token"
 )
 
 // An Iteratee contains a collection of token from a Lexer.

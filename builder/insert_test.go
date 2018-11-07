@@ -8,8 +8,8 @@ import (
 
 	"github.com/lib/pq"
 
-	"github.com/ulule/loukoum"
-	"github.com/ulule/loukoum/builder"
+	"github.com/ulule/loukoum/v2"
+	"github.com/ulule/loukoum/v2/builder"
 )
 
 func TestInsert_Columns(t *testing.T) {

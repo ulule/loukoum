@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v2/types"
 )
 
 // Expression is a SQL expression.
