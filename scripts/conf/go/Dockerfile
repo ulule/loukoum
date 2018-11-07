@@ -20,8 +20,8 @@ RUN apt-get -y update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . /go/src/github.com/ulule/loukoum
-WORKDIR /go/src/github.com/ulule/loukoum
-RUN export GO111MODULE=on && go build ./...
+COPY . /media/ulule/loukoum
+WORKDIR /media/ulule/loukoum
+RUN go mod download
 
 CMD /bin/bash
