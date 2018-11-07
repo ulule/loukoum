@@ -50,7 +50,7 @@ to execute queries.
 Insert a new `Comment` and retrieve its `id`.
 
 ```go
-import lk "github.com/ulule/loukoum"
+import lk "github.com/ulule/loukoum/v3"
 
 // Comment model
 type Comment struct {
@@ -102,7 +102,7 @@ func CreateComment(db *sqlx.DB, comment Comment) (Comment, error) {
 ### INSERT on conflict (UPSERT)
 
 ```go
-import lk "github.com/ulule/loukoum"
+import lk "github.com/ulule/loukoum/v3"
 
 // UpsertComment inserts or updates a comment based on the email attribute.
 func UpsertComment(db *sqlx.DB, comment Comment) (Comment, error) {
@@ -207,7 +207,7 @@ func PublishNews(db *sqlx.DB, news News) (News, error) {
 Retrieve non-deleted users.
 
 ```go
-import lk "github.com/ulule/loukoum"
+import lk "github.com/ulule/loukoum/v3"
 
 // User model
 type User struct {
@@ -388,6 +388,10 @@ See [examples](examples/named) directory for more information.
 > **NOTE:** For `database/sql`, see [standard](examples/standard).
 
 ## Migration
+
+### Migrating from v2.x.x
+
+* Migrate from [dep](https://github.com/golang/dep) to go modules
 
 ### Migrating from v1.x.x
 

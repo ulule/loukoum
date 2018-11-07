@@ -1,9 +1,9 @@
 package loukoum
 
 import (
-	"github.com/ulule/loukoum/builder"
-	"github.com/ulule/loukoum/stmt"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/builder"
+	"github.com/ulule/loukoum/v3/stmt"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 const (
