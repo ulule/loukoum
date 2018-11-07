@@ -3,7 +3,6 @@
 set -eo pipefail
 
 golinter_path="${GOPATH}/bin/golangci-lint"
-export GO111MODULE=on
 
 if [[ ! -x "${golinter_path}" ]]; then
     go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
