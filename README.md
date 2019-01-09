@@ -391,7 +391,8 @@ See [examples](examples/named) directory for more information.
 
 ### Migrating from v2.x.x
 
-* Migrate from [dep](https://github.com/golang/dep) to go modules
+* Migrate from [dep](https://github.com/golang/dep) to [go modules](https://github.com/golang/go/wiki/Modules) by
+replacing the import path `github.com/ulule/loukoum/...` by `github.com/ulule/loukoum/v3/...`
 
 ### Migrating from v1.x.x
 
