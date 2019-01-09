@@ -1,2 +1,5 @@
 test:
-	go test -v ./...
+	scripts/test
+
+lint:
+	scripts/lint
