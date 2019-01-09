@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Order is an expression of a ORDER BY clause.

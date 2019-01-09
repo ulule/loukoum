@@ -1,8 +1,8 @@
 package builder
 
 import (
-	"github.com/ulule/loukoum/stmt"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/stmt"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Update is a builder used for "UPDATE" query.

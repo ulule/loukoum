@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	lk "github.com/ulule/loukoum"
+	lk "github.com/ulule/loukoum/v3"
 )
 
 // User model.

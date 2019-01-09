@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // InfixExpression is an Expression that has a left and right operand with an operator.
