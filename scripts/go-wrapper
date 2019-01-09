@@ -8,7 +8,7 @@ cd "${SOURCE_DIRECTORY}/.."
 ROOT_DIRECTORY=`pwd`
 IMAGE_NAME="loukoum-go"
 DOCKERFILE="scripts/conf/go/Dockerfile"
-CONTAINER_IMAGE="golang:1.11.1-stretch"
+CONTAINER_IMAGE="golang:1.11.4-stretch"
 
 create_docker_image() {
     declare tag="$1" dockerfile="$2" path="$3"
