@@ -1,9 +1,9 @@
 package loukoum
 
 import (
-	"github.com/ulule/loukoum/builder"
-	"github.com/ulule/loukoum/stmt"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/builder"
+	"github.com/ulule/loukoum/v3/stmt"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 const (
@@ -93,6 +93,11 @@ func Raw(value string) stmt.Raw {
 // Exists is a wrapper to create a new Exists expression.
 func Exists(value interface{}) stmt.Exists {
 	return stmt.NewExists(value)
+}
+
+// NotExists is a wrapper to create a new NotExists expression.
+func NotExists(value interface{}) stmt.NotExists {
+	return stmt.NewNotExists(value)
 }
 
 // Count is a wrapper to create a new Count expression.

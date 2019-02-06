@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ulule/loukoum"
-	"github.com/ulule/loukoum/builder"
-	"github.com/ulule/loukoum/stmt"
+	"github.com/ulule/loukoum/v3"
+	"github.com/ulule/loukoum/v3/builder"
+	"github.com/ulule/loukoum/v3/stmt"
 )
 
 func TestSelect_Columns(t *testing.T) {
@@ -963,6 +963,34 @@ func TestSelect_Exists(t *testing.T) {
 			NamedQuery: fmt.Sprint(
 				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
 				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > :arg_1))))",
+			),
+			Args: []interface{}{2},
+		},
+	})
+}
+
+func TestSelect_NotExists(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "Where clause",
+			Builder: loukoum.
+				Select("id").
+				From("users").
+				Where(loukoum.Condition("deleted_at").IsNull(true)).
+				And(loukoum.NotExists(loukoum.Select("1").From("news").Where(
+					loukoum.Condition("news.created_at").GreaterThan(2)),
+				)),
+			String: fmt.Sprint(
+				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
+				"(NOT EXISTS (SELECT 1 FROM news WHERE (news.created_at > 2))))",
+			),
+			Query: fmt.Sprint(
+				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
+				"(NOT EXISTS (SELECT 1 FROM news WHERE (news.created_at > $1))))",
+			),
+			NamedQuery: fmt.Sprint(
+				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
+				"(NOT EXISTS (SELECT 1 FROM news WHERE (news.created_at > :arg_1))))",
 			),
 			Args: []interface{}{2},
 		},

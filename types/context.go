@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ulule/loukoum/format"
+	"github.com/ulule/loukoum/v3/format"
 )
 
 // A Context is passed to a root stmt.Statement to generate a query.

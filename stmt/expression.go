@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Expression is a SQL expression.
@@ -391,6 +391,10 @@ func NewWrapper(arg Expression) Expression {
 			Value: value,
 		}
 	case Exists:
+		return &Wrapper{
+			Value: value,
+		}
+	case NotExists:
 		return &Wrapper{
 			Value: value,
 		}
