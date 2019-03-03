@@ -114,6 +114,7 @@ func Time(value time.Time) string {
 	return fmt.Sprint("'", value.UTC().Format("2006-01-02 15:04:05.999999"), "+00'")
 }
 
+// nolint: interfacer
 func writeRune(buffer *bytes.Buffer, chunk rune) {
 	_, err := buffer.WriteRune(chunk)
 	if err != nil {
@@ -121,6 +122,7 @@ func writeRune(buffer *bytes.Buffer, chunk rune) {
 	}
 }
 
+// nolint: interfacer
 func writeString(buffer *bytes.Buffer, chunk string) {
 	_, err := buffer.WriteString(chunk)
 	if err != nil {

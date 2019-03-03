@@ -150,11 +150,6 @@ func ToSelectExpressions(values []interface{}) []stmt.SelectExpression { // noli
 				panic("loukoum: given column is undefined")
 			}
 			columns = append(columns, value)
-		case stmt.Column:
-			if value.IsEmpty() {
-				panic("loukoum: given column is undefined")
-			}
-			columns = append(columns, value)
 		case string:
 			array := strings.Split(value, ",")
 			for y := range array {
