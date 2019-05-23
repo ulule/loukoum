@@ -2,6 +2,7 @@ package builder_test
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"testing"
 	"time"
@@ -495,7 +496,27 @@ func TestInsert_Valuer(t *testing.T) {
 			NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, :arg_2)",
 			Args:       []interface{}{"tech@ulule.com", sql.NullInt64{}},
 		},
+		{
+			Name: "nil valuer",
+			Builder: loukoum.
+				Insert("table").
+				Columns("email", "login").
+				Values("tech@ulule.com", (*valuer)(nil)),
+			String:     "INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)",
+			Query:      "INSERT INTO table (email, login) VALUES ($1, $2)",
+			NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, :arg_2)",
+			Args:       []interface{}{"tech@ulule.com", (*valuer)(nil)},
+		},
 	})
+}
+
+type valuer struct{}
+
+func (valuer) Value() (driver.Value, error) {
+	return nil, nil
+}
+func (*valuer) Scan(src interface{}) error {
+	return nil
 }
 
 func TestInsert_Set(t *testing.T) {
