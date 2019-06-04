@@ -19,6 +19,7 @@ type BuilderTest struct {
 	String     string
 	Query      string
 	NamedQuery string
+	NamedArgs  map[string]interface{}
 	Args       []interface{}
 	Failure    func() builder.Builder
 }
@@ -62,6 +63,7 @@ func RunBuilderTests(t *testing.T, tests []BuilderTest) {
 						tt.Query = tt.SameQuery
 						tt.NamedQuery = tt.SameQuery
 					}
+
 					t.Run("String", func(t *testing.T) {
 						require.Equal(t, tt.String, builder.String())
 					})
@@ -73,7 +75,11 @@ func RunBuilderTests(t *testing.T, tests []BuilderTest) {
 					t.Run("NamedQuery", func(t *testing.T) {
 						query, args := builder.NamedQuery()
 						require.Equal(t, tt.NamedQuery, query)
-						require.Equal(t, toNamedArgs(tt.Args), args)
+						if tt.NamedArgs != nil {
+							require.Equal(t, tt.NamedArgs, args)
+						} else {
+							require.Equal(t, toNamedArgs(tt.Args), args)
+						}
 					})
 				})
 			}

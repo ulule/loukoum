@@ -12,6 +12,30 @@ import (
 func TestSelect_Columns(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{
+			Name: "SetNamedValues",
+			Builder: loukoum.Select("id").
+				From("images").
+				Where(loukoum.Condition(":languages").Equal(loukoum.Raw("ANY(string_to_array(languages, ','))"))).
+				And(loukoum.Condition("user_id").Equal(1)).
+				SetNamedValues(map[string]interface{}{
+					"languages": "fr",
+				}),
+			Query: fmt.Sprint(
+				"SELECT id FROM images WHERE ",
+				"((:languages = ANY(string_to_array(languages, ','))) AND (user_id = $1))"),
+			String: fmt.Sprint(
+				"SELECT id FROM images WHERE ",
+				"((:languages = ANY(string_to_array(languages, ','))) AND (user_id = 1))"),
+			NamedQuery: fmt.Sprint(
+				"SELECT id FROM images WHERE ",
+				"((:languages = ANY(string_to_array(languages, ','))) AND (user_id = :arg_1))"),
+			Args: []interface{}{1},
+			NamedArgs: map[string]interface{}{
+				"arg_1":     1,
+				"languages": "fr",
+			},
+		},
+		{
 			Name:      "Simple",
 			Builder:   loukoum.Select("test"),
 			SameQuery: "SELECT test",

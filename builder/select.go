@@ -249,7 +249,13 @@ func (b Select) String() string {
 func (b Select) NamedQuery() (string, map[string]interface{}) {
 	ctx := &types.NamedContext{}
 	b.query.Write(ctx)
-	return ctx.Query(), ctx.Values()
+
+	namedValues := ctx.Values()
+	for k, v := range b.query.NamedValues {
+		namedValues[k] = v
+	}
+
+	return ctx.Query(), namedValues
 }
 
 // Query returns the underlying query as a regular statement.
@@ -257,6 +263,12 @@ func (b Select) Query() (string, []interface{}) {
 	ctx := &types.StdContext{}
 	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
+}
+
+// SetNamedValues set named values of the query.
+func (b Select) SetNamedValues(values map[string]interface{}) Select {
+	b.query.NamedValues = values
+	return b
 }
 
 // Statement returns underlying statement.

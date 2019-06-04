@@ -26,6 +26,7 @@ type Select struct {
 	Limit       Limit
 	Offset      Offset
 	Suffix      Suffix
+	NamedValues map[string]interface{}
 }
 
 // NewSelect returns a new Select instance.
