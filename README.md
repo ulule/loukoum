@@ -29,7 +29,7 @@ Just a few examples when and where loukoum can become handy:
 Using [Go Modules](https://github.com/golang/go/wiki/Modules)
 
 ```console
-go get github.com/ulule/loukoum/v3@v3.0.2
+go get github.com/ulule/loukoum/v3@v3.1.0
 ```
 
 ## Usage
