@@ -31,6 +31,11 @@ func Pair(key, value interface{}) types.Pair {
 	return types.Pair{Key: key, Value: value}
 }
 
+// Value is a wrapper to create a new Value expression.
+func Value(value interface{}) stmt.Value {
+	return stmt.NewValue(value)
+}
+
 // Select starts a SelectBuilder using the given columns.
 func Select(columns ...interface{}) builder.Select {
 	return builder.NewSelect().Columns(columns...)

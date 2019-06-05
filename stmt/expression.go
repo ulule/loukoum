@@ -79,6 +79,24 @@ func (identifier Identifier) IsEmpty() bool {
 	return identifier.Identifier == ""
 }
 
+// Contains performs a "contains" comparison.
+func (identifier Identifier) Contains(value interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.Contains)
+	return NewInfixExpression(identifier, operator, NewWrapper(NewExpression(value)))
+}
+
+// IsContainedBy performs a "is contained by" comparison.
+func (identifier Identifier) IsContainedBy(value interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.IsContainedBy)
+	return NewInfixExpression(identifier, operator, NewWrapper(NewExpression(value)))
+}
+
+// Overlap performs an "overlap" comparison.
+func (identifier Identifier) Overlap(value interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.Overlap)
+	return NewInfixExpression(identifier, operator, NewWrapper(NewExpression(value)))
+}
+
 // Equal performs an "equal" comparison.
 func (identifier Identifier) Equal(value interface{}) InfixExpression {
 	operator := NewComparisonOperator(types.Equal)
@@ -207,6 +225,36 @@ func (value Value) Write(ctx types.Context) {
 	} else {
 		ctx.Bind(value.Value)
 	}
+}
+
+// Overlap performs an "overlap" comparison.
+func (value Value) Overlap(what interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.Overlap)
+	return NewInfixExpression(value, operator, NewWrapper(NewExpression(what)))
+}
+
+// Equal performs an "equal" comparison.
+func (value Value) Equal(what interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.Equal)
+	return NewInfixExpression(value, operator, NewWrapper(NewExpression(what)))
+}
+
+// NotEqual performs a "not equal" comparison.
+func (value Value) NotEqual(what interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.NotEqual)
+	return NewInfixExpression(value, operator, NewWrapper(NewExpression(what)))
+}
+
+// Contains performs a "contains" comparison.
+func (value Value) Contains(what interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.Contains)
+	return NewInfixExpression(value, operator, NewWrapper(NewExpression(what)))
+}
+
+// IsContainedBy performs a "is contained by" comparison.
+func (value Value) IsContainedBy(what interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.IsContainedBy)
+	return NewInfixExpression(value, operator, NewWrapper(NewExpression(what)))
 }
 
 // IsEmpty returns true if statement is undefined.

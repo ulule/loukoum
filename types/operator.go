@@ -39,4 +39,7 @@ const (
 	NotILike           = ComparisonOperator("NOT ILIKE")
 	Between            = ComparisonOperator("BETWEEN")
 	NotBetween         = ComparisonOperator("NOT BETWEEN")
+	Contains           = ComparisonOperator("@>")
+	IsContainedBy      = ComparisonOperator("<@")
+	Overlap            = ComparisonOperator("&&")
 )
