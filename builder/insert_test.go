@@ -9,7 +9,7 @@ import (
 
 	"github.com/lib/pq"
 
-	"github.com/ulule/loukoum/v3"
+	loukoum "github.com/ulule/loukoum/v3"
 	"github.com/ulule/loukoum/v3/builder"
 )
 
@@ -24,6 +24,21 @@ func TestInsert_Columns(t *testing.T) {
 			Name:      "Without columns",
 			Builder:   loukoum.Insert("table"),
 			SameQuery: "INSERT INTO table",
+		},
+	})
+}
+
+func TestInsert_Comment(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name:      "With columns",
+			Builder:   loukoum.Insert("table").Columns("a", "b", "c").Comment("/foo"),
+			SameQuery: "INSERT INTO table (a, b, c); -- /foo",
+		},
+		{
+			Name:      "Without columns",
+			Builder:   loukoum.Insert("table").Comment("/foo"),
+			SameQuery: "INSERT INTO table; -- /foo",
 		},
 	})
 }

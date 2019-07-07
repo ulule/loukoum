@@ -26,6 +26,7 @@ type Select struct {
 	Limit       Limit
 	Offset      Offset
 	Suffix      Suffix
+	Comment     Comment
 }
 
 // NewSelect returns a new Select instance.
@@ -118,6 +119,12 @@ func (selekt Select) writeTail(ctx types.Context) {
 	if !selekt.Suffix.IsEmpty() {
 		ctx.Write(" ")
 		selekt.Suffix.Write(ctx)
+	}
+
+	if !selekt.Comment.IsEmpty() {
+		ctx.Write(token.Semicolon.String())
+		ctx.Write(" ")
+		selekt.Comment.Write(ctx)
 	}
 }
 

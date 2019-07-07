@@ -81,6 +81,13 @@ func (b Delete) Returning(values ...interface{}) Delete {
 	return b
 }
 
+// Comment adds comment to the query.
+func (b Delete) Comment(comment string) Delete {
+	b.query.Comment = stmt.NewComment(comment)
+
+	return b
+}
+
 // String returns the underlying query as a raw statement.
 // This function should be used for debugging since it doesn't escape anything and is completely
 // vulnerable to SQL injection.

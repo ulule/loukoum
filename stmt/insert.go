@@ -12,6 +12,7 @@ type Insert struct {
 	Values     Values
 	OnConflict OnConflict
 	Returning  Returning
+	Comment    Comment
 }
 
 // NewInsert returns a new Insert instance.
@@ -53,6 +54,12 @@ func (insert Insert) Write(ctx types.Context) {
 	if !insert.Returning.IsEmpty() {
 		ctx.Write(" ")
 		insert.Returning.Write(ctx)
+	}
+
+	if !insert.Comment.IsEmpty() {
+		ctx.Write(token.Semicolon.String())
+		ctx.Write(" ")
+		insert.Comment.Write(ctx)
 	}
 }
 

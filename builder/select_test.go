@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ulule/loukoum/v3"
+	loukoum "github.com/ulule/loukoum/v3"
 	"github.com/ulule/loukoum/v3/builder"
 	"github.com/ulule/loukoum/v3/stmt"
 )
@@ -92,6 +92,28 @@ func TestSelect_Value(t *testing.T) {
 			Query:      "SELECT id FROM video WHERE (languages && $1)",
 			NamedQuery: "SELECT id FROM video WHERE (languages && :arg_1)",
 			Args:       []interface{}{"{fr}"},
+		},
+	})
+}
+
+func TestSelect_Comment(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name:      "Simple",
+			Builder:   loukoum.Select("test").Comment("/foo"),
+			SameQuery: "SELECT test; -- /foo",
+		},
+		{
+			Name: "Complex",
+			Builder: loukoum.Select("test").
+				From("users").
+				Where(loukoum.Condition("username").
+					Equal("thoas")).
+				Comment("/foo"),
+			String:     "SELECT test FROM users WHERE (username = 'thoas'); -- /foo",
+			Query:      "SELECT test FROM users WHERE (username = $1); -- /foo",
+			NamedQuery: "SELECT test FROM users WHERE (username = :arg_1); -- /foo",
+			Args:       []interface{}{"thoas"},
 		},
 	})
 }
