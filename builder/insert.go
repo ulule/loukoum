@@ -66,6 +66,13 @@ func (b Insert) Returning(values ...interface{}) Insert {
 	return b
 }
 
+// Comment adds comment to the query.
+func (b Insert) Comment(comment string) Insert {
+	b.query.Comment = stmt.NewComment(comment)
+
+	return b
+}
+
 // OnConflict builds the ON CONFLICT clause.
 func (b Insert) OnConflict(args ...interface{}) Insert {
 	if !b.query.OnConflict.IsEmpty() {

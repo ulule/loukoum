@@ -25,6 +25,7 @@ const (
 
 // Symbols token types.
 const (
+	Comment   = Type("--")
 	Comma     = Type(",")
 	Semicolon = Type(";")
 	Colon     = Type(":")

@@ -11,6 +11,7 @@ type Delete struct {
 	Using     Using
 	Where     Where
 	Returning Returning
+	Comment   Comment
 }
 
 // NewDelete returns a new Delete instance.
@@ -41,6 +42,12 @@ func (delete Delete) Write(ctx types.Context) {
 	if !delete.Returning.IsEmpty() {
 		ctx.Write(" ")
 		delete.Returning.Write(ctx)
+	}
+
+	if !delete.Comment.IsEmpty() {
+		ctx.Write(token.Semicolon.String())
+		ctx.Write(" ")
+		delete.Comment.Write(ctx)
 	}
 }
 
