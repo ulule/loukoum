@@ -4,10 +4,119 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ulule/loukoum/v3"
+	loukoum "github.com/ulule/loukoum/v3"
 	"github.com/ulule/loukoum/v3/builder"
 	"github.com/ulule/loukoum/v3/stmt"
 )
+
+func TestSelect_Value(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "ValueEqual",
+			Builder: loukoum.Select("id").
+				From("video").
+				Where(
+					loukoum.Value("fr").
+						Equal(loukoum.Raw("ANY(string_to_array(languages, ','))")),
+				),
+			String:     "SELECT id FROM video WHERE ('fr' = ANY(string_to_array(languages, ',')))",
+			Query:      "SELECT id FROM video WHERE ($1 = ANY(string_to_array(languages, ',')))",
+			NamedQuery: "SELECT id FROM video WHERE (:arg_1 = ANY(string_to_array(languages, ',')))",
+			Args:       []interface{}{"fr"},
+		},
+		{
+			Name: "ValueNotEqual",
+			Builder: loukoum.Select("id").
+				From("video").
+				Where(
+					loukoum.Value("fr").
+						NotEqual(loukoum.Raw("ANY(string_to_array(languages, ','))")),
+				),
+			String:     "SELECT id FROM video WHERE ('fr' != ANY(string_to_array(languages, ',')))",
+			Query:      "SELECT id FROM video WHERE ($1 != ANY(string_to_array(languages, ',')))",
+			NamedQuery: "SELECT id FROM video WHERE (:arg_1 != ANY(string_to_array(languages, ',')))",
+			Args:       []interface{}{"fr"},
+		},
+		{
+			Name: "ValueOverlap",
+			Builder: loukoum.Select("id").
+				From("video").
+				Where(
+					loukoum.Value("{fr}").
+						Overlap(loukoum.Raw("languages")),
+				),
+			String:     "SELECT id FROM video WHERE ('{fr}' && languages)",
+			Query:      "SELECT id FROM video WHERE ($1 && languages)",
+			NamedQuery: "SELECT id FROM video WHERE (:arg_1 && languages)",
+			Args:       []interface{}{"{fr}"},
+		},
+		{
+			Name: "ValueIsContainedBy",
+			Builder: loukoum.Select("id").
+				From("video").
+				Where(
+					loukoum.Value("{fr}").
+						IsContainedBy(loukoum.Raw("languages")),
+				),
+			String:     "SELECT id FROM video WHERE ('{fr}' <@ languages)",
+			Query:      "SELECT id FROM video WHERE ($1 <@ languages)",
+			NamedQuery: "SELECT id FROM video WHERE (:arg_1 <@ languages)",
+			Args:       []interface{}{"{fr}"},
+		},
+		{
+			Name: "IdentifierContains",
+			Builder: loukoum.Select("id").
+				From("video").
+				Where(loukoum.Condition("languages").Contains("{fr}")),
+			String:     "SELECT id FROM video WHERE (languages @> '{fr}')",
+			Query:      "SELECT id FROM video WHERE (languages @> $1)",
+			NamedQuery: "SELECT id FROM video WHERE (languages @> :arg_1)",
+			Args:       []interface{}{"{fr}"},
+		},
+		{
+			Name: "IdentifierIsContainsBy",
+			Builder: loukoum.Select("id").
+				From("video").
+				Where(loukoum.Condition("languages").IsContainedBy("{fr}")),
+			String:     "SELECT id FROM video WHERE (languages <@ '{fr}')",
+			Query:      "SELECT id FROM video WHERE (languages <@ $1)",
+			NamedQuery: "SELECT id FROM video WHERE (languages <@ :arg_1)",
+			Args:       []interface{}{"{fr}"},
+		},
+		{
+			Name: "IdentifierOverlap",
+			Builder: loukoum.Select("id").
+				From("video").
+				Where(loukoum.Condition("languages").Overlap("{fr}")),
+			String:     "SELECT id FROM video WHERE (languages && '{fr}')",
+			Query:      "SELECT id FROM video WHERE (languages && $1)",
+			NamedQuery: "SELECT id FROM video WHERE (languages && :arg_1)",
+			Args:       []interface{}{"{fr}"},
+		},
+	})
+}
+
+func TestSelect_Comment(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name:      "Simple",
+			Builder:   loukoum.Select("test").Comment("/foo"),
+			SameQuery: "SELECT test; -- /foo",
+		},
+		{
+			Name: "Complex",
+			Builder: loukoum.Select("test").
+				From("users").
+				Where(loukoum.Condition("username").
+					Equal("thoas")).
+				Comment("/foo"),
+			String:     "SELECT test FROM users WHERE (username = 'thoas'); -- /foo",
+			Query:      "SELECT test FROM users WHERE (username = $1); -- /foo",
+			NamedQuery: "SELECT test FROM users WHERE (username = :arg_1); -- /foo",
+			Args:       []interface{}{"thoas"},
+		},
+	})
+}
 
 func TestSelect_Columns(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{

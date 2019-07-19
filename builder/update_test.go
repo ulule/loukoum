@@ -8,7 +8,7 @@ import (
 
 	"github.com/lib/pq"
 
-	"github.com/ulule/loukoum/v3"
+	loukoum "github.com/ulule/loukoum/v3"
 	"github.com/ulule/loukoum/v3/builder"
 )
 
@@ -25,6 +25,25 @@ func TestUpdate_Set_Undefined(t *testing.T) {
 			Failure: func() builder.Builder {
 				return loukoum.Update("table").Set("")
 			},
+		},
+	})
+}
+
+func TestUpdate_Comment(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "Complex",
+			Builder: loukoum.Update("users").
+				Set(
+					loukoum.Pair("username", "novln"),
+				).
+				Where(loukoum.Condition("username").
+					Equal("thoas")).
+				Comment("/foo"),
+			String:     "UPDATE users SET username = 'novln' WHERE (username = 'thoas'); -- /foo",
+			Query:      "UPDATE users SET username = $1 WHERE (username = $2); -- /foo",
+			NamedQuery: "UPDATE users SET username = :arg_1 WHERE (username = :arg_2); -- /foo",
+			Args:       []interface{}{"novln", "thoas"},
 		},
 	})
 }

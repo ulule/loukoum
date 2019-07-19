@@ -14,6 +14,7 @@ type Update struct {
 	Set       Set
 	Where     Where
 	Returning Returning
+	Comment   Comment
 }
 
 // NewUpdate returns a new Update instance.
@@ -61,6 +62,12 @@ func (update Update) Write(ctx types.Context) {
 	if !update.Returning.IsEmpty() {
 		ctx.Write(" ")
 		update.Returning.Write(ctx)
+	}
+
+	if !update.Comment.IsEmpty() {
+		ctx.Write(token.Semicolon.String())
+		ctx.Write(" ")
+		update.Comment.Write(ctx)
 	}
 }
 

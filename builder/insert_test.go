@@ -2,13 +2,14 @@ package builder_test
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/lib/pq"
 
-	"github.com/ulule/loukoum/v3"
+	loukoum "github.com/ulule/loukoum/v3"
 	"github.com/ulule/loukoum/v3/builder"
 )
 
@@ -23,6 +24,21 @@ func TestInsert_Columns(t *testing.T) {
 			Name:      "Without columns",
 			Builder:   loukoum.Insert("table"),
 			SameQuery: "INSERT INTO table",
+		},
+	})
+}
+
+func TestInsert_Comment(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name:      "With columns",
+			Builder:   loukoum.Insert("table").Columns("a", "b", "c").Comment("/foo"),
+			SameQuery: "INSERT INTO table (a, b, c); -- /foo",
+		},
+		{
+			Name:      "Without columns",
+			Builder:   loukoum.Insert("table").Comment("/foo"),
+			SameQuery: "INSERT INTO table; -- /foo",
 		},
 	})
 }
@@ -495,7 +511,27 @@ func TestInsert_Valuer(t *testing.T) {
 			NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, :arg_2)",
 			Args:       []interface{}{"tech@ulule.com", sql.NullInt64{}},
 		},
+		{
+			Name: "nil valuer",
+			Builder: loukoum.
+				Insert("table").
+				Columns("email", "login").
+				Values("tech@ulule.com", (*valuer)(nil)),
+			String:     "INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)",
+			Query:      "INSERT INTO table (email, login) VALUES ($1, $2)",
+			NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, :arg_2)",
+			Args:       []interface{}{"tech@ulule.com", (*valuer)(nil)},
+		},
 	})
+}
+
+type valuer struct{}
+
+func (valuer) Value() (driver.Value, error) {
+	return nil, nil
+}
+func (*valuer) Scan(src interface{}) error {
+	return nil
 }
 
 func TestInsert_Set(t *testing.T) {

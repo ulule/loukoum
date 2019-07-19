@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"encoding/hex"
 	"fmt"
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -23,6 +24,12 @@ func Value(arg interface{}) string { // nolint: gocyclo
 	case time.Time:
 		return Time(value)
 	case driver.Valuer:
+		reflectvalue := reflect.ValueOf(value)
+		if reflectvalue.Kind() == reflect.Ptr &&
+			reflectvalue.IsNil() {
+			return "NULL"
+		}
+
 		v, err := value.Value()
 		if err != nil {
 			panic("loukoum: was not able to retrieve valuer value")

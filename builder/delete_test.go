@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ulule/loukoum/v3"
+	loukoum "github.com/ulule/loukoum/v3"
 	"github.com/ulule/loukoum/v3/builder"
 )
 
@@ -35,6 +35,19 @@ func TestDelete(t *testing.T) {
 			Name:      "As only",
 			Builder:   loukoum.Delete(loukoum.Table("table").As("foobar")).Only(),
 			SameQuery: "DELETE FROM ONLY table AS foobar",
+		},
+	})
+}
+
+func TestDelete_Comment(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "Simple",
+			Builders: []builder.Builder{
+				loukoum.Delete("table").Comment("/foo"),
+				loukoum.Delete(loukoum.Table("table")).Comment("/foo"),
+			},
+			SameQuery: "DELETE FROM table; -- /foo",
 		},
 	})
 }
