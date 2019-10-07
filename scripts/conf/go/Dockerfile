@@ -1,6 +1,6 @@
-FROM golang:1.12.7-stretch
+FROM golang:1.13-buster
 
-MAINTAINER thomas.leroux@ulule.com
+MAINTAINER thomas@leroux.io
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV LANG C.UTF-8
@@ -9,16 +9,20 @@ ENV LC_ALL C.UTF-8
 RUN apt-get -y update \
     && apt-get upgrade -y \
     && apt-get -y install git \
-    && go get -u -v github.com/stretchr/testify/require \
-    && go get -u -v github.com/davecgh/go-spew/spew \
-    && go get -u -v github.com/lib/pq \
-    && go get -u -v github.com/jmoiron/sqlx \
-    && go get -u github.com/golangci/golangci-lint/cmd/golangci-lint \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd -ms /bin/bash gopher
 
-COPY . /media/ulule/loukoum
+COPY go.mod go.sum /media/ulule/loukoum/
+RUN chown -R gopher:gopher /media/ulule/loukoum
+ENV GOPATH /home/gopher/go
+ENV PATH $GOPATH/bin:$PATH
+USER gopher
+
+RUN go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+
 WORKDIR /media/ulule/loukoum
 RUN go mod download
+COPY --chown=gopher:gopher . /media/ulule/loukoum
 
-CMD /bin/bash
+CMD [ "/bin/bash" ]

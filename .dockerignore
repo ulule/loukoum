@@ -1,0 +1,8 @@
+# Circle CI directory
+.circleci
+
+# Documentation directory
+docs
+
+# Example directory
+examples
