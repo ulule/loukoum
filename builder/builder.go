@@ -347,3 +347,37 @@ func ToSet(args []interface{}) stmt.Set {
 	set = MergeSet(set, args)
 	return set
 }
+
+// ToLimit takes an empty interfaces and returns a Limit instance.
+func ToLimit(arg interface{}) stmt.Limit {
+	switch value := arg.(type) {
+	case stmt.Limit:
+		return value
+	default:
+		limit, ok := ToInt64(value)
+		if !ok {
+			panic(fmt.Sprintf("loukoum: cannot use %T as limit", value))
+		}
+		if limit <= 0 {
+			panic("loukoum: limit must be a positive integer")
+		}
+		return stmt.NewLimit(limit)
+	}
+}
+
+// ToOffset takes an empty interfaces and returns a Offset instance.
+func ToOffset(arg interface{}) stmt.Offset {
+	switch value := arg.(type) {
+	case stmt.Offset:
+		return value
+	default:
+		offset, ok := ToInt64(value)
+		if !ok {
+			panic(fmt.Sprintf("loukoum: cannot use %T as offset", value))
+		}
+		if offset < 0 {
+			panic("loukoum: offset must be a non-negative integer")
+		}
+		return stmt.NewOffset(offset)
+	}
+}
