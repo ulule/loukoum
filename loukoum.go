@@ -80,6 +80,16 @@ func Order(column string, option ...types.OrderType) stmt.Order {
 	return stmt.NewOrder(column, order)
 }
 
+// Offset is a wrapper to create a new Offset statement.
+func Offset(start int64) stmt.Offset {
+	return stmt.NewOffset(start)
+}
+
+// Limit is a wrapper to create a new Limit statement.
+func Limit(count int64) stmt.Limit {
+	return stmt.NewLimit(count)
+}
+
 // And is a wrapper to create a new InfixExpression statement.
 func And(left stmt.Expression, right stmt.Expression) stmt.InfixExpression {
 	return stmt.NewInfixExpression(left, stmt.NewLogicalOperator(types.And), right)
