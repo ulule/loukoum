@@ -1,8 +1,6 @@
 package stmt
 
 import (
-	"sort"
-
 	"github.com/ulule/loukoum/v3/token"
 	"github.com/ulule/loukoum/v3/types"
 )
@@ -23,11 +21,6 @@ func NewReturning(columns []Column) Returning {
 func (returning Returning) Write(ctx types.Context) {
 	ctx.Write(token.Returning.String())
 	ctx.Write(" ")
-
-	sort.Slice(returning.Columns, func(i, j int) bool {
-		return returning.Columns[i].Name < returning.Columns[j].Name ||
-			returning.Columns[i].Alias < returning.Columns[j].Alias
-	})
 
 	for i := range returning.Columns {
 		if i > 0 {

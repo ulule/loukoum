@@ -352,10 +352,10 @@ func TestInsert_Returning(t *testing.T) {
 				Insert("table").
 				Columns("a", "b", "c").
 				Values([]string{"va", "vb", "vc"}).
-				Returning("a", "b"),
-			String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b",
-			Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING a, b",
-			NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING a, b",
+				Returning("b", "a"),
+			String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING b, a",
+			Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING b, a",
+			NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING b, a",
 			Args:       []interface{}{"va", "vb", "vc"},
 		},
 		{
@@ -364,10 +364,10 @@ func TestInsert_Returning(t *testing.T) {
 				Insert("table").
 				Columns("a", "b", "c").
 				Values([]string{"va", "vb", "vc"}).
-				Returning("a", "b", "c"),
-			String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a, b, c",
-			Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING a, b, c",
-			NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING a, b, c",
+				Returning("b", "a", "c"),
+			String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING b, a, c",
+			Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING b, a, c",
+			NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING b, a, c",
 			Args:       []interface{}{"va", "vb", "vc"},
 		},
 		{
@@ -388,18 +388,18 @@ func TestInsert_Returning(t *testing.T) {
 				Insert("table").
 				Columns("a", "b", "c").
 				Values([]string{"va", "vb", "vc"}).
-				Returning(loukoum.Column("a").As("alias_a"), loukoum.Column("b").As("alias_b")),
+				Returning(loukoum.Column("b").As("alias_b"), loukoum.Column("a").As("alias_a")),
 			String: fmt.Sprint(
 				"INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
-				"RETURNING a AS alias_a, b AS alias_b",
+				"RETURNING b AS alias_b, a AS alias_a",
 			),
 			Query: fmt.Sprint(
 				"INSERT INTO table (a, b, c) VALUES ($1, $2, $3) ",
-				"RETURNING a AS alias_a, b AS alias_b",
+				"RETURNING b AS alias_b, a AS alias_a",
 			),
 			NamedQuery: fmt.Sprint(
 				"INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) ",
-				"RETURNING a AS alias_a, b AS alias_b",
+				"RETURNING b AS alias_b, a AS alias_a",
 			),
 			Args: []interface{}{"va", "vb", "vc"},
 		},
