@@ -187,13 +187,7 @@ func (b Select) Limit(value interface{}) Select {
 		panic("loukoum: select builder has limit clause already defined")
 	}
 
-	limit, ok := ToInt64(value)
-	if !ok || limit <= 0 {
-		panic("loukoum: limit must be a positive integer")
-	}
-
-	b.query.Limit = stmt.NewLimit(limit)
-
+	b.query.Limit = ToLimit(value)
 	return b
 }
 
@@ -203,13 +197,7 @@ func (b Select) Offset(value interface{}) Select {
 		panic("loukoum: select builder has offset clause already defined")
 	}
 
-	offset, ok := ToInt64(value)
-	if !ok || offset < 0 {
-		panic("loukoum: offset must be a non-negative integer")
-	}
-
-	b.query.Offset = stmt.NewOffset(offset)
-
+	b.query.Offset = ToOffset(value)
 	return b
 }
 

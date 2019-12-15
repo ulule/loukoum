@@ -4,7 +4,7 @@
 [![Documentation][godoc-img]][godoc-url]
 ![License][license-img]
 
-*A simple SQL Query Builder.*
+_A simple SQL Query Builder._
 
 [![Loukoum][loukoum-img]][loukoum-url]
 
@@ -18,26 +18,26 @@ Afraid to slip a tiny **SQL injection** manipulating `fmt` to append conditions?
 
 Just a few examples when and where loukoum can become handy:
 
- * Remove user anonymity if user is an admin
- * Display news draft for an author
- * Add filters in query based on request parameters
- * Add a `ON CONFLICT` clause for resource's owner
- * And so on...
+- Remove user anonymity if user is an admin
+- Display news draft for an author
+- Add filters in query based on request parameters
+- Add a `ON CONFLICT` clause for resource's owner
+- And so on...
 
 ## Installation
 
 Using [Go Modules](https://github.com/golang/go/wiki/Modules)
 
 ```console
-go get github.com/ulule/loukoum/v3@v3.2.1
+go get github.com/ulule/loukoum/v3@v3.3.0
 ```
 
 ## Usage
 
 Loukoum helps you generate SQL queries from composable parts.
 
-However, keep in mind it's not an ORM or a Mapper so you have to use a SQL connector ([database/sql][sql-url], [sqlx][sqlx-url], etc.)
-to execute queries.
+However, keep in mind it's not an ORM or a Mapper so you have to use a SQL connector
+([database/sql][sql-url], [sqlx][sqlx-url], [makroud][makroud-url], etc.) to execute queries.
 
 ### INSERT
 
@@ -385,22 +385,22 @@ See [examples](examples/named) directory for more information.
 
 ### Migrating from v2.x.x
 
-* Migrate from [dep](https://github.com/golang/dep) to [go modules](https://github.com/golang/go/wiki/Modules) by
-replacing the import path `github.com/ulule/loukoum/...` by `github.com/ulule/loukoum/v3/...`
+- Migrate from [dep](https://github.com/golang/dep) to [go modules](https://github.com/golang/go/wiki/Modules) by
+  replacing the import path `github.com/ulule/loukoum/...` by `github.com/ulule/loukoum/v3/...`
 
 ### Migrating from v1.x.x
 
- * Change `Prepare()` to `NamedQuery()` for [builder.Builder](https://github.com/ulule/loukoum/blob/d6ee7eac818ec74889870fa82dff411ea266463b/builder/builder.go#L19) interface.
+- Change `Prepare()` to `NamedQuery()` for [builder.Builder](https://github.com/ulule/loukoum/blob/d6ee7eac818ec74889870fa82dff411ea266463b/builder/builder.go#L19) interface.
 
 ## Inspiration
 
-* [squirrel](https://github.com/Masterminds/squirrel)
-* [goqu](https://github.com/doug-martin/goqu)
-* [sqlabble](https://github.com/minodisk/sqlabble)
+- [squirrel](https://github.com/Masterminds/squirrel)
+- [goqu](https://github.com/doug-martin/goqu)
+- [sqlabble](https://github.com/minodisk/sqlabble)
 
 ## Thanks
 
-* [Ilia Choly](https://github.com/icholy)
+- [Ilia Choly](https://github.com/icholy)
 
 ## License
 
@@ -410,12 +410,12 @@ Loukoum artworks are released under the [`Creative Commons BY-SA License`][artwo
 
 ## Contributing
 
-* Ping us on twitter:
-  * [@novln_](https://twitter.com/novln_)
-  * [@oibafsellig](https://twitter.com/oibafsellig)
-  * [@thoas](https://twitter.com/thoas)
-* Fork the [project](https://github.com/ulule/loukoum)
-* Fix [bugs](https://github.com/ulule/loukoum/issues)
+- Ping us on twitter:
+  - [@novln\_](https://twitter.com/novln_)
+  - [@oibafsellig](https://twitter.com/oibafsellig)
+  - [@thoas](https://twitter.com/thoas)
+- Fork the [project](https://github.com/ulule/loukoum)
+- Fix [bugs](https://github.com/ulule/loukoum/issues)
 
 **Don't hesitate ;)**
 
@@ -428,5 +428,6 @@ Loukoum artworks are released under the [`Creative Commons BY-SA License`][artwo
 [artwork-license-url]: docs/images/LICENSE
 [sql-url]: https://golang.org/pkg/database/sql/
 [sqlx-url]: https://github.com/jmoiron/sqlx
+[makroud-url]: https://github.com/ulule/makroud/
 [circle-url]: https://circleci.com/gh/ulule/loukoum/tree/master
 [circle-img]: https://circleci.com/gh/ulule/loukoum.svg?style=shield&circle-token=1de7bc4fd603b0df406ceef4bbba3fb3d6b5ed10
