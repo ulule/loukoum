@@ -16,6 +16,7 @@ type Select struct {
 	Prefix      Prefix
 	With        With
 	Distinct    bool
+	DistinctOn  DistinctOn
 	Expressions []SelectExpression
 	From        From
 	Joins       []Join
@@ -57,6 +58,11 @@ func (selekt Select) writeHead(ctx types.Context) {
 	}
 
 	ctx.Write(token.Select.String())
+
+	if !selekt.DistinctOn.IsEmpty() {
+		ctx.Write(" ")
+		selekt.DistinctOn.Write(ctx)
+	}
 
 	if selekt.Distinct {
 		ctx.Write(" ")
