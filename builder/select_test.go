@@ -233,6 +233,65 @@ func TestSelect_Columns(t *testing.T) {
 	})
 }
 
+func TestSelect_DistinctOn(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "One column",
+			Builders: []builder.Builder{
+				loukoum.
+					Select("date").
+					DistinctOn("id").
+					From("record").
+					Where(loukoum.Condition("disabled").IsNull(false)),
+				loukoum.
+					Select("date").
+					DistinctOn(loukoum.Column("id")).
+					From("record").
+					Where(loukoum.Condition("disabled").IsNull(false)),
+			},
+			SameQuery: "SELECT DISTINCT ON (id) date FROM record WHERE (disabled IS NOT NULL)",
+		},
+		{
+			Name: "Two columns",
+			Builders: []builder.Builder{
+				loukoum.
+					Select("date").
+					DistinctOn("id", "user_id").
+					From("record").
+					Where(loukoum.Condition("disabled").IsNull(false)),
+				loukoum.
+					Select("date").
+					DistinctOn(loukoum.Column("id"), loukoum.Column("user_id")).
+					From("record").
+					Where(loukoum.Condition("disabled").IsNull(false)),
+			},
+			SameQuery: fmt.Sprint(
+				"SELECT DISTINCT ON (id, user_id) date FROM record ",
+				"WHERE (disabled IS NOT NULL)",
+			),
+		},
+		{
+			Name: "Three columns",
+			Builders: []builder.Builder{
+				loukoum.
+					Select("date").
+					DistinctOn("id", "user_id", "project_id").
+					From("record").
+					Where(loukoum.Condition("disabled").IsNull(false)),
+				loukoum.
+					Select("date").
+					DistinctOn(loukoum.Column("id"), loukoum.Column("user_id"), loukoum.Column("project_id")).
+					From("record").
+					Where(loukoum.Condition("disabled").IsNull(false)),
+			},
+			SameQuery: fmt.Sprint(
+				"SELECT DISTINCT ON (id, user_id, project_id) date FROM record ",
+				"WHERE (disabled IS NOT NULL)",
+			),
+		},
+	})
+}
+
 func TestSelect_From(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{

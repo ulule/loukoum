@@ -18,6 +18,23 @@ func NewSelect() Select {
 	return Select{}
 }
 
+// DistinctOn adds a DISTINCT ON clause to the query.
+func (b Select) DistinctOn(args ...interface{}) Select {
+	if !b.query.GroupBy.IsEmpty() {
+		panic("loukoum: select builder has distinct on clause already defined")
+	}
+
+	columns := ToColumns(args)
+	distinctOn := stmt.NewDistinctOn(columns)
+	if distinctOn.IsEmpty() {
+		panic("loukoum: given distinct on clause is undefined")
+	}
+
+	b.query.DistinctOn = distinctOn
+
+	return b
+}
+
 // Distinct adds a DISTINCT clause to the query.
 func (b Select) Distinct() Select {
 	b.query.Distinct = true
