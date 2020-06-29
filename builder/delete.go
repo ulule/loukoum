@@ -93,21 +93,24 @@ func (b Delete) Comment(comment string) Delete {
 // vulnerable to SQL injection.
 // You should use either NamedQuery() or Query()...
 func (b Delete) String() string {
-	ctx := &types.RawContext{}
+	ctx := types.NewRawContext()
+	defer ctx.Reset()
 	b.query.Write(ctx)
 	return ctx.Query()
 }
 
 // NamedQuery returns the underlying query as a named statement.
 func (b Delete) NamedQuery() (string, map[string]interface{}) {
-	ctx := &types.NamedContext{}
+	ctx := types.NewNamedContext()
+	defer ctx.Reset()
 	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 
 // Query returns the underlying query as a regular statement.
 func (b Delete) Query() (string, []interface{}) {
-	ctx := &types.StdContext{}
+	ctx := types.NewStdContext()
+	defer ctx.Reset()
 	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
