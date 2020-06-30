@@ -252,24 +252,25 @@ func (b Select) Comment(comment string) Select {
 // vulnerable to SQL injection.
 // You should use either NamedQuery() or Query()...
 func (b Select) String() string {
-	ctx := types.NewRawContext()
-	defer ctx.Reset()
+	ctx := &types.RawContext{}
 	return ctx.Query()
 }
 
 // NamedQuery returns the underlying query as a named statement.
 func (b Select) NamedQuery() (string, map[string]interface{}) {
-	ctx := types.NewNamedContext()
-	defer ctx.Reset()
+	ctx := &types.NamedContext{}
 	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 
 // Query returns the underlying query as a regular statement.
 func (b Select) Query() (string, []interface{}) {
-	ctx := types.NewStdContext()
-	defer ctx.Reset()
+	ctx := &types.StdContext{}
 	return ctx.Query(), ctx.Values()
+}
+
+func (b Select) Write(ctx types.Context) {
+	b.query.Write(ctx)
 }
 
 // Statement returns underlying statement.

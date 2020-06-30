@@ -118,25 +118,26 @@ func (b Update) Comment(comment string) Update {
 // vulnerable to SQL injection.
 // You should use either NamedQuery() or Query()...
 func (b Update) String() string {
-	ctx := types.NewRawContext()
-	defer ctx.Reset()
+	ctx := &types.RawContext{}
 	b.query.Write(ctx)
 	return ctx.Query()
 }
 
 // NamedQuery returns the underlying query as a named statement.
 func (b Update) NamedQuery() (string, map[string]interface{}) {
-	ctx := types.NewNamedContext()
-	defer ctx.Reset()
+	ctx := &types.NamedContext{}
 	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 
 // Query returns the underlying query as a regular statement.
 func (b Update) Query() (string, []interface{}) {
-	ctx := types.NewStdContext()
-	defer ctx.Reset()
+	ctx := &types.StdContext{}
 	return ctx.Query(), ctx.Values()
+}
+
+func (b Update) Write(ctx types.Context) {
+	b.query.Write(ctx)
 }
 
 // Statement returns underlying statement.

@@ -22,7 +22,6 @@ type RawContext struct {
 // NewRawContext returns a new RawContext instance.
 func NewRawContext() *RawContext {
 	ctx := poolRawContext.Get().(*RawContext)
-	ctx.buffer.Reset()
 	return ctx
 }
 
@@ -44,9 +43,10 @@ func (ctx *RawContext) Query() string {
 	return ctx.buffer.String()
 }
 
-// Reset returns instance to memory pool to reduce pressure on the garbage collector.
-func (ctx *RawContext) Reset() {
+// Close returns instance to memory pool to reduce pressure on the garbage collector.
+func (ctx *RawContext) Close() {
 	if ctx != nil && ctx.buffer.Cap() < (1<<16) {
+		ctx.buffer.Reset()
 		poolRawContext.Put(ctx)
 	}
 }
@@ -60,9 +60,6 @@ type NamedContext struct {
 // NewNamedContext returns a new NamedContext instance.
 func NewNamedContext() *NamedContext {
 	ctx := poolNamedContext.Get().(*NamedContext)
-	for k := range ctx.values {
-		delete(ctx.values, k)
-	}
 	return ctx
 }
 
@@ -82,9 +79,12 @@ func (ctx *NamedContext) Values() map[string]interface{} {
 	return ctx.values
 }
 
-// Reset returns instance to memory pool to reduce pressure on the garbage collector.
-func (ctx *NamedContext) Reset() {
+// Close returns instance to memory pool to reduce pressure on the garbage collector.
+func (ctx *NamedContext) Close() {
 	if ctx != nil && len(ctx.values) < (1<<12) {
+		for k := range ctx.values {
+			delete(ctx.values, k)
+		}
 		poolNamedContext.Put(ctx)
 	}
 }
@@ -98,7 +98,6 @@ type StdContext struct {
 // NewStdContext returns a new StdContext instance.
 func NewStdContext() *StdContext {
 	ctx := poolStdContext.Get().(*StdContext)
-	ctx.values = ctx.values[:0]
 	return ctx
 }
 
@@ -114,9 +113,10 @@ func (ctx *StdContext) Values() []interface{} {
 	return ctx.values
 }
 
-// Reset returns instance to memory pool to reduce pressure on the garbage collector.
-func (ctx *StdContext) Reset() {
+// Close returns instance to memory pool to reduce pressure on the garbage collector.
+func (ctx *StdContext) Close() {
 	if ctx != nil && cap(ctx.values) < (1<<12) {
+		ctx.values = ctx.values[:0]
 		poolStdContext.Put(ctx)
 	}
 }

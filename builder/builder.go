@@ -23,6 +23,8 @@ type Builder interface {
 	Query() (string, []interface{})
 	// Statement returns underlying statement.
 	Statement() stmt.Statement
+	// Write underlying query in given context.
+	Write(ctx types.Context)
 }
 
 // IsSelectBuilder returns true if given builder is of type "Select"

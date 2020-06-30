@@ -130,26 +130,27 @@ func (b Insert) Set(args ...interface{}) Insert {
 // vulnerable to SQL injection.
 // You should use either NamedQuery() or Query()...
 func (b Insert) String() string {
-	ctx := types.NewRawContext()
-	defer ctx.Reset()
+	ctx := &types.RawContext{}
 	b.query.Write(ctx)
 	return ctx.Query()
 }
 
 // NamedQuery returns the underlying query as a named statement.
 func (b Insert) NamedQuery() (string, map[string]interface{}) {
-	ctx := types.NewNamedContext()
-	defer ctx.Reset()
+	ctx := &types.NamedContext{}
 	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 
 // Query returns the underlying query as a regular statement.
 func (b Insert) Query() (string, []interface{}) {
-	ctx := types.NewStdContext()
-	defer ctx.Reset()
+	ctx := &types.StdContext{}
 	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
+}
+
+func (b Insert) Write(ctx types.Context) {
+	b.query.Write(ctx)
 }
 
 // Statement returns underlying statement.
