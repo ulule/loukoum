@@ -1,6 +1,8 @@
 package builder
 
 import (
+	"sync"
+
 	"github.com/ulule/loukoum/v3/stmt"
 	"github.com/ulule/loukoum/v3/types"
 )
@@ -137,6 +139,7 @@ func (b Update) Query() (string, []interface{}) {
 	return ctx.Query(), ctx.Values()
 }
 
+// Write underlying query in given context.
 func (b Update) Write(ctx types.Context) {
 	b.query.Write(ctx)
 }
@@ -148,3 +151,9 @@ func (b Update) Statement() stmt.Statement {
 
 // Ensure that Update is a Builder
 var _ Builder = Update{}
+
+var poolUpdateBuilder = sync.Pool{
+	New: func() interface{} {
+		return &Update{}
+	},
+}

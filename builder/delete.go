@@ -1,6 +1,8 @@
 package builder
 
 import (
+	"sync"
+
 	"github.com/ulule/loukoum/v3/stmt"
 	"github.com/ulule/loukoum/v3/types"
 )
@@ -112,6 +114,7 @@ func (b Delete) Query() (string, []interface{}) {
 	return ctx.Query(), ctx.Values()
 }
 
+// Write underlying query in given context.
 func (b Delete) Write(ctx types.Context) {
 	b.query.Write(ctx)
 }
@@ -121,5 +124,16 @@ func (b Delete) Statement() stmt.Statement {
 	return b.query
 }
 
+// Close returns instance to memory pool to reduce pressure on the garbage collector.
+func (b *Delete) Close() error {
+	return nil
+}
+
 // Ensure that Delete is a Builder
-var _ Builder = Delete{}
+var _ Builder = &Delete{}
+
+var poolDeleteBuilder = sync.Pool{
+	New: func() interface{} {
+		return &Delete{}
+	},
+}

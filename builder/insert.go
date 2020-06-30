@@ -2,6 +2,7 @@ package builder
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/ulule/loukoum/v3/stmt"
 	"github.com/ulule/loukoum/v3/types"
@@ -113,8 +114,7 @@ func (b Insert) Set(args ...interface{}) Insert {
 		panic("loukoum: insert builder has values clause already defined")
 	}
 
-	pairs := ToSet(args).Pairs
-	columns, expressions := pairs.Values()
+	columns, expressions := ToPairValues(args)
 
 	array := stmt.NewArrayExpression(expressions)
 	values := stmt.NewValues(array)
@@ -149,6 +149,7 @@ func (b Insert) Query() (string, []interface{}) {
 	return ctx.Query(), ctx.Values()
 }
 
+// Write underlying query in given context.
 func (b Insert) Write(ctx types.Context) {
 	b.query.Write(ctx)
 }
@@ -160,3 +161,9 @@ func (b Insert) Statement() stmt.Statement {
 
 // Ensure that Insert is a Builder
 var _ Builder = Insert{}
+
+var poolInsertBuilder = sync.Pool{
+	New: func() interface{} {
+		return &Insert{}
+	},
+}

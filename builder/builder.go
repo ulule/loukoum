@@ -21,10 +21,10 @@ type Builder interface {
 	NamedQuery() (string, map[string]interface{})
 	// Query returns the underlying query as a regular statement.
 	Query() (string, []interface{})
-	// Statement returns underlying statement.
-	Statement() stmt.Statement
 	// Write underlying query in given context.
 	Write(ctx types.Context)
+	// Statement returns underlying statement.
+	Statement() stmt.Statement
 }
 
 // IsSelectBuilder returns true if given builder is of type "Select"
@@ -318,6 +318,13 @@ func ToInt64(value interface{}) (int64, bool) { // nolint: gocyclo
 
 // MergeSet merges new pairs into existing ones (last write wins).
 func MergeSet(set stmt.Set, args []interface{}) stmt.Set {
+	if set.IsEmpty() && len(args) == 1 {
+		value, ok := args[0].(stmt.Set)
+		if ok {
+			return value
+		}
+	}
+
 	for i := range args {
 		switch value := args[i].(type) {
 		case string, stmt.Column:
@@ -348,6 +355,28 @@ func ToSet(args []interface{}) stmt.Set {
 	set.Pairs.Mode = stmt.PairAssociativeMode
 	set = MergeSet(set, args)
 	return set
+}
+
+// ToPairValues returns a separated list of columns and expressions from various source.
+func ToPairValues(args []interface{}) ([]stmt.Column, []stmt.Expression) {
+	if len(args) == 1 {
+		switch value := args[0].(type) {
+		case types.Map:
+			columns := make([]stmt.Column, 0, len(value))
+			expressions := make([]stmt.Expression, 0, len(value))
+
+			for k, v := range value {
+				columns = append(columns, ToColumn(k))
+				expressions = append(expressions, stmt.NewExpression(v))
+			}
+
+			return columns, expressions
+		}
+	}
+
+	pairs := ToSet(args).Pairs
+	columns, expressions := pairs.Values()
+	return columns, expressions
 }
 
 // ToLimit takes an empty interfaces and returns a Limit instance.

@@ -2,6 +2,7 @@ package builder
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/ulule/loukoum/v3/parser"
 	"github.com/ulule/loukoum/v3/stmt"
@@ -271,6 +272,7 @@ func (b Select) Query() (string, []interface{}) {
 	return ctx.Query(), ctx.Values()
 }
 
+// Write underlying query in given context.
 func (b Select) Write(ctx types.Context) {
 	b.query.Write(ctx)
 }
@@ -311,3 +313,9 @@ func handleSelectJoin(args []interface{}) stmt.Join {
 
 // Ensure that Select is a Builder
 var _ Builder = Select{}
+
+var poolSelectBuilder = sync.Pool{
+	New: func() interface{} {
+		return &Select{}
+	},
+}
