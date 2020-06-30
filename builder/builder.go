@@ -96,6 +96,11 @@ func ToColumns(values []interface{}) []stmt.Column { // nolint: gocyclo
 
 	for i := range values {
 		switch value := values[i].(type) {
+		case stmt.Column:
+			if value.IsEmpty() {
+				panic("loukoum: given column is undefined")
+			}
+			columns = append(columns, value)
 		case string:
 			array := strings.Split(value, ",")
 			for y := range array {
@@ -105,11 +110,6 @@ func ToColumns(values []interface{}) []stmt.Column { // nolint: gocyclo
 				}
 				columns = append(columns, column)
 			}
-		case stmt.Column:
-			if value.IsEmpty() {
-				panic("loukoum: given column is undefined")
-			}
-			columns = append(columns, value)
 		default:
 			panic(fmt.Sprintf("loukoum: cannot use %T as column", values[i]))
 		}
