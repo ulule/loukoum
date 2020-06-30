@@ -253,6 +253,7 @@ func (b Select) Comment(comment string) Select {
 // You should use either NamedQuery() or Query()...
 func (b Select) String() string {
 	ctx := &types.RawContext{}
+	b.query.Write(ctx)
 	return ctx.Query()
 }
 
@@ -266,6 +267,7 @@ func (b Select) NamedQuery() (string, map[string]interface{}) {
 // Query returns the underlying query as a regular statement.
 func (b Select) Query() (string, []interface{}) {
 	ctx := &types.StdContext{}
+	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 

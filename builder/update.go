@@ -133,6 +133,7 @@ func (b Update) NamedQuery() (string, map[string]interface{}) {
 // Query returns the underlying query as a regular statement.
 func (b Update) Query() (string, []interface{}) {
 	ctx := &types.StdContext{}
+	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }
 
