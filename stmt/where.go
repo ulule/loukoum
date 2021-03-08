@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Where is a WHERE clause.
@@ -13,12 +13,12 @@ type Where struct {
 // NewWhere returns a new Where instance.
 func NewWhere(expression Expression) Where {
 	return Where{
-		Condition: expression,
+		Condition: NewWrapper(expression),
 	}
 }
 
 // Write exposes statement as a SQL query.
-func (where Where) Write(ctx *types.Context) {
+func (where Where) Write(ctx types.Context) {
 	if where.IsEmpty() {
 		panic("loukoum: a where clause expects at least one condition")
 	}
@@ -41,7 +41,7 @@ func (where Where) And(right Expression) Where {
 
 	left := where.Condition
 	operator := NewAndOperator()
-	where.Condition = NewInfixExpression(left, operator, right)
+	where.Condition = NewInfixExpression(left, operator, NewWrapper(right))
 	return where
 }
 
@@ -53,7 +53,7 @@ func (where Where) Or(right Expression) Where {
 
 	left := where.Condition
 	operator := NewOrOperator()
-	where.Condition = NewInfixExpression(left, operator, right)
+	where.Condition = NewInfixExpression(left, operator, NewWrapper(right))
 	return where
 }
 

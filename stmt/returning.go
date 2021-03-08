@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Returning is a RETURNING clause.
@@ -18,24 +18,15 @@ func NewReturning(columns []Column) Returning {
 }
 
 // Write exposes statement as a SQL query.
-func (returning Returning) Write(ctx *types.Context) {
+func (returning Returning) Write(ctx types.Context) {
 	ctx.Write(token.Returning.String())
 	ctx.Write(" ")
-
-	l := len(returning.Columns)
-	if l > 1 {
-		ctx.Write("(")
-	}
 
 	for i := range returning.Columns {
 		if i > 0 {
 			ctx.Write(", ")
 		}
 		returning.Columns[i].Write(ctx)
-	}
-
-	if l > 1 {
-		ctx.Write(")")
 	}
 }
 

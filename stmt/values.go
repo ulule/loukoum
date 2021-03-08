@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Values is a VALUES clause.
@@ -18,7 +18,7 @@ func NewValues(values Expression) Values {
 }
 
 // Write exposes statement as a SQL query.
-func (values Values) Write(ctx *types.Context) {
+func (values Values) Write(ctx types.Context) {
 	if values.IsEmpty() {
 		return
 	}

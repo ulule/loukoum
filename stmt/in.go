@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // In is a IN expression.
@@ -32,7 +32,7 @@ func NewNotIn(identifier Identifier, value Expression) In {
 func (In) expression() {}
 
 // Write exposes statement as a SQL query.
-func (in In) Write(ctx *types.Context) {
+func (in In) Write(ctx types.Context) {
 	if in.IsEmpty() {
 		panic("loukoum: expression is undefined")
 	}
@@ -42,13 +42,27 @@ func (in In) Write(ctx *types.Context) {
 	ctx.Write(" ")
 	in.Operator.Write(ctx)
 	ctx.Write(" (")
-	in.Value.Write(ctx)
+	if !in.Value.IsEmpty() {
+		in.Value.Write(ctx)
+	}
 	ctx.Write("))")
 }
 
 // IsEmpty returns true if statement is undefined.
 func (in In) IsEmpty() bool {
-	return in.Identifier.IsEmpty() || in.Operator.IsEmpty() || in.Value == nil || in.Value.IsEmpty()
+	return in.Identifier.IsEmpty() || in.Operator.IsEmpty() || in.Value == nil
+}
+
+// And creates a new InfixExpression using given Expression.
+func (in In) And(value Expression) InfixExpression {
+	operator := NewAndOperator()
+	return NewInfixExpression(in, operator, value)
+}
+
+// Or creates a new InfixExpression using given Expression.
+func (in In) Or(value Expression) InfixExpression {
+	operator := NewOrOperator()
+	return NewInfixExpression(in, operator, value)
 }
 
 // Ensure that In is an Expression

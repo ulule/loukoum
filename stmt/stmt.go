@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Statement is the interface of the component which is the minimum unit constituting SQL.
@@ -10,5 +10,5 @@ type Statement interface {
 	// IsEmpty returns true if statement is undefined.
 	IsEmpty() bool
 	// Write exposes statement as a SQL query.
-	Write(ctx *types.Context)
+	Write(ctx types.Context)
 }

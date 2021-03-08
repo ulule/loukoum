@@ -1,16 +1,18 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Insert is a INSERT statement.
 type Insert struct {
-	Into      Into
-	Columns   []Column
-	Values    Values
-	Returning Returning
+	Into       Into
+	Columns    []Column
+	Values     Values
+	OnConflict OnConflict
+	Returning  Returning
+	Comment    Comment
 }
 
 // NewInsert returns a new Insert instance.
@@ -19,7 +21,7 @@ func NewInsert() Insert {
 }
 
 // Write exposes statement as a SQL query.
-func (insert Insert) Write(ctx *types.Context) {
+func (insert Insert) Write(ctx types.Context) {
 	if insert.IsEmpty() {
 		panic("loukoum: an insert statement must have at least one column")
 	}
@@ -29,18 +31,14 @@ func (insert Insert) Write(ctx *types.Context) {
 	insert.Into.Write(ctx)
 
 	if len(insert.Columns) > 0 {
-		nbColumns := len(insert.Columns)
+		ctx.Write(" (")
 		for i := range insert.Columns {
-			if i == 0 {
-				ctx.Write(" (")
-			} else {
+			if i != 0 {
 				ctx.Write(", ")
 			}
 			insert.Columns[i].Write(ctx)
-			if i == nbColumns-1 {
-				ctx.Write(")")
-			}
 		}
+		ctx.Write(")")
 	}
 
 	if !insert.Values.IsEmpty() {
@@ -48,9 +46,20 @@ func (insert Insert) Write(ctx *types.Context) {
 		insert.Values.Write(ctx)
 	}
 
+	if !insert.OnConflict.IsEmpty() {
+		ctx.Write(" ")
+		insert.OnConflict.Write(ctx)
+	}
+
 	if !insert.Returning.IsEmpty() {
 		ctx.Write(" ")
 		insert.Returning.Write(ctx)
+	}
+
+	if !insert.Comment.IsEmpty() {
+		ctx.Write(token.Semicolon.String())
+		ctx.Write(" ")
+		insert.Comment.Write(ctx)
 	}
 }
 

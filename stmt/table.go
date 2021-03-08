@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Table is a table identifier.
@@ -31,7 +31,7 @@ func (table Table) As(alias string) Table {
 }
 
 // Write exposes statement as a SQL query.
-func (table Table) Write(ctx *types.Context) {
+func (table Table) Write(ctx types.Context) {
 	ctx.Write(table.Name)
 	if table.Alias != "" {
 		ctx.Write(" ")

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-set -eo pipefail
-
-dep ensure
-dep prune

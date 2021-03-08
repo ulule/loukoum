@@ -1,24 +1,33 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
+
+// SelectExpression is a SQL expression for a SELECT statement.
+type SelectExpression interface {
+	Statement
+	selectExpression()
+}
 
 // Select is a SELECT statement.
 type Select struct {
-	Prefix   Prefix
-	Distinct bool
-	Columns  []Column
-	From     From
-	Joins    []Join
-	Where    Where
-	GroupBy  GroupBy
-	Having   Having
-	OrderBy  OrderBy
-	Limit    Limit
-	Offset   Offset
-	Suffix   Suffix
+	Prefix      Prefix
+	With        With
+	Distinct    bool
+	DistinctOn  DistinctOn
+	Expressions []SelectExpression
+	From        From
+	Joins       []Join
+	Where       Where
+	GroupBy     GroupBy
+	Having      Having
+	OrderBy     OrderBy
+	Limit       Limit
+	Offset      Offset
+	Suffix      Suffix
+	Comment     Comment
 }
 
 // NewSelect returns a new Select instance.
@@ -27,7 +36,7 @@ func NewSelect() Select {
 }
 
 // Write exposes statement as a SQL query.
-func (selekt Select) Write(ctx *types.Context) {
+func (selekt Select) Write(ctx types.Context) {
 	if selekt.IsEmpty() {
 		panic("loukoum: select statements must have at least one column")
 	}
@@ -37,26 +46,36 @@ func (selekt Select) Write(ctx *types.Context) {
 	selekt.writeTail(ctx)
 }
 
-func (selekt Select) writeHead(ctx *types.Context) {
+func (selekt Select) writeHead(ctx types.Context) {
 	if !selekt.Prefix.IsEmpty() {
 		selekt.Prefix.Write(ctx)
 		ctx.Write(" ")
 	}
 
+	if !selekt.With.IsEmpty() {
+		selekt.With.Write(ctx)
+		ctx.Write(" ")
+	}
+
 	ctx.Write(token.Select.String())
+
+	if !selekt.DistinctOn.IsEmpty() {
+		ctx.Write(" ")
+		selekt.DistinctOn.Write(ctx)
+	}
 
 	if selekt.Distinct {
 		ctx.Write(" ")
 		ctx.Write(token.Distinct.String())
 	}
 
-	for i := range selekt.Columns {
+	for i := range selekt.Expressions {
 		if i == 0 {
 			ctx.Write(" ")
 		} else {
 			ctx.Write(", ")
 		}
-		selekt.Columns[i].Write(ctx)
+		selekt.Expressions[i].Write(ctx)
 	}
 
 	if !selekt.From.IsEmpty() {
@@ -65,7 +84,7 @@ func (selekt Select) writeHead(ctx *types.Context) {
 	}
 }
 
-func (selekt Select) writeMiddle(ctx *types.Context) {
+func (selekt Select) writeMiddle(ctx types.Context) {
 	for i := range selekt.Joins {
 		ctx.Write(" ")
 		selekt.Joins[i].Write(ctx)
@@ -87,7 +106,7 @@ func (selekt Select) writeMiddle(ctx *types.Context) {
 	}
 }
 
-func (selekt Select) writeTail(ctx *types.Context) {
+func (selekt Select) writeTail(ctx types.Context) {
 	if !selekt.OrderBy.IsEmpty() {
 		ctx.Write(" ")
 		selekt.OrderBy.Write(ctx)
@@ -107,11 +126,17 @@ func (selekt Select) writeTail(ctx *types.Context) {
 		ctx.Write(" ")
 		selekt.Suffix.Write(ctx)
 	}
+
+	if !selekt.Comment.IsEmpty() {
+		ctx.Write(token.Semicolon.String())
+		ctx.Write(" ")
+		selekt.Comment.Write(ctx)
+	}
 }
 
 // IsEmpty returns true if statement is undefined.
 func (selekt Select) IsEmpty() bool {
-	return len(selekt.Columns) == 0
+	return len(selekt.Expressions) == 0
 }
 
 func (Select) expression() {}

@@ -3,8 +3,8 @@ package stmt
 import (
 	"strconv"
 
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Offset is a OFFSET clause.
@@ -20,7 +20,7 @@ func NewOffset(start int64) Offset {
 }
 
 // Write exposes statement as a SQL query.
-func (offset Offset) Write(ctx *types.Context) {
+func (offset Offset) Write(ctx types.Context) {
 	if offset.IsEmpty() {
 		return
 	}

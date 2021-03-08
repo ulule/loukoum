@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // From is a FROM clause.
@@ -20,7 +20,7 @@ func NewFrom(table Table, only bool) From {
 }
 
 // Write exposes statement as a SQL query.
-func (from From) Write(ctx *types.Context) {
+func (from From) Write(ctx types.Context) {
 	ctx.Write(token.From.String())
 	if from.Only {
 		ctx.Write(" ")

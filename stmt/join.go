@@ -1,18 +1,19 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Join is a JOIN clause.
 type Join struct {
 	Type      types.JoinType
 	Table     Table
-	Condition On
+	Condition OnExpression
 }
 
 // NewJoin returns a new Join instance.
-func NewJoin(kind types.JoinType, table Table, condition On) Join {
+func NewJoin(kind types.JoinType, table Table, condition OnExpression) Join {
 	return Join{
 		Type:      kind,
 		Table:     table,
@@ -21,25 +22,27 @@ func NewJoin(kind types.JoinType, table Table, condition On) Join {
 }
 
 // NewInnerJoin returns a new Join instance using an INNER JOIN.
-func NewInnerJoin(table Table, condition On) Join {
+func NewInnerJoin(table Table, condition OnExpression) Join {
 	return NewJoin(types.InnerJoin, table, condition)
 }
 
 // NewLeftJoin returns a new Join instance using a LEFT JOIN.
-func NewLeftJoin(table Table, condition On) Join {
+func NewLeftJoin(table Table, condition OnExpression) Join {
 	return NewJoin(types.LeftJoin, table, condition)
 }
 
 // NewRightJoin returns a new Join instance using a RIGHT JOIN.
-func NewRightJoin(table Table, condition On) Join {
+func NewRightJoin(table Table, condition OnExpression) Join {
 	return NewJoin(types.RightJoin, table, condition)
 }
 
 // Write exposes statement as a SQL query.
-func (join Join) Write(ctx *types.Context) {
+func (join Join) Write(ctx types.Context) {
 	ctx.Write(join.Type.String())
 	ctx.Write(" ")
 	join.Table.Write(ctx)
+	ctx.Write(" ")
+	ctx.Write(token.On.String())
 	ctx.Write(" ")
 	join.Condition.Write(ctx)
 }

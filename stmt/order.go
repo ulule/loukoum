@@ -1,10 +1,10 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/types"
 )
 
-// Order is an expression of a "ORDER BY" clause.
+// Order is an expression of a ORDER BY clause.
 type Order struct {
 	Expression string
 	Type       types.OrderType
@@ -19,7 +19,7 @@ func NewOrder(expression string, kind types.OrderType) Order {
 }
 
 // Write exposes statement as a SQL query.
-func (order Order) Write(ctx *types.Context) {
+func (order Order) Write(ctx types.Context) {
 	if order.IsEmpty() {
 		return
 	}

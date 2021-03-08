@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Between is a BETWEEN expression.
@@ -38,7 +38,7 @@ func NewNotBetween(identifier Identifier, from, to Expression) Between {
 func (Between) expression() {}
 
 // Write exposes statement as a SQL query.
-func (between Between) Write(ctx *types.Context) {
+func (between Between) Write(ctx types.Context) {
 	if between.IsEmpty() {
 		panic("loukoum: expression is undefined")
 	}

@@ -6,17 +6,17 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ulule/loukoum/lexer"
-	"github.com/ulule/loukoum/stmt"
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/lexer"
+	"github.com/ulule/loukoum/v3/stmt"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // ErrJoinInvalidCondition is returned when join condition cannot be parsed.
 var ErrJoinInvalidCondition = fmt.Errorf("join condition is invalid")
 
 // ParseJoin will try to parse given subquery as a join statement.
-func ParseJoin(subquery string) (stmt.Join, error) {
+func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 	lexer := lexer.New(strings.NewReader(subquery))
 	it := lexer.Iterator()
 
@@ -74,7 +74,62 @@ func ParseJoin(subquery string) (stmt.Join, error) {
 				e = it.Next()
 				right := stmt.NewColumn(e.Value)
 
-				join.Condition = stmt.NewOn(left, right)
+				join.Condition = stmt.NewOnClause(left, right)
+
+				for it.Is(token.And) || it.Is(token.Or) {
+					// We have an AND operator
+					if it.Is(token.And) {
+						e := it.Next()
+						if e.Type != token.And || !it.Is(token.Literal) {
+							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
+							return stmt.Join{}, err
+						}
+
+						// Left condition
+						e = it.Next()
+						left := stmt.NewColumn(e.Value)
+
+						// Check that we have a right condition
+						e = it.Next()
+						if e.Type != token.Equals || !it.Is(token.Literal) {
+							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
+							return stmt.Join{}, err
+						}
+
+						// Right condition
+						e = it.Next()
+						right := stmt.NewColumn(e.Value)
+
+						join.Condition = join.Condition.And(stmt.NewOnClause(left, right))
+
+					}
+					// We have an OR operator
+					if it.Is(token.Or) {
+						e := it.Next()
+						if e.Type != token.Or || !it.Is(token.Literal) {
+							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
+							return stmt.Join{}, err
+						}
+
+						// Left condition
+						e = it.Next()
+						left := stmt.NewColumn(e.Value)
+
+						// Check that we have a right condition
+						e = it.Next()
+						if e.Type != token.Equals || !it.Is(token.Literal) {
+							err := errors.Wrapf(ErrJoinInvalidCondition, "given query cannot be parsed: %s", subquery)
+							return stmt.Join{}, err
+						}
+
+						// Right condition
+						e = it.Next()
+						right := stmt.NewColumn(e.Value)
+
+						join.Condition = join.Condition.Or(stmt.NewOnClause(left, right))
+					}
+				}
+
 				continue
 			}
 

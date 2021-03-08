@@ -3,9 +3,9 @@ package builder
 import (
 	"fmt"
 
-	"github.com/ulule/loukoum/parser"
-	"github.com/ulule/loukoum/stmt"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/parser"
+	"github.com/ulule/loukoum/v3/stmt"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Select is a builder used for "SELECT" query.
@@ -18,6 +18,23 @@ func NewSelect() Select {
 	return Select{}
 }
 
+// DistinctOn adds a DISTINCT ON clause to the query.
+func (b Select) DistinctOn(args ...interface{}) Select {
+	if !b.query.GroupBy.IsEmpty() {
+		panic("loukoum: select builder has distinct on clause already defined")
+	}
+
+	columns := ToColumns(args)
+	distinctOn := stmt.NewDistinctOn(columns)
+	if distinctOn.IsEmpty() {
+		panic("loukoum: given distinct on clause is undefined")
+	}
+
+	b.query.DistinctOn = distinctOn
+
+	return b
+}
+
 // Distinct adds a DISTINCT clause to the query.
 func (b Select) Distinct() Select {
 	b.query.Distinct = true
@@ -26,14 +43,14 @@ func (b Select) Distinct() Select {
 
 // Columns adds result columns to the query.
 func (b Select) Columns(args ...interface{}) Select {
-	if len(b.query.Columns) != 0 {
+	if len(b.query.Expressions) != 0 {
 		panic("loukoum: select builder has columns already defined")
 	}
 	if len(args) == 0 {
 		args = []interface{}{"*"}
 	}
 
-	b.query.Columns = ToColumns(args)
+	b.query.Expressions = ToSelectExpressions(args)
 
 	return b
 }
@@ -114,6 +131,17 @@ func (b Select) join3(args []interface{}) Select {
 	return b
 }
 
+// With adds WITH clauses.
+func (b Select) With(args ...stmt.WithQuery) Select {
+	if b.query.With.IsEmpty() {
+		b.query.With = stmt.NewWith(args)
+		return b
+	}
+
+	b.query.With.Queries = append(b.query.With.Queries, args...)
+	return b
+}
+
 // Where adds WHERE clauses.
 func (b Select) Where(condition stmt.Expression) Select {
 	if b.query.Where.IsEmpty() {
@@ -176,13 +204,7 @@ func (b Select) Limit(value interface{}) Select {
 		panic("loukoum: select builder has limit clause already defined")
 	}
 
-	limit, ok := ToInt64(value)
-	if !ok || limit <= 0 {
-		panic("loukoum: limit must be a positive integer")
-	}
-
-	b.query.Limit = stmt.NewLimit(limit)
-
+	b.query.Limit = ToLimit(value)
 	return b
 }
 
@@ -192,13 +214,7 @@ func (b Select) Offset(value interface{}) Select {
 		panic("loukoum: select builder has offset clause already defined")
 	}
 
-	offset, ok := ToInt64(value)
-	if !ok || offset <= 0 {
-		panic("loukoum: offset must be a positive integer")
-	}
-
-	b.query.Offset = stmt.NewOffset(offset)
-
+	b.query.Offset = ToOffset(value)
 	return b
 }
 
@@ -224,20 +240,35 @@ func (b Select) Prefix(prefix interface{}) Select {
 	return b
 }
 
-// String returns the underlying query as a raw statement.
-func (b Select) String() string {
-	return rawify(b.Prepare())
+// Comment adds comment to the query.
+func (b Select) Comment(comment string) Select {
+	b.query.Comment = stmt.NewComment(comment)
+
+	return b
 }
 
-// Prepare returns the underlying query as a named statement.
-func (b Select) Prepare() (string, map[string]interface{}) {
-	ctx := types.NewContext()
+// String returns the underlying query as a raw statement.
+// This function should be used for debugging since it doesn't escape anything and is completely
+// vulnerable to SQL injection.
+// You should use either NamedQuery() or Query()...
+func (b Select) String() string {
+	ctx := &types.RawContext{}
 	b.query.Write(ctx)
+	return ctx.Query()
+}
 
-	query := ctx.Query()
-	args := ctx.Values()
+// NamedQuery returns the underlying query as a named statement.
+func (b Select) NamedQuery() (string, map[string]interface{}) {
+	ctx := &types.NamedContext{}
+	b.query.Write(ctx)
+	return ctx.Query(), ctx.Values()
+}
 
-	return query, args
+// Query returns the underlying query as a regular statement.
+func (b Select) Query() (string, []interface{}) {
+	ctx := &types.StdContext{}
+	b.query.Write(ctx)
+	return ctx.Query(), ctx.Values()
 }
 
 // Statement returns underlying statement.
@@ -261,7 +292,9 @@ func handleSelectJoin(args []interface{}) stmt.Join {
 	switch value := args[1].(type) {
 	case string:
 		join = parser.MustParseJoin(value)
-	case stmt.On:
+	case stmt.OnClause:
+		join = stmt.NewInnerJoin(table, value)
+	case stmt.InfixOnExpression:
 		join = stmt.NewInnerJoin(table, value)
 	default:
 		panic(fmt.Sprintf("loukoum: cannot use %T as condition for join clause", args[1]))

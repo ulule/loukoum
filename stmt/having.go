@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Having is a HAVING clause.
@@ -19,7 +19,7 @@ func NewHaving(expression Expression) Having {
 }
 
 // Write exposes statement as a SQL query.
-func (having Having) Write(ctx *types.Context) {
+func (having Having) Write(ctx types.Context) {
 	if having.IsEmpty() {
 		panic("loukoum: a having clause expects at least one condition")
 	}

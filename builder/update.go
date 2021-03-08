@@ -1,8 +1,8 @@
 package builder
 
 import (
-	"github.com/ulule/loukoum/stmt"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/stmt"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Update is a builder used for "UPDATE" query.
@@ -25,10 +25,40 @@ func (b Update) Only() Update {
 
 // Set adds a SET clause.
 func (b Update) Set(args ...interface{}) Update {
-	pairs := ToSetPairs(args)
-	for k, v := range pairs {
-		b.query.Set.Pairs[k] = v
+	if len(args) == 0 {
+		panic("loukoum: update set clause requires at least one argument")
 	}
+
+	b.query.Set = MergeSet(b.query.Set, args)
+	return b
+}
+
+// Using assigns the result of the given expression to
+// the columns defined in Set.
+func (b Update) Using(args ...interface{}) Update {
+	if b.query.Set.Pairs.Mode != stmt.PairArrayMode {
+		panic("loukoum: you can only use Using with column-list syntax")
+	}
+
+	if len(args) == 0 {
+		panic("loukoum: using clause requires a column or an expression")
+	}
+
+	for i := range args {
+		b.query.Set.Pairs.Use(stmt.NewExpression(args[i]))
+	}
+
+	return b
+}
+
+// With adds WITH clauses.
+func (b Update) With(args ...stmt.WithQuery) Update {
+	if b.query.With.IsEmpty() {
+		b.query.With = stmt.NewWith(args)
+		return b
+	}
+
+	b.query.With.Queries = append(b.query.With.Queries, args...)
 	return b
 }
 
@@ -76,14 +106,33 @@ func (b Update) Returning(values ...interface{}) Update {
 	return b
 }
 
-// String returns the underlying query as a raw statement.
-func (b Update) String() string {
-	return rawify(b.Prepare())
+// Comment adds comment to the query.
+func (b Update) Comment(comment string) Update {
+	b.query.Comment = stmt.NewComment(comment)
+
+	return b
 }
 
-// Prepare returns the underlying query as a named statement.
-func (b Update) Prepare() (string, map[string]interface{}) {
-	ctx := types.NewContext()
+// String returns the underlying query as a raw statement.
+// This function should be used for debugging since it doesn't escape anything and is completely
+// vulnerable to SQL injection.
+// You should use either NamedQuery() or Query()...
+func (b Update) String() string {
+	ctx := &types.RawContext{}
+	b.query.Write(ctx)
+	return ctx.Query()
+}
+
+// NamedQuery returns the underlying query as a named statement.
+func (b Update) NamedQuery() (string, map[string]interface{}) {
+	ctx := &types.NamedContext{}
+	b.query.Write(ctx)
+	return ctx.Query(), ctx.Values()
+}
+
+// Query returns the underlying query as a regular statement.
+func (b Update) Query() (string, []interface{}) {
+	ctx := &types.StdContext{}
 	b.query.Write(ctx)
 	return ctx.Query(), ctx.Values()
 }

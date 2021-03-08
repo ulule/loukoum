@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // GroupBy is a GROUP BY clause.
@@ -18,7 +18,7 @@ func NewGroupBy(columns []Column) GroupBy {
 }
 
 // Write exposes statement as a SQL query.
-func (group GroupBy) Write(ctx *types.Context) {
+func (group GroupBy) Write(ctx types.Context) {
 	ctx.Write(token.Group.String())
 	ctx.Write(" ")
 	ctx.Write(token.By.String())

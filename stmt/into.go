@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Into is a INTO clause.
@@ -18,7 +18,7 @@ func NewInto(table Table) Into {
 }
 
 // Write exposes statement as a SQL query.
-func (into Into) Write(ctx *types.Context) {
+func (into Into) Write(ctx types.Context) {
 	ctx.Write(token.Into.String())
 	ctx.Write(" ")
 	into.Table.Write(ctx)

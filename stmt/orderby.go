@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // OrderBy is a ORDER BY clause.
@@ -18,7 +18,7 @@ func NewOrderBy(orders []Order) OrderBy {
 }
 
 // Write exposes statement as a SQL query.
-func (order OrderBy) Write(ctx *types.Context) {
+func (order OrderBy) Write(ctx types.Context) {
 	if order.IsEmpty() {
 		return
 	}

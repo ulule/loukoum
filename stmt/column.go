@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Column is a column identifier.
@@ -51,7 +51,7 @@ func (column Column) Desc() Order {
 }
 
 // Write exposes statement as a SQL query.
-func (column Column) Write(ctx *types.Context) {
+func (column Column) Write(ctx types.Context) {
 	ctx.Write(column.Name)
 	if column.Alias != "" {
 		ctx.Write(" ")
@@ -66,5 +66,7 @@ func (column Column) IsEmpty() bool {
 	return column.Name == ""
 }
 
-// Ensure that Column is a Statement
-var _ Statement = Column{}
+func (Column) selectExpression() {}
+
+// Ensure that Column is a SelectExpression.
+var _ SelectExpression = Column{}

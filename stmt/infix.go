@@ -1,7 +1,7 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // InfixExpression is an Expression that has a left and right operand with an operator.
@@ -24,7 +24,7 @@ func NewInfixExpression(left Expression, operator Operator, right Expression) In
 func (InfixExpression) expression() {}
 
 // Write exposes statement as a SQL query.
-func (expression InfixExpression) Write(ctx *types.Context) {
+func (expression InfixExpression) Write(ctx types.Context) {
 	if expression.IsEmpty() {
 		panic("loukoum: expression is undefined")
 	}
@@ -47,13 +47,13 @@ func (expression InfixExpression) IsEmpty() bool {
 // And creates a new InfixExpression using given Expression.
 func (expression InfixExpression) And(value Expression) InfixExpression {
 	operator := NewAndOperator()
-	return NewInfixExpression(expression, operator, value)
+	return NewInfixExpression(expression, operator, NewWrapper(value))
 }
 
 // Or creates a new InfixExpression using given Expression.
 func (expression InfixExpression) Or(value Expression) InfixExpression {
 	operator := NewOrOperator()
-	return NewInfixExpression(expression, operator, value)
+	return NewInfixExpression(expression, operator, NewWrapper(value))
 }
 
 // Ensure that InfixExpression is an Expression

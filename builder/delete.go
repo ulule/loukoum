@@ -1,8 +1,8 @@
 package builder
 
 import (
-	"github.com/ulule/loukoum/stmt"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/stmt"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Delete is a builder used for "SELECT" query.
@@ -81,20 +81,35 @@ func (b Delete) Returning(values ...interface{}) Delete {
 	return b
 }
 
-// String returns the underlying query as a raw statement.
-func (b Delete) String() string {
-	return rawify(b.Prepare())
+// Comment adds comment to the query.
+func (b Delete) Comment(comment string) Delete {
+	b.query.Comment = stmt.NewComment(comment)
+
+	return b
 }
 
-// Prepare returns the underlying query as a named statement.
-func (b Delete) Prepare() (string, map[string]interface{}) {
-	ctx := types.NewContext()
+// String returns the underlying query as a raw statement.
+// This function should be used for debugging since it doesn't escape anything and is completely
+// vulnerable to SQL injection.
+// You should use either NamedQuery() or Query()...
+func (b Delete) String() string {
+	ctx := &types.RawContext{}
 	b.query.Write(ctx)
+	return ctx.Query()
+}
 
-	query := ctx.Query()
-	args := ctx.Values()
+// NamedQuery returns the underlying query as a named statement.
+func (b Delete) NamedQuery() (string, map[string]interface{}) {
+	ctx := &types.NamedContext{}
+	b.query.Write(ctx)
+	return ctx.Query(), ctx.Values()
+}
 
-	return query, args
+// Query returns the underlying query as a regular statement.
+func (b Delete) Query() (string, []interface{}) {
+	ctx := &types.StdContext{}
+	b.query.Write(ctx)
+	return ctx.Query(), ctx.Values()
 }
 
 // Statement returns underlying statement.

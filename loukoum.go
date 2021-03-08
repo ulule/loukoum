@@ -1,9 +1,9 @@
 package loukoum
 
 import (
-	"github.com/ulule/loukoum/builder"
-	"github.com/ulule/loukoum/stmt"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/builder"
+	"github.com/ulule/loukoum/v3/stmt"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 const (
@@ -13,6 +13,10 @@ const (
 	LeftJoin = types.LeftJoin
 	// RightJoin is used for "RIGHT JOIN" in join statement.
 	RightJoin = types.RightJoin
+	// LeftOuterJoin is used for "LEFT OUTER JOIN" in join statement.
+	LeftOuterJoin = types.LeftOuterJoin
+	// RightOuterJoin is used for "RIGHT OUTER JOIN" in join statement.
+	RightOuterJoin = types.RightOuterJoin
 	// Asc is used for "ORDER BY" statement.
 	Asc = types.Asc
 	// Desc is used for "ORDER BY" statement.
@@ -25,6 +29,11 @@ type Map = types.Map
 // Pair takes a key and its related value and returns a Pair.
 func Pair(key, value interface{}) types.Pair {
 	return types.Pair{Key: key, Value: value}
+}
+
+// Value is a wrapper to create a new Value expression.
+func Value(value interface{}) stmt.Value {
+	return stmt.NewValue(value)
 }
 
 // Select starts a SelectBuilder using the given columns.
@@ -43,8 +52,18 @@ func Table(name string) stmt.Table {
 }
 
 // On is a wrapper to create a new On statement.
-func On(left string, right string) stmt.On {
-	return stmt.NewOn(stmt.NewColumn(left), stmt.NewColumn(right))
+func On(left string, right string) stmt.OnClause {
+	return stmt.NewOnClause(stmt.NewColumn(left), stmt.NewColumn(right))
+}
+
+// AndOn is a wrapper to create a new On statement using an infix expression.
+func AndOn(left stmt.OnExpression, right stmt.OnExpression) stmt.OnExpression {
+	return stmt.NewInfixOnExpression(left, stmt.NewLogicalOperator(types.And), right)
+}
+
+// OrOn is a wrapper to create a new On statement using an infix expression.
+func OrOn(left stmt.OnExpression, right stmt.OnExpression) stmt.OnExpression {
+	return stmt.NewInfixOnExpression(left, stmt.NewLogicalOperator(types.Or), right)
 }
 
 // Condition is a wrapper to create a new Identifier statement.
@@ -59,6 +78,16 @@ func Order(column string, option ...types.OrderType) stmt.Order {
 		order = option[0]
 	}
 	return stmt.NewOrder(column, order)
+}
+
+// Offset is a wrapper to create a new Offset statement.
+func Offset(start int64) stmt.Offset {
+	return stmt.NewOffset(start)
+}
+
+// Limit is a wrapper to create a new Limit statement.
+func Limit(count int64) stmt.Limit {
+	return stmt.NewLimit(count)
 }
 
 // And is a wrapper to create a new InfixExpression statement.
@@ -76,6 +105,41 @@ func Raw(value string) stmt.Raw {
 	return stmt.NewRaw(value)
 }
 
+// Exists is a wrapper to create a new Exists expression.
+func Exists(value interface{}) stmt.Exists {
+	return stmt.NewExists(value)
+}
+
+// NotExists is a wrapper to create a new NotExists expression.
+func NotExists(value interface{}) stmt.NotExists {
+	return stmt.NewNotExists(value)
+}
+
+// Count is a wrapper to create a new Count expression.
+func Count(value string) stmt.Count {
+	return stmt.NewCount(value)
+}
+
+// Max is a wrapper to create a new Max expression.
+func Max(value string) stmt.Max {
+	return stmt.NewMax(value)
+}
+
+// Min is a wrapper to create a new Min expression.
+func Min(value string) stmt.Min {
+	return stmt.NewMin(value)
+}
+
+// Sum is a wrapper to create a new Sum expression.
+func Sum(value string) stmt.Sum {
+	return stmt.NewSum(value)
+}
+
+// With is a wrapper to create a new WithQuery statement.
+func With(name string, value interface{}) stmt.WithQuery {
+	return stmt.NewWithQuery(name, value)
+}
+
 // Insert starts an InsertBuilder using the given table as into clause.
 func Insert(into interface{}) builder.Insert {
 	return builder.NewInsert().Into(into)
@@ -89,4 +153,14 @@ func Delete(from interface{}) builder.Delete {
 // Update starts an Update builder using the given table.
 func Update(table interface{}) builder.Update {
 	return builder.NewUpdate(table)
+}
+
+// DoNothing is a wrapper to create a new ConflictNoAction statement.
+func DoNothing() stmt.ConflictNoAction {
+	return stmt.NewConflictNoAction()
+}
+
+// DoUpdate is a wrapper to create a new ConflictUpdateAction statement.
+func DoUpdate(args ...interface{}) stmt.ConflictUpdateAction {
+	return stmt.NewConflictUpdateAction(builder.ToSet(args))
 }

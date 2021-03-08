@@ -3,8 +3,8 @@ package stmt
 import (
 	"strconv"
 
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Limit is a LIMIT clause.
@@ -20,7 +20,7 @@ func NewLimit(count int64) Limit {
 }
 
 // Write exposes statement as a SQL query.
-func (limit Limit) Write(ctx *types.Context) {
+func (limit Limit) Write(ctx types.Context) {
 	if limit.IsEmpty() {
 		return
 	}

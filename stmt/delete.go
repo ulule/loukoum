@@ -1,8 +1,8 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Delete is a DELETE statement.
@@ -11,6 +11,7 @@ type Delete struct {
 	Using     Using
 	Where     Where
 	Returning Returning
+	Comment   Comment
 }
 
 // NewDelete returns a new Delete instance.
@@ -19,7 +20,7 @@ func NewDelete() Delete {
 }
 
 // Write exposes statement as a SQL query.
-func (delete Delete) Write(ctx *types.Context) {
+func (delete Delete) Write(ctx types.Context) {
 	if delete.IsEmpty() {
 		panic("loukoum: a delete statement must have a table")
 	}
@@ -41,6 +42,12 @@ func (delete Delete) Write(ctx *types.Context) {
 	if !delete.Returning.IsEmpty() {
 		ctx.Write(" ")
 		delete.Returning.Write(ctx)
+	}
+
+	if !delete.Comment.IsEmpty() {
+		ctx.Write(token.Semicolon.String())
+		ctx.Write(" ")
+		delete.Comment.Write(ctx)
 	}
 }
 

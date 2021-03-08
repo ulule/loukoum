@@ -1,18 +1,20 @@
 package stmt
 
 import (
-	"github.com/ulule/loukoum/token"
-	"github.com/ulule/loukoum/types"
+	"github.com/ulule/loukoum/v3/token"
+	"github.com/ulule/loukoum/v3/types"
 )
 
 // Update is the UPDATE statement.
 type Update struct {
+	With      With
 	Table     Table
 	Only      bool
 	From      From
 	Set       Set
 	Where     Where
 	Returning Returning
+	Comment   Comment
 }
 
 // NewUpdate returns a new Update instance.
@@ -24,9 +26,14 @@ func NewUpdate(table Table) Update {
 }
 
 // Write exposes statement as a SQL query.
-func (update Update) Write(ctx *types.Context) {
+func (update Update) Write(ctx types.Context) {
 	if update.IsEmpty() {
-		panic("loukoum: an update statement must have a table")
+		panic("loukoum: an update statement must have a table and/or values")
+	}
+
+	if !update.With.IsEmpty() {
+		update.With.Write(ctx)
+		ctx.Write(" ")
 	}
 
 	ctx.Write(token.Update.String())
@@ -55,6 +62,12 @@ func (update Update) Write(ctx *types.Context) {
 	if !update.Returning.IsEmpty() {
 		ctx.Write(" ")
 		update.Returning.Write(ctx)
+	}
+
+	if !update.Comment.IsEmpty() {
+		ctx.Write(token.Semicolon.String())
+		ctx.Write(" ")
+		update.Comment.Write(ctx)
 	}
 }
 

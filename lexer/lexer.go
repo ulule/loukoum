@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 
-	"github.com/ulule/loukoum/token"
+	"github.com/ulule/loukoum/v3/token"
 )
 
 const (
@@ -60,6 +60,7 @@ func (l *Lexer) current() rune {
 }
 
 // next return the next rune in reader.
+// nolint: deadcode, megacheck
 func (l *Lexer) next() rune {
 	return l.en
 }
@@ -197,6 +198,7 @@ func isDigit(e rune) bool {
 	return '0' <= e && e <= '9'
 }
 
+// nolint: deadcode, megacheck
 func isHex(e rune) bool {
 	return isDigit(e) || 'a' <= e && e <= 'f' || 'A' <= e && e <= 'F'
 }
