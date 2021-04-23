@@ -685,6 +685,17 @@ func TestSelect_WhereEqual(t *testing.T) {
 			),
 			Args: []interface{}{"01C9TZXM678JR3GFZE1Y6494G3"},
 		},
+		{
+			Name: "Call Equal",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(stmt.NewCall("upper", stmt.NewIdentifier("email")).Equal("FOO@EXAMPLE.ORG")),
+			String:     "SELECT id FROM table WHERE (upper(email) = 'FOO@EXAMPLE.ORG')",
+			Query:      "SELECT id FROM table WHERE (upper(email) = $1)",
+			NamedQuery: "SELECT id FROM table WHERE (upper(email) = :arg_1)",
+			Args:       []interface{}{"FOO@EXAMPLE.ORG"},
+		},
 	})
 }
 
@@ -1132,6 +1143,23 @@ func TestSelect_WhereIn(t *testing.T) {
 				loukoum.Condition("id").In(nil),
 			),
 			SameQuery: "SELECT id FROM table WHERE (id IN ())",
+		},
+		{
+			Name: "Call In",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(stmt.NewCall("upper", stmt.NewIdentifier("email")).In([]string{
+					"FOO@EXAMPLE.ORG",
+					"BAR@EXAMPLE.ORG",
+				})),
+			String:     "SELECT id FROM table WHERE (upper(email) IN ('FOO@EXAMPLE.ORG', 'BAR@EXAMPLE.ORG'))",
+			Query:      "SELECT id FROM table WHERE (upper(email) IN ($1, $2))",
+			NamedQuery: "SELECT id FROM table WHERE (upper(email) IN (:arg_1, :arg_2))",
+			Args: []interface{}{
+				"FOO@EXAMPLE.ORG",
+				"BAR@EXAMPLE.ORG",
+			},
 		},
 	})
 }
