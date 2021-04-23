@@ -950,6 +950,33 @@ func TestSelect_WhereBetween(t *testing.T) {
 	})
 }
 
+func TestSelect_WhereIsDistinctFrom(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "IS DISTINCT FROM",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(loukoum.Condition("col").IsDistinctFrom(10)),
+			String:     "SELECT id FROM table WHERE (col IS DISTINCT FROM 10)",
+			Query:      "SELECT id FROM table WHERE (col IS DISTINCT FROM $1)",
+			NamedQuery: "SELECT id FROM table WHERE (col IS DISTINCT FROM :arg_1)",
+			Args:       []interface{}{10},
+		},
+		{
+			Name: "IS NOT DISTINCT FROM",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(loukoum.Condition("col").IsNotDistinctFrom(10)),
+			String:     "SELECT id FROM table WHERE (col IS NOT DISTINCT FROM 10)",
+			Query:      "SELECT id FROM table WHERE (col IS NOT DISTINCT FROM $1)",
+			NamedQuery: "SELECT id FROM table WHERE (col IS NOT DISTINCT FROM :arg_1)",
+			Args:       []interface{}{10},
+		},
+	})
+}
+
 func TestSelect_WhereIn(t *testing.T) {
 	RunBuilderTests(t, []BuilderTest{
 		{
