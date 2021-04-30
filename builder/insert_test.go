@@ -18,12 +18,12 @@ func TestInsert_Columns(t *testing.T) {
 		{
 			Name:      "With columns",
 			Builder:   loukoum.Insert("table").Columns("a", "b", "c"),
-			SameQuery: "INSERT INTO table (a, b, c)",
+			SameQuery: "INSERT INTO \"table\" (\"a\", \"b\", \"c\")",
 		},
 		{
 			Name:      "Without columns",
 			Builder:   loukoum.Insert("table"),
-			SameQuery: "INSERT INTO table",
+			SameQuery: "INSERT INTO \"table\"",
 		},
 	})
 }
@@ -33,12 +33,12 @@ func TestInsert_Comment(t *testing.T) {
 		{
 			Name:      "With columns",
 			Builder:   loukoum.Insert("table").Columns("a", "b", "c").Comment("/foo"),
-			SameQuery: "INSERT INTO table (a, b, c); -- /foo",
+			SameQuery: "INSERT INTO \"table\" (\"a\", \"b\", \"c\"); -- /foo",
 		},
 		{
 			Name:      "Without columns",
 			Builder:   loukoum.Insert("table").Comment("/foo"),
-			SameQuery: "INSERT INTO table; -- /foo",
+			SameQuery: "INSERT INTO \"table\"; -- /foo",
 		},
 	})
 }
@@ -51,9 +51,9 @@ func TestInsert_Values(t *testing.T) {
 				loukoum.Insert("table").Columns("a", "b", "c").Values([]string{"va", "vb", "vc"}),
 				loukoum.Insert("table").Columns("a", "b", "c").Values("va", "vb", "vc"),
 			},
-			String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc')",
-			Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3)",
-			NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3)",
+			String:     "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ('va', 'vb', 'vc')",
+			Query:      "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ($1, $2, $3)",
+			NamedQuery: "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES (:arg_1, :arg_2, :arg_3)",
 			Args:       []interface{}{"va", "vb", "vc"},
 		},
 		{
@@ -62,9 +62,9 @@ func TestInsert_Values(t *testing.T) {
 				loukoum.Insert("table").Values([]string{"va", "vb", "vc"}),
 				loukoum.Insert("table").Values("va", "vb", "vc"),
 			},
-			String:     "INSERT INTO table VALUES ('va', 'vb', 'vc')",
-			Query:      "INSERT INTO table VALUES ($1, $2, $3)",
-			NamedQuery: "INSERT INTO table VALUES (:arg_1, :arg_2, :arg_3)",
+			String:     "INSERT INTO \"table\" VALUES ('va', 'vb', 'vc')",
+			Query:      "INSERT INTO \"table\" VALUES ($1, $2, $3)",
+			NamedQuery: "INSERT INTO \"table\" VALUES (:arg_1, :arg_2, :arg_3)",
 			Args:       []interface{}{"va", "vb", "vc"},
 		},
 		{
@@ -77,9 +77,9 @@ func TestInsert_Values(t *testing.T) {
 					Columns("email", "enabled", "created_at").
 					Values([]interface{}{"tech@ulule.com", true, loukoum.Raw("NOW()")}),
 			},
-			String:     "INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW())",
-			Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW())",
-			NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW())",
+			String:     "INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ('tech@ulule.com', true, NOW())",
+			Query:      "INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ($1, $2, NOW())",
+			NamedQuery: "INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES (:arg_1, :arg_2, NOW())",
 			Args:       []interface{}{"tech@ulule.com", true},
 		},
 		{
@@ -94,9 +94,9 @@ func TestInsert_Values(t *testing.T) {
 					Columns("data").
 					Values([][]byte{{1, 2, 3}}),
 			},
-			String:     "INSERT INTO table (data) VALUES (decode('010203', 'hex'))",
-			Query:      "INSERT INTO table (data) VALUES ($1)",
-			NamedQuery: "INSERT INTO table (data) VALUES (:arg_1)",
+			String:     "INSERT INTO \"table\" (\"data\") VALUES (decode('010203', 'hex'))",
+			Query:      "INSERT INTO \"table\" (\"data\") VALUES ($1)",
+			NamedQuery: "INSERT INTO \"table\" (\"data\") VALUES (:arg_1)",
 			Args:       []interface{}{[]byte{1, 2, 3}},
 		},
 	})
@@ -112,15 +112,15 @@ func TestInsert_OnConflict(t *testing.T) {
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 				OnConflict(loukoum.DoNothing()),
 			String: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ('tech@ulule.com', true, NOW()) ",
 				"ON CONFLICT DO NOTHING",
 			),
 			Query: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ($1, $2, NOW()) ",
 				"ON CONFLICT DO NOTHING",
 			),
 			NamedQuery: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES (:arg_1, :arg_2, NOW()) ",
 				"ON CONFLICT DO NOTHING",
 			),
 			Args: []interface{}{"tech@ulule.com", true},
@@ -140,16 +140,16 @@ func TestInsert_OnConflict(t *testing.T) {
 					OnConflict(loukoum.Column("email"), loukoum.DoNothing()),
 			},
 			String: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-				"ON CONFLICT (email) DO NOTHING",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ('tech@ulule.com', true, NOW()) ",
+				"ON CONFLICT (\"email\") DO NOTHING",
 			),
 			Query: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
-				"ON CONFLICT (email) DO NOTHING",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ($1, $2, NOW()) ",
+				"ON CONFLICT (\"email\") DO NOTHING",
 			),
 			NamedQuery: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
-				"ON CONFLICT (email) DO NOTHING",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES (:arg_1, :arg_2, NOW()) ",
+				"ON CONFLICT (\"email\") DO NOTHING",
 			),
 			Args: []interface{}{"tech@ulule.com", true},
 		},
@@ -161,16 +161,16 @@ func TestInsert_OnConflict(t *testing.T) {
 				Values("tech@ulule.com", true, loukoum.Raw("NOW()")).
 				OnConflict("email", loukoum.Column("uuid"), "reference", loukoum.DoNothing()),
 			String: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-				"ON CONFLICT (email, uuid, reference) DO NOTHING",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ('tech@ulule.com', true, NOW()) ",
+				"ON CONFLICT (\"email\", \"uuid\", \"reference\") DO NOTHING",
 			),
 			Query: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
-				"ON CONFLICT (email, uuid, reference) DO NOTHING",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ($1, $2, NOW()) ",
+				"ON CONFLICT (\"email\", \"uuid\", \"reference\") DO NOTHING",
 			),
 			NamedQuery: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
-				"ON CONFLICT (email, uuid, reference) DO NOTHING",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES (:arg_1, :arg_2, NOW()) ",
+				"ON CONFLICT (\"email\", \"uuid\", \"reference\") DO NOTHING",
 			),
 			Args: []interface{}{"tech@ulule.com", true},
 		},
@@ -195,16 +195,16 @@ func TestInsert_OnConflict(t *testing.T) {
 					)),
 			},
 			String: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-				"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = true",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ('tech@ulule.com', true, NOW()) ",
+				"ON CONFLICT (\"email\") DO UPDATE SET \"created_at\" = NOW(), \"enabled\" = true",
 			),
 			Query: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
-				"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = $3",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ($1, $2, NOW()) ",
+				"ON CONFLICT (\"email\") DO UPDATE SET \"created_at\" = NOW(), \"enabled\" = $3",
 			),
 			NamedQuery: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
-				"ON CONFLICT (email) DO UPDATE SET created_at = NOW(), enabled = :arg_3",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES (:arg_1, :arg_2, NOW()) ",
+				"ON CONFLICT (\"email\") DO UPDATE SET \"created_at\" = NOW(), \"enabled\" = :arg_3",
 			),
 			Args: []interface{}{"tech@ulule.com", true, true},
 		},
@@ -219,16 +219,16 @@ func TestInsert_OnConflict(t *testing.T) {
 					loukoum.Pair("enabled", true),
 				)),
 			String: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-				"ON CONFLICT (email, uuid) DO UPDATE SET created_at = NOW(), enabled = true",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ('tech@ulule.com', true, NOW()) ",
+				"ON CONFLICT (\"email\", \"uuid\") DO UPDATE SET \"created_at\" = NOW(), \"enabled\" = true",
 			),
 			Query: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
-				"ON CONFLICT (email, uuid) DO UPDATE SET created_at = NOW(), enabled = $3",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ($1, $2, NOW()) ",
+				"ON CONFLICT (\"email\", \"uuid\") DO UPDATE SET \"created_at\" = NOW(), \"enabled\" = $3",
 			),
 			NamedQuery: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
-				"ON CONFLICT (email, uuid) DO UPDATE SET created_at = NOW(), enabled = :arg_3",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES (:arg_1, :arg_2, NOW()) ",
+				"ON CONFLICT (\"email\", \"uuid\") DO UPDATE SET \"created_at\" = NOW(), \"enabled\" = :arg_3",
 			),
 			Args: []interface{}{"tech@ulule.com", true, true},
 		},
@@ -243,16 +243,16 @@ func TestInsert_OnConflict(t *testing.T) {
 					loukoum.Pair("enabled", true),
 				)),
 			String: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', true, NOW()) ",
-				"ON CONFLICT (email, uuid, reference) DO UPDATE SET created_at = NOW(), enabled = true",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ('tech@ulule.com', true, NOW()) ",
+				"ON CONFLICT (\"email\", \"uuid\", \"reference\") DO UPDATE SET \"created_at\" = NOW(), \"enabled\" = true",
 			),
 			Query: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, NOW()) ",
-				"ON CONFLICT (email, uuid, reference) DO UPDATE SET created_at = NOW(), enabled = $3",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ($1, $2, NOW()) ",
+				"ON CONFLICT (\"email\", \"uuid\", \"reference\") DO UPDATE SET \"created_at\" = NOW(), \"enabled\" = $3",
 			),
 			NamedQuery: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, NOW()) ",
-				"ON CONFLICT (email, uuid, reference) DO UPDATE SET created_at = NOW(), enabled = :arg_3",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES (:arg_1, :arg_2, NOW()) ",
+				"ON CONFLICT (\"email\", \"uuid\", \"reference\") DO UPDATE SET \"created_at\" = NOW(), \"enabled\" = :arg_3",
 			),
 			Args: []interface{}{"tech@ulule.com", true, true},
 		},
@@ -341,9 +341,9 @@ func TestInsert_Returning(t *testing.T) {
 				Columns("a", "b", "c").
 				Values([]string{"va", "vb", "vc"}).
 				Returning("a"),
-			String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a",
-			Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING a",
-			NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING a",
+			String:     "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ('va', 'vb', 'vc') RETURNING \"a\"",
+			Query:      "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ($1, $2, $3) RETURNING \"a\"",
+			NamedQuery: "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES (:arg_1, :arg_2, :arg_3) RETURNING \"a\"",
 			Args:       []interface{}{"va", "vb", "vc"},
 		},
 		{
@@ -353,9 +353,9 @@ func TestInsert_Returning(t *testing.T) {
 				Columns("a", "b", "c").
 				Values([]string{"va", "vb", "vc"}).
 				Returning("b", "a"),
-			String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING b, a",
-			Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING b, a",
-			NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING b, a",
+			String:     "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ('va', 'vb', 'vc') RETURNING \"b\", \"a\"",
+			Query:      "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ($1, $2, $3) RETURNING \"b\", \"a\"",
+			NamedQuery: "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES (:arg_1, :arg_2, :arg_3) RETURNING \"b\", \"a\"",
 			Args:       []interface{}{"va", "vb", "vc"},
 		},
 		{
@@ -365,9 +365,9 @@ func TestInsert_Returning(t *testing.T) {
 				Columns("a", "b", "c").
 				Values([]string{"va", "vb", "vc"}).
 				Returning("b", "a", "c"),
-			String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING b, a, c",
-			Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING b, a, c",
-			NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING b, a, c",
+			String:     "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ('va', 'vb', 'vc') RETURNING \"b\", \"a\", \"c\"",
+			Query:      "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ($1, $2, $3) RETURNING \"b\", \"a\", \"c\"",
+			NamedQuery: "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES (:arg_1, :arg_2, :arg_3) RETURNING \"b\", \"a\", \"c\"", //nolint:lll
 			Args:       []interface{}{"va", "vb", "vc"},
 		},
 		{
@@ -377,9 +377,9 @@ func TestInsert_Returning(t *testing.T) {
 				Columns("a", "b", "c").
 				Values([]string{"va", "vb", "vc"}).
 				Returning(loukoum.Column("a").As("alias_a")),
-			String:     "INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') RETURNING a AS alias_a",
-			Query:      "INSERT INTO table (a, b, c) VALUES ($1, $2, $3) RETURNING a AS alias_a",
-			NamedQuery: "INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) RETURNING a AS alias_a",
+			String:     "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ('va', 'vb', 'vc') RETURNING \"a\" AS \"alias_a\"",
+			Query:      "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ($1, $2, $3) RETURNING \"a\" AS \"alias_a\"",
+			NamedQuery: "INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES (:arg_1, :arg_2, :arg_3) RETURNING \"a\" AS \"alias_a\"", //nolint:lll
 			Args:       []interface{}{"va", "vb", "vc"},
 		},
 		{
@@ -390,16 +390,16 @@ func TestInsert_Returning(t *testing.T) {
 				Values([]string{"va", "vb", "vc"}).
 				Returning(loukoum.Column("b").As("alias_b"), loukoum.Column("a").As("alias_a")),
 			String: fmt.Sprint(
-				"INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
-				"RETURNING b AS alias_b, a AS alias_a",
+				"INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ('va', 'vb', 'vc') ",
+				"RETURNING \"b\" AS \"alias_b\", \"a\" AS \"alias_a\"",
 			),
 			Query: fmt.Sprint(
-				"INSERT INTO table (a, b, c) VALUES ($1, $2, $3) ",
-				"RETURNING b AS alias_b, a AS alias_a",
+				"INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ($1, $2, $3) ",
+				"RETURNING \"b\" AS \"alias_b\", \"a\" AS \"alias_a\"",
 			),
 			NamedQuery: fmt.Sprint(
-				"INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) ",
-				"RETURNING b AS alias_b, a AS alias_a",
+				"INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES (:arg_1, :arg_2, :arg_3) ",
+				"RETURNING \"b\" AS \"alias_b\", \"a\" AS \"alias_a\"",
 			),
 			Args: []interface{}{"va", "vb", "vc"},
 		},
@@ -415,16 +415,16 @@ func TestInsert_Returning(t *testing.T) {
 					loukoum.Column("c").As("alias_c"),
 				),
 			String: fmt.Sprint(
-				"INSERT INTO table (a, b, c) VALUES ('va', 'vb', 'vc') ",
-				"RETURNING a AS alias_a, b AS alias_b, c AS alias_c",
+				"INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ('va', 'vb', 'vc') ",
+				"RETURNING \"a\" AS \"alias_a\", \"b\" AS \"alias_b\", \"c\" AS \"alias_c\"",
 			),
 			Query: fmt.Sprint(
-				"INSERT INTO table (a, b, c) VALUES ($1, $2, $3) ",
-				"RETURNING a AS alias_a, b AS alias_b, c AS alias_c",
+				"INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES ($1, $2, $3) ",
+				"RETURNING \"a\" AS \"alias_a\", \"b\" AS \"alias_b\", \"c\" AS \"alias_c\"",
 			),
 			NamedQuery: fmt.Sprint(
-				"INSERT INTO table (a, b, c) VALUES (:arg_1, :arg_2, :arg_3) ",
-				"RETURNING a AS alias_a, b AS alias_b, c AS alias_c",
+				"INSERT INTO \"table\" (\"a\", \"b\", \"c\") VALUES (:arg_1, :arg_2, :arg_3) ",
+				"RETURNING \"a\" AS \"alias_a\", \"b\" AS \"alias_b\", \"c\" AS \"alias_c\"",
 			),
 			Args: []interface{}{"va", "vb", "vc"},
 		},
@@ -446,11 +446,11 @@ func TestInsert_Valuer(t *testing.T) {
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, pq.NullTime{Time: when, Valid: true}),
 			String: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ('tech@ulule.com', ",
 				"true, '2017-11-23 16:47:27+00')",
 			),
-			Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, $3)",
-			NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, :arg_3)",
+			Query:      "INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ($1, $2, $3)",
+			NamedQuery: "INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES (:arg_1, :arg_2, :arg_3)",
 			Args:       []interface{}{"tech@ulule.com", true, pq.NullTime{Time: when, Valid: true}},
 		},
 		{
@@ -460,11 +460,11 @@ func TestInsert_Valuer(t *testing.T) {
 				Columns("email", "enabled", "created_at").
 				Values("tech@ulule.com", true, pq.NullTime{}),
 			String: fmt.Sprint(
-				"INSERT INTO table (email, enabled, created_at) VALUES ('tech@ulule.com', ",
+				"INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ('tech@ulule.com', ",
 				"true, NULL)",
 			),
-			Query:      "INSERT INTO table (email, enabled, created_at) VALUES ($1, $2, $3)",
-			NamedQuery: "INSERT INTO table (email, enabled, created_at) VALUES (:arg_1, :arg_2, :arg_3)",
+			Query:      "INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES ($1, $2, $3)",
+			NamedQuery: "INSERT INTO \"table\" (\"email\", \"enabled\", \"created_at\") VALUES (:arg_1, :arg_2, :arg_3)",
 			Args:       []interface{}{"tech@ulule.com", true, pq.NullTime{}},
 		},
 		{
@@ -473,9 +473,9 @@ func TestInsert_Valuer(t *testing.T) {
 				Insert("table").
 				Columns("email", "comment").
 				Values("tech@ulule.com", sql.NullString{String: "foobar", Valid: true}),
-			String:     "INSERT INTO table (email, comment) VALUES ('tech@ulule.com', 'foobar')",
-			Query:      "INSERT INTO table (email, comment) VALUES ($1, $2)",
-			NamedQuery: "INSERT INTO table (email, comment) VALUES (:arg_1, :arg_2)",
+			String:     "INSERT INTO \"table\" (\"email\", \"comment\") VALUES ('tech@ulule.com', 'foobar')",
+			Query:      "INSERT INTO \"table\" (\"email\", \"comment\") VALUES ($1, $2)",
+			NamedQuery: "INSERT INTO \"table\" (\"email\", \"comment\") VALUES (:arg_1, :arg_2)",
 			Args:       []interface{}{"tech@ulule.com", sql.NullString{String: "foobar", Valid: true}},
 		},
 		{
@@ -484,9 +484,9 @@ func TestInsert_Valuer(t *testing.T) {
 				Insert("table").
 				Columns("email", "comment").
 				Values("tech@ulule.com", sql.NullString{}),
-			String:     "INSERT INTO table (email, comment) VALUES ('tech@ulule.com', NULL)",
-			Query:      "INSERT INTO table (email, comment) VALUES ($1, $2)",
-			NamedQuery: "INSERT INTO table (email, comment) VALUES (:arg_1, :arg_2)",
+			String:     "INSERT INTO \"table\" (\"email\", \"comment\") VALUES ('tech@ulule.com', NULL)",
+			Query:      "INSERT INTO \"table\" (\"email\", \"comment\") VALUES ($1, $2)",
+			NamedQuery: "INSERT INTO \"table\" (\"email\", \"comment\") VALUES (:arg_1, :arg_2)",
 			Args:       []interface{}{"tech@ulule.com", sql.NullString{}},
 		},
 		{
@@ -495,9 +495,9 @@ func TestInsert_Valuer(t *testing.T) {
 				Insert("table").
 				Columns("email", "login").
 				Values("tech@ulule.com", sql.NullInt64{Int64: 30, Valid: true}),
-			String:     "INSERT INTO table (email, login) VALUES ('tech@ulule.com', 30)",
-			Query:      "INSERT INTO table (email, login) VALUES ($1, $2)",
-			NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, :arg_2)",
+			String:     "INSERT INTO \"table\" (\"email\", \"login\") VALUES ('tech@ulule.com', 30)",
+			Query:      "INSERT INTO \"table\" (\"email\", \"login\") VALUES ($1, $2)",
+			NamedQuery: "INSERT INTO \"table\" (\"email\", \"login\") VALUES (:arg_1, :arg_2)",
 			Args:       []interface{}{"tech@ulule.com", sql.NullInt64{Int64: 30, Valid: true}},
 		},
 		{
@@ -506,9 +506,9 @@ func TestInsert_Valuer(t *testing.T) {
 				Insert("table").
 				Columns("email", "login").
 				Values("tech@ulule.com", sql.NullInt64{}),
-			String:     "INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)",
-			Query:      "INSERT INTO table (email, login) VALUES ($1, $2)",
-			NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, :arg_2)",
+			String:     "INSERT INTO \"table\" (\"email\", \"login\") VALUES ('tech@ulule.com', NULL)",
+			Query:      "INSERT INTO \"table\" (\"email\", \"login\") VALUES ($1, $2)",
+			NamedQuery: "INSERT INTO \"table\" (\"email\", \"login\") VALUES (:arg_1, :arg_2)",
 			Args:       []interface{}{"tech@ulule.com", sql.NullInt64{}},
 		},
 		{
@@ -517,9 +517,9 @@ func TestInsert_Valuer(t *testing.T) {
 				Insert("table").
 				Columns("email", "login").
 				Values("tech@ulule.com", (*valuer)(nil)),
-			String:     "INSERT INTO table (email, login) VALUES ('tech@ulule.com', NULL)",
-			Query:      "INSERT INTO table (email, login) VALUES ($1, $2)",
-			NamedQuery: "INSERT INTO table (email, login) VALUES (:arg_1, :arg_2)",
+			String:     "INSERT INTO \"table\" (\"email\", \"login\") VALUES ('tech@ulule.com', NULL)",
+			Query:      "INSERT INTO \"table\" (\"email\", \"login\") VALUES ($1, $2)",
+			NamedQuery: "INSERT INTO \"table\" (\"email\", \"login\") VALUES (:arg_1, :arg_2)",
 			Args:       []interface{}{"tech@ulule.com", (*valuer)(nil)},
 		},
 	})
@@ -554,15 +554,15 @@ func TestInsert_Set(t *testing.T) {
 				),
 			},
 			String: fmt.Sprint(
-				"INSERT INTO table (created_at, email, enabled) ",
+				"INSERT INTO \"table\" (\"created_at\", \"email\", \"enabled\") ",
 				"VALUES (NOW(), 'tech@ulule.com', true)",
 			),
 			Query: fmt.Sprint(
-				"INSERT INTO table (created_at, email, enabled) ",
+				"INSERT INTO \"table\" (\"created_at\", \"email\", \"enabled\") ",
 				"VALUES (NOW(), $1, $2)",
 			),
 			NamedQuery: fmt.Sprint(
-				"INSERT INTO table (created_at, email, enabled) ",
+				"INSERT INTO \"table\" (\"created_at\", \"email\", \"enabled\") ",
 				"VALUES (NOW(), :arg_1, :arg_2)",
 			),
 			Args: []interface{}{"tech@ulule.com", true},
