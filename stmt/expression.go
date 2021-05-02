@@ -479,3 +479,61 @@ func (wrapper Wrapper) IsEmpty() bool {
 
 // Ensure that Wrapper is an Expression
 var _ Expression = Wrapper{}
+
+// ----------------------------------------------------------------------------
+// Call
+// ----------------------------------------------------------------------------
+
+// Call is a call expression.
+type Call struct {
+	function string
+	args     []Expression
+}
+
+// NewCall returns a new Call.
+func NewCall(function string, args ...Expression) Call {
+	return Call{
+		function: function,
+		args:     args,
+	}
+}
+
+func (Call) expression() {}
+
+// Write writes call to ctx.
+func (call Call) Write(ctx types.Context) {
+	ctx.Write(call.function)
+	ctx.Write("(")
+	for i, arg := range call.args {
+		if i > 0 {
+			ctx.Write(", ")
+		}
+		arg.Write(ctx)
+	}
+	ctx.Write(")")
+}
+
+// Equal adds an = expression.
+func (call Call) Equal(what interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.Equal)
+	return NewInfixExpression(call, operator, NewWrapper(NewExpression(what)))
+}
+
+// ILike performs a "ilike" condition.
+func (call Call) ILike(value interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.ILike)
+	return NewInfixExpression(call, operator, NewExpression(value))
+}
+
+// In adds a IN expression.
+func (call Call) In(value ...interface{}) In {
+	return NewIn(call, NewArrayExpression(value...))
+}
+
+// IsEmpty reports whether call is empty.
+func (call Call) IsEmpty() bool {
+	return false
+}
+
+// Ensure that Value is an Expression
+var _ Expression = Call{}

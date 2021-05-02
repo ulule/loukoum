@@ -6,24 +6,24 @@ import (
 
 // In is a IN expression.
 type In struct {
-	Identifier Identifier
+	Expression Expression
 	Operator   ComparisonOperator
 	Value      Expression
 }
 
 // NewIn returns a new In instance using an inclusive operator.
-func NewIn(identifier Identifier, value Expression) In {
+func NewIn(expression Expression, value Expression) In {
 	return In{
-		Identifier: identifier,
+		Expression: expression,
 		Operator:   NewComparisonOperator(types.In),
 		Value:      value,
 	}
 }
 
 // NewNotIn returns a new In instance using an exclusive operator.
-func NewNotIn(identifier Identifier, value Expression) In {
+func NewNotIn(expression Expression, value Expression) In {
 	return In{
-		Identifier: identifier,
+		Expression: expression,
 		Operator:   NewComparisonOperator(types.NotIn),
 		Value:      value,
 	}
@@ -38,7 +38,7 @@ func (in In) Write(ctx types.Context) {
 	}
 
 	ctx.Write("(")
-	in.Identifier.Write(ctx)
+	in.Expression.Write(ctx)
 	ctx.Write(" ")
 	in.Operator.Write(ctx)
 	ctx.Write(" (")
@@ -50,7 +50,7 @@ func (in In) Write(ctx types.Context) {
 
 // IsEmpty returns true if statement is undefined.
 func (in In) IsEmpty() bool {
-	return in.Identifier.IsEmpty() || in.Operator.IsEmpty() || in.Value == nil
+	return in.Expression.IsEmpty() || in.Operator.IsEmpty() || in.Value == nil
 }
 
 // And creates a new InfixExpression using given Expression.
