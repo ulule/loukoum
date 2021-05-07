@@ -27,6 +27,7 @@ func NewOnClause(left, right Column) OnClause {
 	}
 }
 
+func (OnClause) expression()   {}
 func (OnClause) onExpression() {}
 
 // And creates a new InfixOnExpression using given OnExpression.
@@ -75,6 +76,7 @@ func NewInfixOnExpression(left OnExpression, operator LogicalOperator, right OnE
 	}
 }
 
+func (InfixOnExpression) expression()   {}
 func (InfixOnExpression) onExpression() {}
 
 // Write exposes statement as a SQL query.

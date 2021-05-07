@@ -9,11 +9,11 @@ import (
 type Join struct {
 	Type      types.JoinType
 	Table     Table
-	Condition OnExpression
+	Condition Expression
 }
 
 // NewJoin returns a new Join instance.
-func NewJoin(kind types.JoinType, table Table, condition OnExpression) Join {
+func NewJoin(kind types.JoinType, table Table, condition Expression) Join {
 	return Join{
 		Type:      kind,
 		Table:     table,
@@ -22,17 +22,17 @@ func NewJoin(kind types.JoinType, table Table, condition OnExpression) Join {
 }
 
 // NewInnerJoin returns a new Join instance using an INNER JOIN.
-func NewInnerJoin(table Table, condition OnExpression) Join {
+func NewInnerJoin(table Table, condition Expression) Join {
 	return NewJoin(types.InnerJoin, table, condition)
 }
 
 // NewLeftJoin returns a new Join instance using a LEFT JOIN.
-func NewLeftJoin(table Table, condition OnExpression) Join {
+func NewLeftJoin(table Table, condition Expression) Join {
 	return NewJoin(types.LeftJoin, table, condition)
 }
 
 // NewRightJoin returns a new Join instance using a RIGHT JOIN.
-func NewRightJoin(table Table, condition OnExpression) Join {
+func NewRightJoin(table Table, condition Expression) Join {
 	return NewJoin(types.RightJoin, table, condition)
 }
 
