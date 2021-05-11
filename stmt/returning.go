@@ -7,13 +7,13 @@ import (
 
 // Returning is a RETURNING clause.
 type Returning struct {
-	Columns []Column
+	Columns []SelectExpression
 }
 
 // NewReturning returns a new Returning instance.
-func NewReturning(columns []Column) Returning {
+func NewReturning(exprs []SelectExpression) Returning {
 	return Returning{
-		Columns: columns,
+		Columns: exprs,
 	}
 }
 

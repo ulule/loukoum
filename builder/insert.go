@@ -61,7 +61,7 @@ func (b Insert) Returning(values ...interface{}) Insert {
 		panic("loukoum: insert builder has returning clause already defined")
 	}
 
-	b.query.Returning = stmt.NewReturning(ToColumns(values))
+	b.query.Returning = stmt.NewReturning(ToSelectExpressions(values))
 
 	return b
 }

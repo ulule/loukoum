@@ -52,12 +52,12 @@ func (column Column) Desc() Order {
 
 // Write exposes statement as a SQL query.
 func (column Column) Write(ctx types.Context) {
-	ctx.Write(column.Name)
+	ctx.Write(quote(column.Name))
 	if column.Alias != "" {
 		ctx.Write(" ")
 		ctx.Write(token.As.String())
 		ctx.Write(" ")
-		ctx.Write(column.Alias)
+		ctx.Write(quote(column.Alias))
 	}
 }
 

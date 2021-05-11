@@ -19,9 +19,9 @@ func TestSelect_Value(t *testing.T) {
 					loukoum.Value("fr").
 						Equal(loukoum.Raw("ANY(string_to_array(languages, ','))")),
 				),
-			String:     "SELECT id FROM video WHERE ('fr' = ANY(string_to_array(languages, ',')))",
-			Query:      "SELECT id FROM video WHERE ($1 = ANY(string_to_array(languages, ',')))",
-			NamedQuery: "SELECT id FROM video WHERE (:arg_1 = ANY(string_to_array(languages, ',')))",
+			String:     "SELECT \"id\" FROM \"video\" WHERE ('fr' = ANY(string_to_array(languages, ',')))",
+			Query:      "SELECT \"id\" FROM \"video\" WHERE ($1 = ANY(string_to_array(languages, ',')))",
+			NamedQuery: "SELECT \"id\" FROM \"video\" WHERE (:arg_1 = ANY(string_to_array(languages, ',')))",
 			Args:       []interface{}{"fr"},
 		},
 		{
@@ -32,9 +32,9 @@ func TestSelect_Value(t *testing.T) {
 					loukoum.Value("fr").
 						NotEqual(loukoum.Raw("ANY(string_to_array(languages, ','))")),
 				),
-			String:     "SELECT id FROM video WHERE ('fr' != ANY(string_to_array(languages, ',')))",
-			Query:      "SELECT id FROM video WHERE ($1 != ANY(string_to_array(languages, ',')))",
-			NamedQuery: "SELECT id FROM video WHERE (:arg_1 != ANY(string_to_array(languages, ',')))",
+			String:     "SELECT \"id\" FROM \"video\" WHERE ('fr' != ANY(string_to_array(languages, ',')))",
+			Query:      "SELECT \"id\" FROM \"video\" WHERE ($1 != ANY(string_to_array(languages, ',')))",
+			NamedQuery: "SELECT \"id\" FROM \"video\" WHERE (:arg_1 != ANY(string_to_array(languages, ',')))",
 			Args:       []interface{}{"fr"},
 		},
 		{
@@ -45,9 +45,9 @@ func TestSelect_Value(t *testing.T) {
 					loukoum.Value("{fr}").
 						Overlap(loukoum.Raw("languages")),
 				),
-			String:     "SELECT id FROM video WHERE ('{fr}' && languages)",
-			Query:      "SELECT id FROM video WHERE ($1 && languages)",
-			NamedQuery: "SELECT id FROM video WHERE (:arg_1 && languages)",
+			String:     "SELECT \"id\" FROM \"video\" WHERE ('{fr}' && languages)",
+			Query:      "SELECT \"id\" FROM \"video\" WHERE ($1 && languages)",
+			NamedQuery: "SELECT \"id\" FROM \"video\" WHERE (:arg_1 && languages)",
 			Args:       []interface{}{"{fr}"},
 		},
 		{
@@ -58,9 +58,9 @@ func TestSelect_Value(t *testing.T) {
 					loukoum.Value("{fr}").
 						IsContainedBy(loukoum.Raw("languages")),
 				),
-			String:     "SELECT id FROM video WHERE ('{fr}' <@ languages)",
-			Query:      "SELECT id FROM video WHERE ($1 <@ languages)",
-			NamedQuery: "SELECT id FROM video WHERE (:arg_1 <@ languages)",
+			String:     "SELECT \"id\" FROM \"video\" WHERE ('{fr}' <@ languages)",
+			Query:      "SELECT \"id\" FROM \"video\" WHERE ($1 <@ languages)",
+			NamedQuery: "SELECT \"id\" FROM \"video\" WHERE (:arg_1 <@ languages)",
 			Args:       []interface{}{"{fr}"},
 		},
 		{
@@ -68,9 +68,9 @@ func TestSelect_Value(t *testing.T) {
 			Builder: loukoum.Select("id").
 				From("video").
 				Where(loukoum.Condition("languages").Contains("{fr}")),
-			String:     "SELECT id FROM video WHERE (languages @> '{fr}')",
-			Query:      "SELECT id FROM video WHERE (languages @> $1)",
-			NamedQuery: "SELECT id FROM video WHERE (languages @> :arg_1)",
+			String:     "SELECT \"id\" FROM \"video\" WHERE (\"languages\" @> '{fr}')",
+			Query:      "SELECT \"id\" FROM \"video\" WHERE (\"languages\" @> $1)",
+			NamedQuery: "SELECT \"id\" FROM \"video\" WHERE (\"languages\" @> :arg_1)",
 			Args:       []interface{}{"{fr}"},
 		},
 		{
@@ -78,9 +78,9 @@ func TestSelect_Value(t *testing.T) {
 			Builder: loukoum.Select("id").
 				From("video").
 				Where(loukoum.Condition("languages").IsContainedBy("{fr}")),
-			String:     "SELECT id FROM video WHERE (languages <@ '{fr}')",
-			Query:      "SELECT id FROM video WHERE (languages <@ $1)",
-			NamedQuery: "SELECT id FROM video WHERE (languages <@ :arg_1)",
+			String:     "SELECT \"id\" FROM \"video\" WHERE (\"languages\" <@ '{fr}')",
+			Query:      "SELECT \"id\" FROM \"video\" WHERE (\"languages\" <@ $1)",
+			NamedQuery: "SELECT \"id\" FROM \"video\" WHERE (\"languages\" <@ :arg_1)",
 			Args:       []interface{}{"{fr}"},
 		},
 		{
@@ -88,9 +88,9 @@ func TestSelect_Value(t *testing.T) {
 			Builder: loukoum.Select("id").
 				From("video").
 				Where(loukoum.Condition("languages").Overlap("{fr}")),
-			String:     "SELECT id FROM video WHERE (languages && '{fr}')",
-			Query:      "SELECT id FROM video WHERE (languages && $1)",
-			NamedQuery: "SELECT id FROM video WHERE (languages && :arg_1)",
+			String:     "SELECT \"id\" FROM \"video\" WHERE (\"languages\" && '{fr}')",
+			Query:      "SELECT \"id\" FROM \"video\" WHERE (\"languages\" && $1)",
+			NamedQuery: "SELECT \"id\" FROM \"video\" WHERE (\"languages\" && :arg_1)",
 			Args:       []interface{}{"{fr}"},
 		},
 	})
@@ -101,7 +101,7 @@ func TestSelect_Comment(t *testing.T) {
 		{
 			Name:      "Simple",
 			Builder:   loukoum.Select("test").Comment("/foo"),
-			SameQuery: "SELECT test; -- /foo",
+			SameQuery: "SELECT \"test\"; -- /foo",
 		},
 		{
 			Name: "Complex",
@@ -110,9 +110,9 @@ func TestSelect_Comment(t *testing.T) {
 				Where(loukoum.Condition("username").
 					Equal("thoas")).
 				Comment("/foo"),
-			String:     "SELECT test FROM users WHERE (username = 'thoas'); -- /foo",
-			Query:      "SELECT test FROM users WHERE (username = $1); -- /foo",
-			NamedQuery: "SELECT test FROM users WHERE (username = :arg_1); -- /foo",
+			String:     "SELECT \"test\" FROM \"users\" WHERE (\"username\" = 'thoas'); -- /foo",
+			Query:      "SELECT \"test\" FROM \"users\" WHERE (\"username\" = $1); -- /foo",
+			NamedQuery: "SELECT \"test\" FROM \"users\" WHERE (\"username\" = :arg_1); -- /foo",
 			Args:       []interface{}{"thoas"},
 		},
 	})
@@ -123,27 +123,27 @@ func TestSelect_Columns(t *testing.T) {
 		{
 			Name:      "Simple",
 			Builder:   loukoum.Select("test"),
-			SameQuery: "SELECT test",
+			SameQuery: "SELECT \"test\"",
 		},
 		{
 			Name:      "Distinct",
 			Builder:   loukoum.Select("test").Distinct(),
-			SameQuery: "SELECT DISTINCT test",
+			SameQuery: "SELECT DISTINCT \"test\"",
 		},
 		{
 			Name:      "As",
 			Builder:   loukoum.Select(loukoum.Column("test").As("foobar")),
-			SameQuery: "SELECT test AS foobar",
+			SameQuery: "SELECT \"test\" AS \"foobar\"",
 		},
 		{
 			Name:      "Two columns",
 			Builder:   loukoum.Select("test", "foobar"),
-			SameQuery: "SELECT test, foobar",
+			SameQuery: "SELECT \"test\", \"foobar\"",
 		},
 		{
 			Name:      "Two columns as",
 			Builder:   loukoum.Select("test", loukoum.Column("test2").As("foobar")),
-			SameQuery: "SELECT test, test2 AS foobar",
+			SameQuery: "SELECT \"test\", \"test2\" AS \"foobar\"",
 		},
 		{
 			Name: "Three columns as",
@@ -151,7 +151,7 @@ func TestSelect_Columns(t *testing.T) {
 				loukoum.Select("a", "b", loukoum.Column("c").As("x")),
 				loukoum.Select("a", loukoum.Column("b"), loukoum.Column("c").As("x")),
 			},
-			SameQuery: "SELECT a, b, c AS x",
+			SameQuery: "SELECT \"a\", \"b\", \"c\" AS \"x\"",
 		},
 		{
 			Name: "Three columns",
@@ -163,11 +163,11 @@ func TestSelect_Columns(t *testing.T) {
 					loukoum.Column("c"),
 				}),
 			},
-			SameQuery: "SELECT a, b, c",
+			SameQuery: "SELECT \"a\", \"b\", \"c\"",
 		},
 		{
 			Name:      "Exists expression",
-			Builder:   loukoum.Select(loukoum.Exists(loukoum.Select("1"))),
+			Builder:   loukoum.Select(loukoum.Exists(loukoum.Select(loukoum.Raw("1")))),
 			SameQuery: "SELECT EXISTS (SELECT 1)",
 		},
 		{
@@ -249,7 +249,7 @@ func TestSelect_DistinctOn(t *testing.T) {
 					From("record").
 					Where(loukoum.Condition("disabled").IsNull(false)),
 			},
-			SameQuery: "SELECT DISTINCT ON (id) date FROM record WHERE (disabled IS NOT NULL)",
+			SameQuery: "SELECT DISTINCT ON (\"id\") \"date\" FROM \"record\" WHERE (\"disabled\" IS NOT NULL)",
 		},
 		{
 			Name: "Two columns",
@@ -266,8 +266,8 @@ func TestSelect_DistinctOn(t *testing.T) {
 					Where(loukoum.Condition("disabled").IsNull(false)),
 			},
 			SameQuery: fmt.Sprint(
-				"SELECT DISTINCT ON (id, user_id) date FROM record ",
-				"WHERE (disabled IS NOT NULL)",
+				"SELECT DISTINCT ON (\"id\", \"user_id\") \"date\" FROM \"record\" ",
+				"WHERE (\"disabled\" IS NOT NULL)",
 			),
 		},
 		{
@@ -285,8 +285,8 @@ func TestSelect_DistinctOn(t *testing.T) {
 					Where(loukoum.Condition("disabled").IsNull(false)),
 			},
 			SameQuery: fmt.Sprint(
-				"SELECT DISTINCT ON (id, user_id, project_id) date FROM record ",
-				"WHERE (disabled IS NOT NULL)",
+				"SELECT DISTINCT ON (\"id\", \"user_id\", \"project_id\") \"date\" FROM \"record\" ",
+				"WHERE (\"disabled\" IS NOT NULL)",
 			),
 		},
 	})
@@ -297,12 +297,12 @@ func TestSelect_From(t *testing.T) {
 		{
 			Name:      "Simple",
 			Builder:   loukoum.Select("a", "b", "c").From("foobar"),
-			SameQuery: "SELECT a, b, c FROM foobar",
+			SameQuery: "SELECT \"a\", \"b\", \"c\" FROM \"foobar\"",
 		},
 		{
 			Name:      "As",
 			Builder:   loukoum.Select("a").From(loukoum.Table("foobar").As("example")),
-			SameQuery: "SELECT a FROM foobar AS example",
+			SameQuery: "SELECT \"a\" FROM \"foobar\" AS \"example\"",
 		},
 	})
 }
@@ -333,7 +333,7 @@ func TestSelect_Join(t *testing.T) {
 					From("test1").
 					Join("test2", "ON test1.id = test2.fk_id", loukoum.InnerJoin),
 			},
-			SameQuery: "SELECT a, b, c FROM test1 INNER JOIN test2 ON test1.id = test2.fk_id",
+			SameQuery: "SELECT \"a\", \"b\", \"c\" FROM \"test1\" INNER JOIN \"test2\" ON \"test1\".\"id\" = \"test2\".\"fk_id\"", //nolint:lll
 		},
 		{
 			Name: "Left",
@@ -341,7 +341,7 @@ func TestSelect_Join(t *testing.T) {
 				Select("a", "b", "c").
 				From("test1").
 				Join("test3", "test3.fkey = test1.id", loukoum.LeftJoin),
-			SameQuery: "SELECT a, b, c FROM test1 LEFT JOIN test3 ON test3.fkey = test1.id",
+			SameQuery: "SELECT \"a\", \"b\", \"c\" FROM \"test1\" LEFT JOIN \"test3\" ON \"test3\".\"fkey\" = \"test1\".\"id\"",
 		},
 		{
 			Name: "Right",
@@ -349,7 +349,7 @@ func TestSelect_Join(t *testing.T) {
 				Select("a", "b", "c").
 				From("test2").
 				Join("test4", "test4.gid = test2.id", loukoum.RightJoin),
-			SameQuery: "SELECT a, b, c FROM test2 RIGHT JOIN test4 ON test4.gid = test2.id",
+			SameQuery: "SELECT \"a\", \"b\", \"c\" FROM \"test2\" RIGHT JOIN \"test4\" ON \"test4\".\"gid\" = \"test2\".\"id\"",
 		},
 		{
 			Name: "Left Outer",
@@ -357,7 +357,7 @@ func TestSelect_Join(t *testing.T) {
 				Select("a", "b", "c").
 				From("test1").
 				Join("test3", "test3.fkey = test1.id", loukoum.LeftOuterJoin),
-			SameQuery: "SELECT a, b, c FROM test1 LEFT OUTER JOIN test3 ON test3.fkey = test1.id",
+			SameQuery: "SELECT \"a\", \"b\", \"c\" FROM \"test1\" LEFT OUTER JOIN \"test3\" ON \"test3\".\"fkey\" = \"test1\".\"id\"", //nolint:lll
 		},
 		{
 			Name: "Right Outer",
@@ -365,7 +365,7 @@ func TestSelect_Join(t *testing.T) {
 				Select("a", "b", "c").
 				From("test1").
 				Join("test3", "test3.fkey = test1.id", loukoum.RightOuterJoin),
-			SameQuery: "SELECT a, b, c FROM test1 RIGHT OUTER JOIN test3 ON test3.fkey = test1.id",
+			SameQuery: "SELECT \"a\", \"b\", \"c\" FROM \"test1\" RIGHT OUTER JOIN \"test3\" ON \"test3\".\"fkey\" = \"test1\".\"id\"", //nolint:lll
 		},
 		{
 			Name: "Two tables",
@@ -387,8 +387,8 @@ func TestSelect_Join(t *testing.T) {
 					Join(loukoum.Table("test3"), loukoum.On("test4.uid", "test3.id")),
 			},
 			SameQuery: fmt.Sprint(
-				"SELECT a, b, c FROM test2 INNER JOIN test4 ON test4.gid = test2.id ",
-				"INNER JOIN test3 ON test4.uid = test3.id",
+				"SELECT \"a\", \"b\", \"c\" FROM \"test2\" INNER JOIN \"test4\" ON \"test4\".\"gid\" = \"test2\".\"id\" ",
+				"INNER JOIN \"test3\" ON \"test4\".\"uid\" = \"test3\".\"id\"",
 			),
 		},
 		{
@@ -415,8 +415,8 @@ func TestSelect_Join(t *testing.T) {
 					),
 			},
 			SameQuery: fmt.Sprint(
-				"SELECT a, b, c FROM test2 INNER JOIN test4 ON (test4.gid = test2.id AND test4.d = test2.d) ",
-				"INNER JOIN test3 ON (test4.uid = test3.id AND test3.e = test2.e)",
+				"SELECT \"a\", \"b\", \"c\" FROM \"test2\" INNER JOIN \"test4\" ON (\"test4\".\"gid\" = \"test2\".\"id\" AND \"test4\".\"d\" = \"test2\".\"d\") ", //nolint:lll
+				"INNER JOIN \"test3\" ON (\"test4\".\"uid\" = \"test3\".\"id\" AND \"test3\".\"e\" = \"test2\".\"e\")",
 			),
 		},
 		{
@@ -453,9 +453,9 @@ func TestSelect_Join(t *testing.T) {
 					),
 			},
 			SameQuery: fmt.Sprint(
-				"SELECT a, b, c FROM test2 ",
-				"INNER JOIN test4 ON ((test4.gid = test2.id AND test4.d = test2.d) OR test4.f = test2.f) ",
-				"INNER JOIN test3 ON ((test4.uid = test3.id OR test3.e = test2.e) AND test3.g = test2.g)",
+				"SELECT \"a\", \"b\", \"c\" FROM \"test2\" ",
+				"INNER JOIN \"test4\" ON ((\"test4\".\"gid\" = \"test2\".\"id\" AND \"test4\".\"d\" = \"test2\".\"d\") OR \"test4\".\"f\" = \"test2\".\"f\") ", //nolint:lll
+				"INNER JOIN \"test3\" ON ((\"test4\".\"uid\" = \"test3\".\"id\" OR \"test3\".\"e\" = \"test2\".\"e\") AND \"test3\".\"g\" = \"test2\".\"g\")",  //nolint:lll
 			),
 		},
 	})
@@ -469,9 +469,9 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("id").Equal(1)),
-			String:     `SELECT id FROM table WHERE (id = 1)`,
-			Query:      `SELECT id FROM table WHERE (id = $1)`,
-			NamedQuery: `SELECT id FROM table WHERE (id = :arg_1)`,
+			String:     `SELECT "id" FROM "table" WHERE ("id" = 1)`,
+			Query:      `SELECT "id" FROM "table" WHERE ("id" = $1)`,
+			NamedQuery: `SELECT "id" FROM "table" WHERE ("id" = :arg_1)`,
 			Args:       []interface{}{1},
 		},
 		{
@@ -481,9 +481,9 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 				From("table").
 				Where(loukoum.Condition("id").Equal(1)).
 				And(loukoum.Condition("slug").Equal("foo")),
-			String:     "SELECT id FROM table WHERE ((id = 1) AND (slug = 'foo'))",
-			Query:      "SELECT id FROM table WHERE ((id = $1) AND (slug = $2))",
-			NamedQuery: "SELECT id FROM table WHERE ((id = :arg_1) AND (slug = :arg_2))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE ((\"id\" = 1) AND (\"slug\" = 'foo'))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE ((\"id\" = $1) AND (\"slug\" = $2))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE ((\"id\" = :arg_1) AND (\"slug\" = :arg_2))",
 			Args:       []interface{}{1, "foo"},
 		},
 		{
@@ -494,9 +494,9 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 				Where(loukoum.Condition("id").Equal(1)).
 				And(loukoum.Condition("slug").Equal("foo")).
 				And(loukoum.Condition("title").Equal("hello")),
-			String:     "SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) AND (title = 'hello'))",
-			Query:      "SELECT id FROM table WHERE (((id = $1) AND (slug = $2)) AND (title = $3))",
-			NamedQuery: "SELECT id FROM table WHERE (((id = :arg_1) AND (slug = :arg_2)) AND (title = :arg_3))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = 1) AND (\"slug\" = 'foo')) AND (\"title\" = 'hello'))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = $1) AND (\"slug\" = $2)) AND (\"title\" = $3))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = :arg_1) AND (\"slug\" = :arg_2)) AND (\"title\" = :arg_3))", //nolint:lll
 			Args:       []interface{}{1, "foo", "hello"},
 		},
 		{
@@ -507,9 +507,9 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 				Where(loukoum.Condition("id").Equal(1)).
 				Or(loukoum.Condition("slug").Equal("foo")).
 				Or(loukoum.Condition("title").Equal("hello")),
-			String:     "SELECT id FROM table WHERE (((id = 1) OR (slug = 'foo')) OR (title = 'hello'))",
-			Query:      "SELECT id FROM table WHERE (((id = $1) OR (slug = $2)) OR (title = $3))",
-			NamedQuery: "SELECT id FROM table WHERE (((id = :arg_1) OR (slug = :arg_2)) OR (title = :arg_3))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = 1) OR (\"slug\" = 'foo')) OR (\"title\" = 'hello'))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = $1) OR (\"slug\" = $2)) OR (\"title\" = $3))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = :arg_1) OR (\"slug\" = :arg_2)) OR (\"title\" = :arg_3))", //nolint:lll
 			Args:       []interface{}{1, "foo", "hello"},
 		},
 		{
@@ -520,9 +520,9 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 				Where(loukoum.Condition("id").Equal(1)).
 				And(loukoum.Condition("slug").Equal("foo")).
 				Or(loukoum.Condition("title").Equal("hello")),
-			String:     `SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) OR (title = 'hello'))`,
-			Query:      `SELECT id FROM table WHERE (((id = $1) AND (slug = $2)) OR (title = $3))`,
-			NamedQuery: `SELECT id FROM table WHERE (((id = :arg_1) AND (slug = :arg_2)) OR (title = :arg_3))`,
+			String:     `SELECT "id" FROM "table" WHERE ((("id" = 1) AND ("slug" = 'foo')) OR ("title" = 'hello'))`,
+			Query:      `SELECT "id" FROM "table" WHERE ((("id" = $1) AND ("slug" = $2)) OR ("title" = $3))`,
+			NamedQuery: `SELECT "id" FROM "table" WHERE ((("id" = :arg_1) AND ("slug" = :arg_2)) OR ("title" = :arg_3))`,
 			Args:       []interface{}{1, "foo", "hello"},
 		},
 		{
@@ -537,16 +537,16 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 					loukoum.And(loukoum.Condition("slug").Equal("foo"), loukoum.Condition("active").Equal(true)),
 				),
 			String: fmt.Sprint(
-				"SELECT id FROM table WHERE (((id = 1) OR (title = 'hello')) OR ",
-				"((slug = 'foo') AND (active = true)))",
+				"SELECT \"id\" FROM \"table\" WHERE (((\"id\" = 1) OR (\"title\" = 'hello')) OR ",
+				"((\"slug\" = 'foo') AND (\"active\" = true)))",
 			),
 			Query: fmt.Sprint(
-				"SELECT id FROM table WHERE (((id = $1) OR (title = $2)) OR ",
-				"((slug = $3) AND (active = $4)))",
+				"SELECT \"id\" FROM \"table\" WHERE (((\"id\" = $1) OR (\"title\" = $2)) OR ",
+				"((\"slug\" = $3) AND (\"active\" = $4)))",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT id FROM table WHERE (((id = :arg_1) OR (title = :arg_2)) OR ",
-				"((slug = :arg_3) AND (active = :arg_4)))",
+				"SELECT \"id\" FROM \"table\" WHERE (((\"id\" = :arg_1) OR (\"title\" = :arg_2)) OR ",
+				"((\"slug\" = :arg_3) AND (\"active\" = :arg_4)))",
 			),
 			Args: []interface{}{1, "hello", "foo", true},
 		},
@@ -566,9 +566,9 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 					Where(loukoum.Condition("id").Equal(1)).
 					Where(loukoum.Condition("title").Equal("hello")),
 			},
-			String:     "SELECT id FROM table WHERE ((id = 1) AND (title = 'hello'))",
-			Query:      "SELECT id FROM table WHERE ((id = $1) AND (title = $2))",
-			NamedQuery: "SELECT id FROM table WHERE ((id = :arg_1) AND (title = :arg_2))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE ((\"id\" = 1) AND (\"title\" = 'hello'))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE ((\"id\" = $1) AND (\"title\" = $2))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE ((\"id\" = :arg_1) AND (\"title\" = :arg_2))",
 			Args:       []interface{}{1, "hello"},
 		},
 		{
@@ -579,9 +579,9 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 				Where(loukoum.Condition("id").Equal(1)).
 				Where(loukoum.Condition("title").Equal("hello")).
 				Where(loukoum.Condition("disable").Equal(false)),
-			String:     "SELECT id FROM table WHERE (((id = 1) AND (title = 'hello')) AND (disable = false))",
-			Query:      "SELECT id FROM table WHERE (((id = $1) AND (title = $2)) AND (disable = $3))",
-			NamedQuery: "SELECT id FROM table WHERE (((id = :arg_1) AND (title = :arg_2)) AND (disable = :arg_3))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = 1) AND (\"title\" = 'hello')) AND (\"disable\" = false))", //nolint:lll
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = $1) AND (\"title\" = $2)) AND (\"disable\" = $3))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = :arg_1) AND (\"title\" = :arg_2)) AND (\"disable\" = :arg_3))", //nolint:lll
 			Args:       []interface{}{1, "hello", false},
 		},
 		{
@@ -595,9 +595,9 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 						loukoum.Condition("slug").Equal("foo").And(loukoum.Condition("active").Equal(true)),
 					),
 			},
-			String:     "SELECT id FROM table WHERE ((id = 1) OR ((slug = 'foo') AND (active = true)))",
-			Query:      "SELECT id FROM table WHERE ((id = $1) OR ((slug = $2) AND (active = $3)))",
-			NamedQuery: "SELECT id FROM table WHERE ((id = :arg_1) OR ((slug = :arg_2) AND (active = :arg_3)))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE ((\"id\" = 1) OR ((\"slug\" = 'foo') AND (\"active\" = true)))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE ((\"id\" = $1) OR ((\"slug\" = $2) AND (\"active\" = $3)))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE ((\"id\" = :arg_1) OR ((\"slug\" = :arg_2) AND (\"active\" = :arg_3)))", //nolint:lll
 			Args:       []interface{}{1, "foo", true},
 		},
 		{
@@ -607,9 +607,9 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 				From("table").
 				Where(loukoum.Condition("id").Equal(1).And(loukoum.Condition("slug").Equal("foo"))).
 				Or(loukoum.Condition("active").Equal(true)),
-			String:     "SELECT id FROM table WHERE (((id = 1) AND (slug = 'foo')) OR (active = true))",
-			Query:      "SELECT id FROM table WHERE (((id = $1) AND (slug = $2)) OR (active = $3))",
-			NamedQuery: "SELECT id FROM table WHERE (((id = :arg_1) AND (slug = :arg_2)) OR (active = :arg_3))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = 1) AND (\"slug\" = 'foo')) OR (\"active\" = true))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = $1) AND (\"slug\" = $2)) OR (\"active\" = $3))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = :arg_1) AND (\"slug\" = :arg_2)) OR (\"active\" = :arg_3))", //nolint:lll
 			Args:       []interface{}{1, "foo", true},
 		},
 	})
@@ -623,9 +623,9 @@ func TestSelect_WhereEqual(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("disabled").Equal(false)),
-			String:     "SELECT id FROM table WHERE (disabled = false)",
-			Query:      "SELECT id FROM table WHERE (disabled = $1)",
-			NamedQuery: "SELECT id FROM table WHERE (disabled = :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"disabled\" = false)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"disabled\" = $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"disabled\" = :arg_1)",
 			Args:       []interface{}{false},
 		},
 		{
@@ -634,9 +634,9 @@ func TestSelect_WhereEqual(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("disabled").NotEqual(false)),
-			String:     "SELECT id FROM table WHERE (disabled != false)",
-			Query:      "SELECT id FROM table WHERE (disabled != $1)",
-			NamedQuery: "SELECT id FROM table WHERE (disabled != :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"disabled\" != false)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"disabled\" != $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"disabled\" != :arg_1)",
 			Args:       []interface{}{false},
 		},
 		{
@@ -649,16 +649,16 @@ func TestSelect_WhereEqual(t *testing.T) {
 						Where(loukoum.Condition("public_id").Equal("01C9TZXM678JR3GFZE1Y6494G3")),
 				)),
 			String: fmt.Sprint(
-				"SELECT id FROM news WHERE (user_id = (SELECT id FROM users WHERE ",
-				"(public_id = '01C9TZXM678JR3GFZE1Y6494G3')))",
+				"SELECT \"id\" FROM \"news\" WHERE (\"user_id\" = (SELECT \"id\" FROM \"users\" WHERE ",
+				"(\"public_id\" = '01C9TZXM678JR3GFZE1Y6494G3')))",
 			),
 			Query: fmt.Sprint(
-				"SELECT id FROM news WHERE (user_id = (SELECT id FROM users WHERE ",
-				"(public_id = $1)))",
+				"SELECT \"id\" FROM \"news\" WHERE (\"user_id\" = (SELECT \"id\" FROM \"users\" WHERE ",
+				"(\"public_id\" = $1)))",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT id FROM news WHERE (user_id = (SELECT id FROM users WHERE ",
-				"(public_id = :arg_1)))",
+				"SELECT \"id\" FROM \"news\" WHERE (\"user_id\" = (SELECT \"id\" FROM \"users\" WHERE ",
+				"(\"public_id\" = :arg_1)))",
 			),
 			Args: []interface{}{"01C9TZXM678JR3GFZE1Y6494G3"},
 		},
@@ -672,16 +672,16 @@ func TestSelect_WhereEqual(t *testing.T) {
 						Where(loukoum.Condition("public_id").Equal("01C9TZXM678JR3GFZE1Y6494G3")),
 				)),
 			String: fmt.Sprint(
-				"SELECT id FROM news WHERE (user_id != (SELECT id FROM users WHERE ",
-				"(public_id = '01C9TZXM678JR3GFZE1Y6494G3')))",
+				"SELECT \"id\" FROM \"news\" WHERE (\"user_id\" != (SELECT \"id\" FROM \"users\" WHERE ",
+				"(\"public_id\" = '01C9TZXM678JR3GFZE1Y6494G3')))",
 			),
 			Query: fmt.Sprint(
-				"SELECT id FROM news WHERE (user_id != (SELECT id FROM users WHERE ",
-				"(public_id = $1)))",
+				"SELECT \"id\" FROM \"news\" WHERE (\"user_id\" != (SELECT \"id\" FROM \"users\" WHERE ",
+				"(\"public_id\" = $1)))",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT id FROM news WHERE (user_id != (SELECT id FROM users WHERE ",
-				"(public_id = :arg_1)))",
+				"SELECT \"id\" FROM \"news\" WHERE (\"user_id\" != (SELECT \"id\" FROM \"users\" WHERE ",
+				"(\"public_id\" = :arg_1)))",
 			),
 			Args: []interface{}{"01C9TZXM678JR3GFZE1Y6494G3"},
 		},
@@ -691,9 +691,9 @@ func TestSelect_WhereEqual(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(stmt.NewCall("upper", stmt.NewIdentifier("email")).Equal("FOO@EXAMPLE.ORG")),
-			String:     "SELECT id FROM table WHERE (upper(email) = 'FOO@EXAMPLE.ORG')",
-			Query:      "SELECT id FROM table WHERE (upper(email) = $1)",
-			NamedQuery: "SELECT id FROM table WHERE (upper(email) = :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (upper(\"email\") = 'FOO@EXAMPLE.ORG')",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (upper(\"email\") = $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (upper(\"email\") = :arg_1)",
 			Args:       []interface{}{"FOO@EXAMPLE.ORG"},
 		},
 	})
@@ -707,7 +707,7 @@ func TestSelect_WhereIs(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("disabled").Is(nil)),
-			SameQuery: "SELECT id FROM table WHERE (disabled IS NULL)",
+			SameQuery: "SELECT \"id\" FROM \"table\" WHERE (\"disabled\" IS NULL)",
 		},
 		{
 			Name: "Not true",
@@ -715,9 +715,9 @@ func TestSelect_WhereIs(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("active").IsNot(true)),
-			String:     "SELECT id FROM table WHERE (active IS NOT true)",
-			Query:      "SELECT id FROM table WHERE (active IS NOT $1)",
-			NamedQuery: "SELECT id FROM table WHERE (active IS NOT :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"active\" IS NOT true)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"active\" IS NOT $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"active\" IS NOT :arg_1)",
 			Args:       []interface{}{true},
 		},
 	})
@@ -731,9 +731,9 @@ func TestSelect_WhereGreaterThan(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("count").GreaterThan(2)),
-			String:     "SELECT id FROM table WHERE (count > 2)",
-			Query:      "SELECT id FROM table WHERE (count > $1)",
-			NamedQuery: "SELECT id FROM table WHERE (count > :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"count\" > 2)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"count\" > $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"count\" > :arg_1)",
 			Args:       []interface{}{2},
 		},
 		{
@@ -742,9 +742,9 @@ func TestSelect_WhereGreaterThan(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("count").GreaterThanOrEqual(4)),
-			String:     "SELECT id FROM table WHERE (count >= 4)",
-			Query:      "SELECT id FROM table WHERE (count >= $1)",
-			NamedQuery: "SELECT id FROM table WHERE (count >= :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"count\" >= 4)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"count\" >= $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"count\" >= :arg_1)",
 			Args:       []interface{}{4},
 		},
 		{
@@ -753,7 +753,7 @@ func TestSelect_WhereGreaterThan(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("updated_at").GreaterThanOrEqual(loukoum.Raw("NOW()"))),
-			SameQuery: "SELECT id FROM table WHERE (updated_at >= NOW())",
+			SameQuery: "SELECT \"id\" FROM \"table\" WHERE (\"updated_at\" >= NOW())",
 		},
 		{
 			Name: "Greater than subquery",
@@ -765,16 +765,16 @@ func TestSelect_WhereGreaterThan(t *testing.T) {
 						Where(loukoum.Condition("id").Equal(6598)),
 				)),
 			String: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter > (SELECT counter FROM table WHERE ",
-				"(id = 6598)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" > (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = 6598)))",
 			),
 			Query: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter > (SELECT counter FROM table WHERE ",
-				"(id = $1)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" > (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = $1)))",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter > (SELECT counter FROM table WHERE ",
-				"(id = :arg_1)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" > (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = :arg_1)))",
 			),
 			Args: []interface{}{6598},
 		},
@@ -788,16 +788,16 @@ func TestSelect_WhereGreaterThan(t *testing.T) {
 						Where(loukoum.Condition("id").Equal(6598)),
 				)),
 			String: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter >= (SELECT counter FROM table WHERE ",
-				"(id = 6598)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" >= (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = 6598)))",
 			),
 			Query: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter >= (SELECT counter FROM table WHERE ",
-				"(id = $1)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" >= (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = $1)))",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter >= (SELECT counter FROM table WHERE ",
-				"(id = :arg_1)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" >= (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = :arg_1)))",
 			),
 			Args: []interface{}{6598},
 		},
@@ -812,9 +812,9 @@ func TestSelect_WhereLessThan(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("count").LessThan(3)),
-			String:     "SELECT id FROM table WHERE (count < 3)",
-			Query:      "SELECT id FROM table WHERE (count < $1)",
-			NamedQuery: "SELECT id FROM table WHERE (count < :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"count\" < 3)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"count\" < $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"count\" < :arg_1)",
 			Args:       []interface{}{3},
 		},
 		{
@@ -823,9 +823,9 @@ func TestSelect_WhereLessThan(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("count").LessThanOrEqual(6)),
-			String:     "SELECT id FROM table WHERE (count <= 6)",
-			Query:      "SELECT id FROM table WHERE (count <= $1)",
-			NamedQuery: "SELECT id FROM table WHERE (count <= :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"count\" <= 6)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"count\" <= $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"count\" <= :arg_1)",
 			Args:       []interface{}{6},
 		},
 		{
@@ -834,7 +834,7 @@ func TestSelect_WhereLessThan(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("updated_at").LessThanOrEqual(loukoum.Raw("NOW()"))),
-			SameQuery: "SELECT id FROM table WHERE (updated_at <= NOW())",
+			SameQuery: "SELECT \"id\" FROM \"table\" WHERE (\"updated_at\" <= NOW())",
 		},
 		{
 			Name: "Less than subquery",
@@ -846,16 +846,16 @@ func TestSelect_WhereLessThan(t *testing.T) {
 						Where(loukoum.Condition("id").Equal(6598)),
 				)),
 			String: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter < (SELECT counter FROM table WHERE ",
-				"(id = 6598)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" < (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = 6598)))",
 			),
 			Query: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter < (SELECT counter FROM table WHERE ",
-				"(id = $1)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" < (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = $1)))",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter < (SELECT counter FROM table WHERE ",
-				"(id = :arg_1)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" < (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = :arg_1)))",
 			),
 			Args: []interface{}{6598},
 		},
@@ -869,16 +869,16 @@ func TestSelect_WhereLessThan(t *testing.T) {
 						Where(loukoum.Condition("id").Equal(6598)),
 				)),
 			String: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter <= (SELECT counter FROM table WHERE ",
-				"(id = 6598)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" <= (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = 6598)))",
 			),
 			Query: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter <= (SELECT counter FROM table WHERE ",
-				"(id = $1)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" <= (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = $1)))",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT id FROM table WHERE (counter <= (SELECT counter FROM table WHERE ",
-				"(id = :arg_1)))",
+				"SELECT \"id\" FROM \"table\" WHERE (\"counter\" <= (SELECT \"counter\" FROM \"table\" WHERE ",
+				"(\"id\" = :arg_1)))",
 			),
 			Args: []interface{}{6598},
 		},
@@ -893,9 +893,9 @@ func TestSelect_WhereLike(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("title").Like("foo%")),
-			String:     "SELECT id FROM table WHERE (title LIKE 'foo%')",
-			Query:      "SELECT id FROM table WHERE (title LIKE $1)",
-			NamedQuery: "SELECT id FROM table WHERE (title LIKE :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"title\" LIKE 'foo%')",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"title\" LIKE $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"title\" LIKE :arg_1)",
 			Args:       []interface{}{"foo%"},
 		},
 		{
@@ -904,9 +904,9 @@ func TestSelect_WhereLike(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("title").NotLike("foo%")),
-			String:     "SELECT id FROM table WHERE (title NOT LIKE 'foo%')",
-			Query:      "SELECT id FROM table WHERE (title NOT LIKE $1)",
-			NamedQuery: "SELECT id FROM table WHERE (title NOT LIKE :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"title\" NOT LIKE 'foo%')",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"title\" NOT LIKE $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"title\" NOT LIKE :arg_1)",
 			Args:       []interface{}{"foo%"},
 		},
 		{
@@ -915,9 +915,9 @@ func TestSelect_WhereLike(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("title").ILike("foo%")),
-			String:     "SELECT id FROM table WHERE (title ILIKE 'foo%')",
-			Query:      "SELECT id FROM table WHERE (title ILIKE $1)",
-			NamedQuery: "SELECT id FROM table WHERE (title ILIKE :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"title\" ILIKE 'foo%')",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"title\" ILIKE $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"title\" ILIKE :arg_1)",
 			Args:       []interface{}{"foo%"},
 		},
 		{
@@ -926,9 +926,9 @@ func TestSelect_WhereLike(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("title").NotILike("foo%")),
-			String:     "SELECT id FROM table WHERE (title NOT ILIKE 'foo%')",
-			Query:      "SELECT id FROM table WHERE (title NOT ILIKE $1)",
-			NamedQuery: "SELECT id FROM table WHERE (title NOT ILIKE :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"title\" NOT ILIKE 'foo%')",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"title\" NOT ILIKE $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"title\" NOT ILIKE :arg_1)",
 			Args:       []interface{}{"foo%"},
 		},
 	})
@@ -942,9 +942,9 @@ func TestSelect_WhereBetween(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("count").Between(10, 20)),
-			String:     "SELECT id FROM table WHERE (count BETWEEN 10 AND 20)",
-			Query:      "SELECT id FROM table WHERE (count BETWEEN $1 AND $2)",
-			NamedQuery: "SELECT id FROM table WHERE (count BETWEEN :arg_1 AND :arg_2)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"count\" BETWEEN 10 AND 20)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"count\" BETWEEN $1 AND $2)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"count\" BETWEEN :arg_1 AND :arg_2)",
 			Args:       []interface{}{10, 20},
 		},
 		{
@@ -953,9 +953,9 @@ func TestSelect_WhereBetween(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("count").NotBetween(50, 70)),
-			String:     "SELECT id FROM table WHERE (count NOT BETWEEN 50 AND 70)",
-			Query:      "SELECT id FROM table WHERE (count NOT BETWEEN $1 AND $2)",
-			NamedQuery: "SELECT id FROM table WHERE (count NOT BETWEEN :arg_1 AND :arg_2)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"count\" NOT BETWEEN 50 AND 70)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"count\" NOT BETWEEN $1 AND $2)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"count\" NOT BETWEEN :arg_1 AND :arg_2)",
 			Args:       []interface{}{50, 70},
 		},
 	})
@@ -969,9 +969,9 @@ func TestSelect_WhereIsDistinctFrom(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("col").IsDistinctFrom(10)),
-			String:     "SELECT id FROM table WHERE (col IS DISTINCT FROM 10)",
-			Query:      "SELECT id FROM table WHERE (col IS DISTINCT FROM $1)",
-			NamedQuery: "SELECT id FROM table WHERE (col IS DISTINCT FROM :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"col\" IS DISTINCT FROM 10)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"col\" IS DISTINCT FROM $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"col\" IS DISTINCT FROM :arg_1)",
 			Args:       []interface{}{10},
 		},
 		{
@@ -980,9 +980,9 @@ func TestSelect_WhereIsDistinctFrom(t *testing.T) {
 				Select("id").
 				From("table").
 				Where(loukoum.Condition("col").IsNotDistinctFrom(10)),
-			String:     "SELECT id FROM table WHERE (col IS NOT DISTINCT FROM 10)",
-			Query:      "SELECT id FROM table WHERE (col IS NOT DISTINCT FROM $1)",
-			NamedQuery: "SELECT id FROM table WHERE (col IS NOT DISTINCT FROM :arg_1)",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"col\" IS NOT DISTINCT FROM 10)",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"col\" IS NOT DISTINCT FROM $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"col\" IS NOT DISTINCT FROM :arg_1)",
 			Args:       []interface{}{10},
 		},
 	})
@@ -1002,9 +1002,9 @@ func TestSelect_WhereIn(t *testing.T) {
 					From("table").
 					Where(loukoum.Condition("id").In(int64(1), int64(2), int64(3))),
 			},
-			String:     "SELECT id FROM table WHERE (id IN (1, 2, 3))",
-			Query:      "SELECT id FROM table WHERE (id IN ($1, $2, $3))",
-			NamedQuery: "SELECT id FROM table WHERE (id IN (:arg_1, :arg_2, :arg_3))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"id\" IN (1, 2, 3))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"id\" IN ($1, $2, $3))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"id\" IN (:arg_1, :arg_2, :arg_3))",
 			Args:       []interface{}{int64(1), int64(2), int64(3)},
 		},
 		{
@@ -1019,9 +1019,9 @@ func TestSelect_WhereIn(t *testing.T) {
 					From("table").
 					Where(loukoum.Condition("id").NotIn(1, 2, 3)),
 			},
-			String:     "SELECT id FROM table WHERE (id NOT IN (1, 2, 3))",
-			Query:      "SELECT id FROM table WHERE (id NOT IN ($1, $2, $3))",
-			NamedQuery: "SELECT id FROM table WHERE (id NOT IN (:arg_1, :arg_2, :arg_3))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"id\" NOT IN (1, 2, 3))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"id\" NOT IN ($1, $2, $3))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"id\" NOT IN (:arg_1, :arg_2, :arg_3))",
 			Args:       []interface{}{1, 2, 3},
 		},
 		{
@@ -1036,9 +1036,9 @@ func TestSelect_WhereIn(t *testing.T) {
 					From("table").
 					Where(loukoum.Condition("status").In("read", "unread")),
 			},
-			String:     "SELECT id FROM table WHERE (status IN ('read', 'unread'))",
-			Query:      "SELECT id FROM table WHERE (status IN ($1, $2))",
-			NamedQuery: "SELECT id FROM table WHERE (status IN (:arg_1, :arg_2))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"status\" IN ('read', 'unread'))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"status\" IN ($1, $2))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"status\" IN (:arg_1, :arg_2))",
 			Args:       []interface{}{"read", "unread"},
 		},
 		{
@@ -1053,9 +1053,9 @@ func TestSelect_WhereIn(t *testing.T) {
 					From("table").
 					Where(loukoum.Condition("status").NotIn("read", "unread")),
 			},
-			String:     "SELECT id FROM table WHERE (status NOT IN ('read', 'unread'))",
-			Query:      "SELECT id FROM table WHERE (status NOT IN ($1, $2))",
-			NamedQuery: "SELECT id FROM table WHERE (status NOT IN (:arg_1, :arg_2))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"status\" NOT IN ('read', 'unread'))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"status\" NOT IN ($1, $2))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"status\" NOT IN (:arg_1, :arg_2))",
 			Args:       []interface{}{"read", "unread"},
 		},
 		{
@@ -1070,9 +1070,9 @@ func TestSelect_WhereIn(t *testing.T) {
 					From("table").
 					Where(loukoum.Condition("status").In([]string{"read"})),
 			},
-			String:     "SELECT id FROM table WHERE (status IN ('read'))",
-			Query:      "SELECT id FROM table WHERE (status IN ($1))",
-			NamedQuery: "SELECT id FROM table WHERE (status IN (:arg_1))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"status\" IN ('read'))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"status\" IN ($1))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"status\" IN (:arg_1))",
 			Args:       []interface{}{"read"},
 		},
 		{
@@ -1087,16 +1087,16 @@ func TestSelect_WhereIn(t *testing.T) {
 					From("table").
 					Where(loukoum.Condition("status").NotIn([]string{"read"})),
 			},
-			String:     "SELECT id FROM table WHERE (status NOT IN ('read'))",
-			Query:      "SELECT id FROM table WHERE (status NOT IN ($1))",
-			NamedQuery: "SELECT id FROM table WHERE (status NOT IN (:arg_1))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"status\" NOT IN ('read'))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"status\" NOT IN ($1))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"status\" NOT IN (:arg_1))",
 			Args:       []interface{}{"read"},
 		},
 		{
 			Name: "In Raw",
 			Builder: loukoum.Select("name").From("users").
 				Where(loukoum.Condition("id").In(loukoum.Raw("?"))),
-			SameQuery: "SELECT name FROM users WHERE (id IN (?))",
+			SameQuery: "SELECT \"name\" FROM \"users\" WHERE (\"id\" IN (?))",
 		},
 		{
 			Name: "In subquery",
@@ -1108,9 +1108,9 @@ func TestSelect_WhereIn(t *testing.T) {
 						From("table").
 						Where(loukoum.Condition("id").Equal(1)),
 				)),
-			String:     "SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = 1)))",
-			Query:      "SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = $1)))",
-			NamedQuery: "SELECT id FROM table WHERE (id IN (SELECT id FROM table WHERE (id = :arg_1)))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"id\" IN (SELECT \"id\" FROM \"table\" WHERE (\"id\" = 1)))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"id\" IN (SELECT \"id\" FROM \"table\" WHERE (\"id\" = $1)))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"id\" IN (SELECT \"id\" FROM \"table\" WHERE (\"id\" = :arg_1)))",
 			Args:       []interface{}{1},
 		},
 		{
@@ -1123,9 +1123,9 @@ func TestSelect_WhereIn(t *testing.T) {
 						From("table").
 						Where(loukoum.Condition("id").Equal(1)),
 				)),
-			String:     "SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = 1)))",
-			Query:      "SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = $1)))",
-			NamedQuery: "SELECT id FROM table WHERE (id NOT IN (SELECT id FROM table WHERE (id = :arg_1)))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (\"id\" NOT IN (SELECT \"id\" FROM \"table\" WHERE (\"id\" = 1)))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (\"id\" NOT IN (SELECT \"id\" FROM \"table\" WHERE (\"id\" = $1)))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (\"id\" NOT IN (SELECT \"id\" FROM \"table\" WHERE (\"id\" = :arg_1)))", //nolint:lll
 			Args:       []interface{}{1},
 		},
 		{
@@ -1134,7 +1134,7 @@ func TestSelect_WhereIn(t *testing.T) {
 				Select("id").From("table").Where(
 				loukoum.Condition("id").In([]int{}),
 			),
-			SameQuery: "SELECT id FROM table WHERE (id IN ())",
+			SameQuery: "SELECT \"id\" FROM \"table\" WHERE (\"id\" IN ())",
 		},
 		{
 			Name: "In nil slice",
@@ -1142,7 +1142,7 @@ func TestSelect_WhereIn(t *testing.T) {
 				Select("id").From("table").Where(
 				loukoum.Condition("id").In(nil),
 			),
-			SameQuery: "SELECT id FROM table WHERE (id IN ())",
+			SameQuery: "SELECT \"id\" FROM \"table\" WHERE (\"id\" IN ())",
 		},
 		{
 			Name: "Call In",
@@ -1153,9 +1153,9 @@ func TestSelect_WhereIn(t *testing.T) {
 					"FOO@EXAMPLE.ORG",
 					"BAR@EXAMPLE.ORG",
 				})),
-			String:     "SELECT id FROM table WHERE (upper(email) IN ('FOO@EXAMPLE.ORG', 'BAR@EXAMPLE.ORG'))",
-			Query:      "SELECT id FROM table WHERE (upper(email) IN ($1, $2))",
-			NamedQuery: "SELECT id FROM table WHERE (upper(email) IN (:arg_1, :arg_2))",
+			String:     "SELECT \"id\" FROM \"table\" WHERE (upper(\"email\") IN ('FOO@EXAMPLE.ORG', 'BAR@EXAMPLE.ORG'))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (upper(\"email\") IN ($1, $2))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (upper(\"email\") IN (:arg_1, :arg_2))",
 			Args: []interface{}{
 				"FOO@EXAMPLE.ORG",
 				"BAR@EXAMPLE.ORG",
@@ -1172,20 +1172,20 @@ func TestSelect_Exists(t *testing.T) {
 				Select("id").
 				From("users").
 				Where(loukoum.Condition("deleted_at").IsNull(true)).
-				And(loukoum.Exists(loukoum.Select("1").From("news").Where(
+				And(loukoum.Exists(loukoum.Select(loukoum.Raw("1")).From("news").Where(
 					loukoum.Condition("news.created_at").GreaterThan(2)),
 				)),
 			String: fmt.Sprint(
-				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
-				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > 2))))",
+				"SELECT \"id\" FROM \"users\" WHERE ((\"deleted_at\" IS NULL) AND ",
+				"(EXISTS (SELECT 1 FROM \"news\" WHERE (\"news\".\"created_at\" > 2))))",
 			),
 			Query: fmt.Sprint(
-				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
-				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > $1))))",
+				"SELECT \"id\" FROM \"users\" WHERE ((\"deleted_at\" IS NULL) AND ",
+				"(EXISTS (SELECT 1 FROM \"news\" WHERE (\"news\".\"created_at\" > $1))))",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
-				"(EXISTS (SELECT 1 FROM news WHERE (news.created_at > :arg_1))))",
+				"SELECT \"id\" FROM \"users\" WHERE ((\"deleted_at\" IS NULL) AND ",
+				"(EXISTS (SELECT 1 FROM \"news\" WHERE (\"news\".\"created_at\" > :arg_1))))",
 			),
 			Args: []interface{}{2},
 		},
@@ -1200,20 +1200,20 @@ func TestSelect_NotExists(t *testing.T) {
 				Select("id").
 				From("users").
 				Where(loukoum.Condition("deleted_at").IsNull(true)).
-				And(loukoum.NotExists(loukoum.Select("1").From("news").Where(
+				And(loukoum.NotExists(loukoum.Select(loukoum.Raw("1")).From("news").Where(
 					loukoum.Condition("news.created_at").GreaterThan(2)),
 				)),
 			String: fmt.Sprint(
-				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
-				"(NOT EXISTS (SELECT 1 FROM news WHERE (news.created_at > 2))))",
+				"SELECT \"id\" FROM \"users\" WHERE ((\"deleted_at\" IS NULL) AND ",
+				"(NOT EXISTS (SELECT 1 FROM \"news\" WHERE (\"news\".\"created_at\" > 2))))",
 			),
 			Query: fmt.Sprint(
-				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
-				"(NOT EXISTS (SELECT 1 FROM news WHERE (news.created_at > $1))))",
+				"SELECT \"id\" FROM \"users\" WHERE ((\"deleted_at\" IS NULL) AND ",
+				"(NOT EXISTS (SELECT 1 FROM \"news\" WHERE (\"news\".\"created_at\" > $1))))",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT id FROM users WHERE ((deleted_at IS NULL) AND ",
-				"(NOT EXISTS (SELECT 1 FROM news WHERE (news.created_at > :arg_1))))",
+				"SELECT \"id\" FROM \"users\" WHERE ((\"deleted_at\" IS NULL) AND ",
+				"(NOT EXISTS (SELECT 1 FROM \"news\" WHERE (\"news\".\"created_at\" > :arg_1))))",
 			),
 			Args: []interface{}{2},
 		},
@@ -1226,54 +1226,54 @@ func TestSelect_GroupBy(t *testing.T) {
 			Name: "One column",
 			Builders: []builder.Builder{
 				loukoum.
-					Select("name", "COUNT(*)").
+					Select("name", loukoum.Raw("COUNT(*)")).
 					From("user").
 					Where(loukoum.Condition("disabled").IsNull(false)).
 					GroupBy("name"),
 				loukoum.
-					Select("name", "COUNT(*)").
+					Select("name", loukoum.Raw("COUNT(*)")).
 					From("user").
 					Where(loukoum.Condition("disabled").IsNull(false)).
 					GroupBy(loukoum.Column("name")),
 			},
-			SameQuery: "SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name",
+			SameQuery: "SELECT \"name\", COUNT(*) FROM \"user\" WHERE (\"disabled\" IS NOT NULL) GROUP BY \"name\"",
 		},
 		{
 			Name: "Two columns",
 			Builders: []builder.Builder{
 				loukoum.
-					Select("name", "locale", "COUNT(*)").
+					Select("name", "locale", loukoum.Raw("COUNT(*)")).
 					From("user").
 					Where(loukoum.Condition("disabled").IsNull(false)).
 					GroupBy("name", "locale"),
 				loukoum.
-					Select("name", "locale", "COUNT(*)").
+					Select("name", "locale", loukoum.Raw("COUNT(*)")).
 					From("user").
 					Where(loukoum.Condition("disabled").IsNull(false)).
 					GroupBy(loukoum.Column("name"), loukoum.Column("locale")),
 			},
 			SameQuery: fmt.Sprint(
-				"SELECT name, locale, COUNT(*) FROM user ",
-				"WHERE (disabled IS NOT NULL) GROUP BY name, locale",
+				"SELECT \"name\", \"locale\", COUNT(*) FROM \"user\" ",
+				"WHERE (\"disabled\" IS NOT NULL) GROUP BY \"name\", \"locale\"",
 			),
 		},
 		{
 			Name: "Three columns",
 			Builders: []builder.Builder{
 				loukoum.
-					Select("name", "locale", "country", "COUNT(*)").
+					Select("name", "locale", "country", loukoum.Raw("COUNT(*)")).
 					From("user").
 					Where(loukoum.Condition("disabled").IsNull(false)).
 					GroupBy("name", "locale", "country"),
 				loukoum.
-					Select("name", "locale", "country", "COUNT(*)").
+					Select("name", "locale", "country", loukoum.Raw("COUNT(*)")).
 					From("user").
 					Where(loukoum.Condition("disabled").IsNull(false)).
 					GroupBy(loukoum.Column("name"), loukoum.Column("locale"), loukoum.Column("country")),
 			},
 			SameQuery: fmt.Sprint(
-				"SELECT name, locale, country, COUNT(*) FROM user ",
-				"WHERE (disabled IS NOT NULL) GROUP BY name, locale, country",
+				"SELECT \"name\", \"locale\", \"country\", COUNT(*) FROM \"user\" ",
+				"WHERE (\"disabled\" IS NOT NULL) GROUP BY \"name\", \"locale\", \"country\"",
 			),
 		},
 	})
@@ -1284,45 +1284,45 @@ func TestSelect_Having(t *testing.T) {
 		{
 			Name: "One condition",
 			Builder: loukoum.
-				Select("name", "COUNT(*)").
+				Select("name", loukoum.Raw("COUNT(*)")).
 				From("user").
 				Where(loukoum.Condition("disabled").IsNull(false)).
 				GroupBy("name").
-				Having(loukoum.Condition("COUNT(*)").GreaterThan(10)),
+				Having(stmt.NewCall("COUNT", loukoum.Raw("*")).GreaterThan(10)),
 			String: fmt.Sprint(
-				"SELECT name, COUNT(*) FROM user ",
-				"WHERE (disabled IS NOT NULL) GROUP BY name HAVING (COUNT(*) > 10)",
+				"SELECT \"name\", COUNT(*) FROM \"user\" ",
+				"WHERE (\"disabled\" IS NOT NULL) GROUP BY \"name\" HAVING (COUNT(*) > 10)",
 			),
 			Query: fmt.Sprint(
-				"SELECT name, COUNT(*) FROM user ",
-				"WHERE (disabled IS NOT NULL) GROUP BY name HAVING (COUNT(*) > $1)",
+				"SELECT \"name\", COUNT(*) FROM \"user\" ",
+				"WHERE (\"disabled\" IS NOT NULL) GROUP BY \"name\" HAVING (COUNT(*) > $1)",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT name, COUNT(*) FROM user ",
-				"WHERE (disabled IS NOT NULL) GROUP BY name HAVING (COUNT(*) > :arg_1)",
+				"SELECT \"name\", COUNT(*) FROM \"user\" ",
+				"WHERE (\"disabled\" IS NOT NULL) GROUP BY \"name\" HAVING (COUNT(*) > :arg_1)",
 			),
 			Args: []interface{}{10},
 		},
 		{
 			Name: "Two conditions",
 			Builder: loukoum.
-				Select("name", "COUNT(*)").
+				Select("name", loukoum.Raw("COUNT(*)")).
 				From("user").
 				Where(loukoum.Condition("disabled").IsNull(false)).
 				GroupBy("name").
 				Having(
-					loukoum.Condition("COUNT(*)").GreaterThan(10).And(loukoum.Condition("COUNT(*)").LessThan(500)),
+					stmt.NewCall("COUNT", loukoum.Raw("*")).GreaterThan(10).And(stmt.NewCall("COUNT", loukoum.Raw("*")).LessThan(500)),
 				),
 			String: fmt.Sprint(
-				"SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name ",
+				"SELECT \"name\", COUNT(*) FROM \"user\" WHERE (\"disabled\" IS NOT NULL) GROUP BY \"name\" ",
 				"HAVING ((COUNT(*) > 10) AND (COUNT(*) < 500))",
 			),
 			Query: fmt.Sprint(
-				"SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name ",
+				"SELECT \"name\", COUNT(*) FROM \"user\" WHERE (\"disabled\" IS NOT NULL) GROUP BY \"name\" ",
 				"HAVING ((COUNT(*) > $1) AND (COUNT(*) < $2))",
 			),
 			NamedQuery: fmt.Sprint(
-				"SELECT name, COUNT(*) FROM user WHERE (disabled IS NOT NULL) GROUP BY name ",
+				"SELECT \"name\", COUNT(*) FROM \"user\" WHERE (\"disabled\" IS NOT NULL) GROUP BY \"name\" ",
 				"HAVING ((COUNT(*) > :arg_1) AND (COUNT(*) < :arg_2))",
 			),
 			Args: []interface{}{10, 500},
@@ -1348,7 +1348,7 @@ func TestSelect_OrderBy(t *testing.T) {
 					From("user").
 					OrderBy(loukoum.Column("id").Asc()),
 			},
-			SameQuery: "SELECT name FROM user ORDER BY id ASC",
+			SameQuery: "SELECT \"name\" FROM \"user\" ORDER BY id ASC",
 		},
 		{
 			Name: "With order desc",
@@ -1362,7 +1362,7 @@ func TestSelect_OrderBy(t *testing.T) {
 					From("user").
 					OrderBy(loukoum.Column("id").Desc()),
 			},
-			SameQuery: "SELECT name FROM user ORDER BY id DESC",
+			SameQuery: "SELECT \"name\" FROM \"user\" ORDER BY id DESC",
 		},
 		{
 			Name: "With order desc and asc",
@@ -1386,7 +1386,7 @@ func TestSelect_OrderBy(t *testing.T) {
 					OrderBy(loukoum.Column("locale").Asc()).
 					OrderBy(loukoum.Column("id").Desc()),
 			},
-			SameQuery: "SELECT name FROM user ORDER BY locale ASC, id DESC",
+			SameQuery: "SELECT \"name\" FROM \"user\" ORDER BY locale ASC, id DESC",
 		},
 	})
 }
@@ -1399,7 +1399,7 @@ func TestSelect_Limit(t *testing.T) {
 				Select("name").
 				From("user").
 				Limit(10),
-			SameQuery: "SELECT name FROM user LIMIT 10",
+			SameQuery: "SELECT \"name\" FROM \"user\" LIMIT 10",
 		},
 		{
 			Name: "string 50",
@@ -1407,7 +1407,7 @@ func TestSelect_Limit(t *testing.T) {
 				Select("name").
 				From("user").
 				Limit("50"),
-			SameQuery: "SELECT name FROM user LIMIT 50",
+			SameQuery: "SELECT \"name\" FROM \"user\" LIMIT 50",
 		},
 		{
 			Name: "uint64 700",
@@ -1415,7 +1415,7 @@ func TestSelect_Limit(t *testing.T) {
 				Select("name").
 				From("user").
 				Limit(uint64(700)),
-			SameQuery: "SELECT name FROM user LIMIT 700",
+			SameQuery: "SELECT \"name\" FROM \"user\" LIMIT 700",
 		},
 		{
 			Name: "Corner case 0",
@@ -1446,7 +1446,7 @@ func TestSelect_Offset(t *testing.T) {
 				Select("name").
 				From("user").
 				Offset(10),
-			SameQuery: "SELECT name FROM user OFFSET 10",
+			SameQuery: "SELECT \"name\" FROM \"user\" OFFSET 10",
 		},
 		{
 			Name: "string 50",
@@ -1454,7 +1454,7 @@ func TestSelect_Offset(t *testing.T) {
 				Select("name").
 				From("user").
 				Offset("50"),
-			SameQuery: "SELECT name FROM user OFFSET 50",
+			SameQuery: "SELECT \"name\" FROM \"user\" OFFSET 50",
 		},
 		{
 			Name: "uint64 700",
@@ -1462,7 +1462,7 @@ func TestSelect_Offset(t *testing.T) {
 				Select("name").
 				From("user").
 				Offset(uint64(700)),
-			SameQuery: "SELECT name FROM user OFFSET 700",
+			SameQuery: "SELECT \"name\" FROM \"user\" OFFSET 700",
 		},
 		{
 			Name: "Corner case 0",
@@ -1490,27 +1490,27 @@ func TestSelect_With(t *testing.T) {
 		{
 			Name: "Count with simple with statement",
 			Builder: loukoum.
-				Select("AVG(COUNT)").
+				Select(loukoum.Raw("AVG(COUNT)")).
 				From("members").
 				With(loukoum.With("members",
-					loukoum.Select("COUNT(*)").
+					loukoum.Select(loukoum.Raw("COUNT(*)")).
 						From("table").
 						Where(loukoum.Condition("deleted_at").IsNull(true)).
 						GroupBy("group_id"),
 				)),
 			SameQuery: fmt.Sprint(
-				"WITH members AS (SELECT COUNT(*) FROM table WHERE (deleted_at IS NULL) GROUP BY group_id) ",
-				"SELECT AVG(COUNT) FROM members",
+				"WITH members AS (SELECT COUNT(*) FROM \"table\" WHERE (\"deleted_at\" IS NULL) GROUP BY \"group_id\") ",
+				"SELECT AVG(COUNT) FROM \"members\"",
 			),
 		},
 		{
 			Name: "Sum with simple with statement",
 			Builder: loukoum.
-				Select("SUM(project.amount_raised - withdrawn.amount)").
+				Select(loukoum.Raw("SUM(project.amount_raised - withdrawn.amount)")).
 				From("project").
 				Join("withdrawn", loukoum.On("withdrawn.project_id", "project.id"), loukoum.LeftJoin).
 				With(loukoum.With("withdrawn",
-					loukoum.Select("SUM(amount) AS amount", "project_id").
+					loukoum.Select(loukoum.Raw("SUM(amount) AS amount"), "project_id").
 						From("withdrawal").
 						GroupBy("project_id"),
 				)).
@@ -1518,37 +1518,37 @@ func TestSelect_With(t *testing.T) {
 				Where(loukoum.Condition("project.deleted_at").IsNull(true)).
 				Where(loukoum.Condition("project.amount_raised").GreaterThan(loukoum.Raw("withdrawn.amount"))),
 			String: fmt.Sprint(
-				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id) ",
-				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
-				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id WHERE (((project.amount_raised > 0) ",
-				"AND (project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, \"project_id\" FROM \"withdrawal\" GROUP BY \"project_id\") ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM \"project\" ",
+				"LEFT JOIN \"withdrawn\" ON \"withdrawn\".\"project_id\" = \"project\".\"id\" WHERE (((\"project\".\"amount_raised\" > 0) ", //nolint:lll
+				"AND (\"project\".\"deleted_at\" IS NULL)) AND (\"project\".\"amount_raised\" > withdrawn.amount))",
 			),
 			Query: fmt.Sprint(
-				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id) ",
-				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
-				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id WHERE (((project.amount_raised > $1) ",
-				"AND (project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, \"project_id\" FROM \"withdrawal\" GROUP BY \"project_id\") ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM \"project\" ",
+				"LEFT JOIN \"withdrawn\" ON \"withdrawn\".\"project_id\" = \"project\".\"id\" WHERE (((\"project\".\"amount_raised\" > $1) ", //nolint:lll
+				"AND (\"project\".\"deleted_at\" IS NULL)) AND (\"project\".\"amount_raised\" > withdrawn.amount))",
 			),
 			NamedQuery: fmt.Sprint(
-				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id) ",
-				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
-				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id WHERE (((project.amount_raised > :arg_1) ",
-				"AND (project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, \"project_id\" FROM \"withdrawal\" GROUP BY \"project_id\") ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM \"project\" ",
+				"LEFT JOIN \"withdrawn\" ON \"withdrawn\".\"project_id\" = \"project\".\"id\" WHERE (((\"project\".\"amount_raised\" > :arg_1) ", //nolint:lll
+				"AND (\"project\".\"deleted_at\" IS NULL)) AND (\"project\".\"amount_raised\" > withdrawn.amount))",
 			),
 			Args: []interface{}{0},
 		},
 		{
 			Name: "Multiple with statement",
 			Builder: loukoum.
-				Select("SUM(project.amount_raised - withdrawn.amount)").
+				Select(loukoum.Raw("SUM(project.amount_raised - withdrawn.amount)")).
 				From("project").
 				With(loukoum.With("withdrawn",
-					loukoum.Select("SUM(amount) AS amount", "project_id").
+					loukoum.Select(loukoum.Raw("SUM(amount) AS amount"), "project_id").
 						From("withdrawal").
 						GroupBy("project_id"),
 				)).
 				With(loukoum.With("contributions",
-					loukoum.Select("COUNT(*) AS count", "project_id").
+					loukoum.Select(loukoum.Raw("COUNT(*) AS count"), "project_id").
 						From("contribution").
 						GroupBy("project_id"),
 				)).
@@ -1559,31 +1559,31 @@ func TestSelect_With(t *testing.T) {
 				Where(loukoum.Condition("project.deleted_at").IsNull(true)).
 				Where(loukoum.Condition("project.amount_raised").GreaterThan(loukoum.Raw("withdrawn.amount"))),
 			String: fmt.Sprint(
-				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id), ",
-				"contributions AS (SELECT COUNT(*) AS count, project_id FROM contribution GROUP BY project_id) ",
-				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
-				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id ",
-				"LEFT JOIN contributions ON contributions.project_id = project.id ",
-				"WHERE ((((project.amount_raised > 0) AND (contributions.count > 10)) AND ",
-				"(project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, \"project_id\" FROM \"withdrawal\" GROUP BY \"project_id\"), ",
+				"contributions AS (SELECT COUNT(*) AS count, \"project_id\" FROM \"contribution\" GROUP BY \"project_id\") ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM \"project\" ",
+				"LEFT JOIN \"withdrawn\" ON \"withdrawn\".\"project_id\" = \"project\".\"id\" ",
+				"LEFT JOIN \"contributions\" ON \"contributions\".\"project_id\" = \"project\".\"id\" ",
+				"WHERE ((((\"project\".\"amount_raised\" > 0) AND (\"contributions\".\"count\" > 10)) AND ",
+				"(\"project\".\"deleted_at\" IS NULL)) AND (\"project\".\"amount_raised\" > withdrawn.amount))",
 			),
 			Query: fmt.Sprint(
-				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id), ",
-				"contributions AS (SELECT COUNT(*) AS count, project_id FROM contribution GROUP BY project_id) ",
-				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
-				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id ",
-				"LEFT JOIN contributions ON contributions.project_id = project.id ",
-				"WHERE ((((project.amount_raised > $1) AND (contributions.count > $2)) AND ",
-				"(project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, \"project_id\" FROM \"withdrawal\" GROUP BY \"project_id\"), ",
+				"contributions AS (SELECT COUNT(*) AS count, \"project_id\" FROM \"contribution\" GROUP BY \"project_id\") ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM \"project\" ",
+				"LEFT JOIN \"withdrawn\" ON \"withdrawn\".\"project_id\" = \"project\".\"id\" ",
+				"LEFT JOIN \"contributions\" ON \"contributions\".\"project_id\" = \"project\".\"id\" ",
+				"WHERE ((((\"project\".\"amount_raised\" > $1) AND (\"contributions\".\"count\" > $2)) AND ",
+				"(\"project\".\"deleted_at\" IS NULL)) AND (\"project\".\"amount_raised\" > withdrawn.amount))",
 			),
 			NamedQuery: fmt.Sprint(
-				"WITH withdrawn AS (SELECT SUM(amount) AS amount, project_id FROM withdrawal GROUP BY project_id), ",
-				"contributions AS (SELECT COUNT(*) AS count, project_id FROM contribution GROUP BY project_id) ",
-				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM project ",
-				"LEFT JOIN withdrawn ON withdrawn.project_id = project.id ",
-				"LEFT JOIN contributions ON contributions.project_id = project.id ",
-				"WHERE ((((project.amount_raised > :arg_1) AND (contributions.count > :arg_2)) AND ",
-				"(project.deleted_at IS NULL)) AND (project.amount_raised > withdrawn.amount))",
+				"WITH withdrawn AS (SELECT SUM(amount) AS amount, \"project_id\" FROM \"withdrawal\" GROUP BY \"project_id\"), ",
+				"contributions AS (SELECT COUNT(*) AS count, \"project_id\" FROM \"contribution\" GROUP BY \"project_id\") ",
+				"SELECT SUM(project.amount_raised - withdrawn.amount) FROM \"project\" ",
+				"LEFT JOIN \"withdrawn\" ON \"withdrawn\".\"project_id\" = \"project\".\"id\" ",
+				"LEFT JOIN \"contributions\" ON \"contributions\".\"project_id\" = \"project\".\"id\" ",
+				"WHERE ((((\"project\".\"amount_raised\" > :arg_1) AND (\"contributions\".\"count\" > :arg_2)) AND ",
+				"(\"project\".\"deleted_at\" IS NULL)) AND (\"project\".\"amount_raised\" > withdrawn.amount))",
 			),
 			Args: []interface{}{0, 10},
 		},
@@ -1598,7 +1598,7 @@ func TestSelect_Extra(t *testing.T) {
 				Select("name").
 				From("user").
 				Prefix("EXPLAIN ANALYZE"),
-			SameQuery: "EXPLAIN ANALYZE SELECT name FROM user",
+			SameQuery: "EXPLAIN ANALYZE SELECT \"name\" FROM \"user\"",
 		},
 		{
 			Name: "Suffix",
@@ -1606,7 +1606,7 @@ func TestSelect_Extra(t *testing.T) {
 				Select("name").
 				From("user").
 				Suffix("FOR UPDATE"),
-			SameQuery: "SELECT name FROM user FOR UPDATE",
+			SameQuery: "SELECT \"name\" FROM \"user\" FOR UPDATE",
 		},
 	})
 }

@@ -43,11 +43,11 @@ func (on OnClause) Or(value OnExpression) OnExpression {
 
 // Write exposes statement as a SQL query.
 func (on OnClause) Write(ctx types.Context) {
-	ctx.Write(on.Left.Name)
+	on.Left.Write(ctx)
 	ctx.Write(" ")
 	ctx.Write(token.Equals.String())
 	ctx.Write(" ")
-	ctx.Write(on.Right.Name)
+	on.Right.Write(ctx)
 }
 
 // IsEmpty returns true if statement is undefined.

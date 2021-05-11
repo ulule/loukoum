@@ -101,7 +101,7 @@ func (b Update) Returning(values ...interface{}) Update {
 		panic("loukoum: update builder has returning clause already defined")
 	}
 
-	b.query.Returning = stmt.NewReturning(ToColumns(values))
+	b.query.Returning = stmt.NewReturning(ToSelectExpressions(values))
 
 	return b
 }

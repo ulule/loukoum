@@ -71,7 +71,7 @@ func (Identifier) expression() {}
 
 // Write exposes statement as a SQL query.
 func (identifier Identifier) Write(ctx types.Context) {
-	ctx.Write(identifier.Identifier)
+	ctx.Write(quote(identifier.Identifier))
 }
 
 // IsEmpty returns true if statement is undefined.
@@ -419,7 +419,8 @@ func NewRaw(value string) Raw {
 	}
 }
 
-func (Raw) expression() {}
+func (Raw) expression()       {}
+func (Raw) selectExpression() {}
 
 // Write exposes statement as a SQL query.
 func (raw Raw) Write(ctx types.Context) {
@@ -433,6 +434,9 @@ func (raw Raw) IsEmpty() bool {
 
 // Ensure that Raw is an Expression
 var _ Expression = Raw{}
+
+// Ensure that Raw is a SelectExpression
+var _ SelectExpression = Raw{}
 
 // ----------------------------------------------------------------------------
 // Wrapper
@@ -517,6 +521,18 @@ func (call Call) Write(ctx types.Context) {
 func (call Call) Equal(what interface{}) InfixExpression {
 	operator := NewComparisonOperator(types.Equal)
 	return NewInfixExpression(call, operator, NewWrapper(NewExpression(what)))
+}
+
+// GreaterThan performs a "greater than" comparison.
+func (call Call) GreaterThan(value interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.GreaterThan)
+	return NewInfixExpression(call, operator, NewWrapper(NewExpression(value)))
+}
+
+// LessThan performs a "less than" comparison.
+func (call Call) LessThan(value interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.LessThan)
+	return NewInfixExpression(call, operator, NewWrapper(NewExpression(value)))
 }
 
 // ILike performs a "ilike" condition.

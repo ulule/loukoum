@@ -32,12 +32,12 @@ func (table Table) As(alias string) Table {
 
 // Write exposes statement as a SQL query.
 func (table Table) Write(ctx types.Context) {
-	ctx.Write(table.Name)
+	ctx.Write(quote(table.Name))
 	if table.Alias != "" {
 		ctx.Write(" ")
 		ctx.Write(token.As.String())
 		ctx.Write(" ")
-		ctx.Write(table.Alias)
+		ctx.Write(quote(table.Alias))
 	}
 }
 

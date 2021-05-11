@@ -76,7 +76,7 @@ func (b Delete) Returning(values ...interface{}) Delete {
 		panic("loukoum: delete builder has returning clause already defined")
 	}
 
-	b.query.Returning = stmt.NewReturning(ToColumns(values))
+	b.query.Returning = stmt.NewReturning(ToSelectExpressions(values))
 
 	return b
 }
