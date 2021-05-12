@@ -100,8 +100,7 @@ func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 						e = it.Next()
 						right := stmt.NewColumn(e.Value)
 
-						join.Condition = join.Condition.And(stmt.NewOnClause(left, right))
-
+						join.Condition = stmt.NewInfixExpression(join.Condition, stmt.NewLogicalOperator(types.And), stmt.NewOnClause(left, right)) //nolint:lll
 					}
 					// We have an OR operator
 					if it.Is(token.Or) {
@@ -126,7 +125,7 @@ func ParseJoin(subquery string) (stmt.Join, error) { // nolint: gocyclo
 						e = it.Next()
 						right := stmt.NewColumn(e.Value)
 
-						join.Condition = join.Condition.Or(stmt.NewOnClause(left, right))
+						join.Condition = stmt.NewInfixExpression(join.Condition, stmt.NewLogicalOperator(types.Or), stmt.NewOnClause(left, right)) //nolint:lll
 					}
 				}
 
