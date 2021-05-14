@@ -535,6 +535,12 @@ func (call Call) LessThan(value interface{}) InfixExpression {
 	return NewInfixExpression(call, operator, NewWrapper(NewExpression(value)))
 }
 
+// Like performs a "like" condition.
+func (call Call) Like(value interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.Like)
+	return NewInfixExpression(call, operator, NewExpression(value))
+}
+
 // ILike performs a "ilike" condition.
 func (call Call) ILike(value interface{}) InfixExpression {
 	operator := NewComparisonOperator(types.ILike)
@@ -544,6 +550,12 @@ func (call Call) ILike(value interface{}) InfixExpression {
 // In adds a IN expression.
 func (call Call) In(value ...interface{}) In {
 	return NewIn(call, NewArrayExpression(value...))
+}
+
+// Overlap performs an "overlap" comparison.
+func (call Call) Overlap(what interface{}) InfixExpression {
+	operator := NewComparisonOperator(types.Overlap)
+	return NewInfixExpression(call, operator, NewWrapper(NewExpression(what)))
 }
 
 // IsEmpty reports whether call is empty.
