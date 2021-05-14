@@ -304,6 +304,26 @@ func TestSelect_From(t *testing.T) {
 			Builder:   loukoum.Select("a").From(loukoum.Table("foobar").As("example")),
 			SameQuery: "SELECT \"a\" FROM \"foobar\" AS \"example\"",
 		},
+		{
+			Name:      "Multiple",
+			Builder:   loukoum.Select("a").From(loukoum.Table("foobar").As("example"), loukoum.Table("foobar").As("example2")),
+			SameQuery: "SELECT \"a\" FROM \"foobar\" AS \"example\", \"foobar\" AS \"example2\"",
+		},
+		{
+			Name:      "Multiple strings",
+			Builder:   loukoum.Select("a").From("example", "example2"),
+			SameQuery: "SELECT \"a\" FROM \"example\", \"example2\"",
+		},
+		{
+			Name:      "Multiple raws",
+			Builder:   loukoum.Select("a").From(loukoum.Raw("example1 ex1"), loukoum.Raw("example2 ex2")),
+			SameQuery: "SELECT \"a\" FROM example1 ex1, example2 ex2",
+		},
+		{
+			Name:      "Multiple raw",
+			Builder:   loukoum.Select("a").From(loukoum.Raw("example1 ex1, example2 ex2")),
+			SameQuery: "SELECT \"a\" FROM example1 ex1, example2 ex2",
+		},
 	})
 }
 

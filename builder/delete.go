@@ -16,23 +16,13 @@ func NewDelete() Delete {
 }
 
 // From sets the FROM clause of the query.
-func (b Delete) From(arg interface{}) Delete {
+func (b Delete) From(arg ...interface{}) Delete {
 	if !b.query.From.IsEmpty() {
 		panic("loukoum: delete builder has from clause already defined")
 	}
 
-	only := b.query.From.Only
-	b.query.From = ToFrom(arg)
-	if only {
-		b.query.From.Only = only
-	}
+	b.query.From = ToFrom(arg...)
 
-	return b
-}
-
-// Only adds a ONLY clause to the query.
-func (b Delete) Only() Delete {
-	b.query.From.Only = true
 	return b
 }
 

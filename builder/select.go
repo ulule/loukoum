@@ -56,12 +56,12 @@ func (b Select) Columns(args ...interface{}) Select {
 }
 
 // From sets the FROM clause of the query.
-func (b Select) From(arg interface{}) Select {
+func (b Select) From(arg ...interface{}) Select {
 	if !b.query.From.IsEmpty() {
 		panic("loukoum: select builder has from clause already defined")
 	}
 
-	b.query.From = ToFrom(arg)
+	b.query.From = ToFrom(arg...)
 
 	return b
 }

@@ -199,20 +199,26 @@ func ToTables(values []interface{}) []stmt.Table {
 }
 
 // ToFrom takes an empty interfaces and returns a From instance.
-func ToFrom(arg interface{}) stmt.From {
+func ToFrom(args ...interface{}) stmt.From {
 	from := stmt.From{}
 
-	switch value := arg.(type) {
-	case string:
-		from = stmt.NewFrom(stmt.NewTable(value), false)
-	case stmt.From:
-		from = value
-	case stmt.Table:
-		from = stmt.NewFrom(value, false)
-	default:
-		panic(fmt.Sprintf("loukoum: cannot use %T as from clause", arg))
+	tables := make([]stmt.Statement, len(args))
+	for i := range args {
+		switch value := args[i].(type) {
+		case string:
+			tables[i] = stmt.NewTable(value)
+		case stmt.From:
+			from = value
+		case stmt.Table:
+			tables[i] = value
+		case stmt.Raw:
+			tables[i] = value
+		default:
+			panic(fmt.Sprintf("loukoum: cannot use %T as from clause", args[i]))
+		}
 	}
 
+	from = stmt.NewFrom(tables)
 	if from.IsEmpty() {
 		panic("loukoum: given from clause is undefined")
 	}
