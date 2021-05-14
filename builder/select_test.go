@@ -304,6 +304,11 @@ func TestSelect_From(t *testing.T) {
 			Builder:   loukoum.Select("a").From(loukoum.Table("foobar").As("example")),
 			SameQuery: "SELECT \"a\" FROM \"foobar\" AS \"example\"",
 		},
+		{
+			Name:      "Multiple",
+			Builder:   loukoum.Select("a").From(loukoum.Raw("table 1, table 2")),
+			SameQuery: "SELECT \"a\" FROM table 1, table 2",
+		},
 	})
 }
 

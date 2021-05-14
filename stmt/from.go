@@ -8,11 +8,11 @@ import (
 // From is a FROM clause.
 type From struct {
 	Only  bool
-	Table Table
+	Table Statement
 }
 
 // NewFrom returns a new From instance.
-func NewFrom(table Table, only bool) From {
+func NewFrom(table Statement, only bool) From {
 	return From{
 		Only:  only,
 		Table: table,
@@ -32,6 +32,9 @@ func (from From) Write(ctx types.Context) {
 
 // IsEmpty returns true if statement is undefined.
 func (from From) IsEmpty() bool {
+	if from.Table == nil {
+		return true
+	}
 	return from.Table.IsEmpty()
 }
 

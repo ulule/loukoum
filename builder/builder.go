@@ -209,6 +209,8 @@ func ToFrom(arg interface{}) stmt.From {
 		from = value
 	case stmt.Table:
 		from = stmt.NewFrom(value, false)
+	case stmt.Raw:
+		from = stmt.NewFrom(value, false)
 	default:
 		panic(fmt.Sprintf("loukoum: cannot use %T as from clause", arg))
 	}
