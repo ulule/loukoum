@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lib/pq"
 	loukoum "github.com/ulule/loukoum/v3"
 	"github.com/ulule/loukoum/v3/builder"
 	"github.com/ulule/loukoum/v3/stmt"
@@ -695,6 +696,17 @@ func TestSelect_WhereEqual(t *testing.T) {
 			Query:      "SELECT \"id\" FROM \"table\" WHERE (upper(\"email\") = $1)",
 			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (upper(\"email\") = :arg_1)",
 			Args:       []interface{}{"FOO@EXAMPLE.ORG"},
+		},
+		{
+			Name: "Raw Equal",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(loukoum.Condition(loukoum.Raw("string_to_array(languages, ',')")).Overlap(pq.StringArray{"fr"})),
+			String:     "SELECT \"id\" FROM \"table\" WHERE (string_to_array(languages, ',') && '{\"fr\"}')",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (string_to_array(languages, ',') && $1)",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (string_to_array(languages, ',') && :arg_1)",
+			Args:       []interface{}{pq.StringArray{"fr"}},
 		},
 	})
 }
