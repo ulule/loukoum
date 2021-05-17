@@ -21,8 +21,7 @@ func TestDelete(t *testing.T) {
 		{
 			Name: "Only",
 			Builders: []builder.Builder{
-				loukoum.Delete("table").Only(),
-				loukoum.Delete(loukoum.Table("table")).Only(),
+				loukoum.Delete(loukoum.Table("table").Only()),
 			},
 			SameQuery: "DELETE FROM ONLY \"table\"",
 		},
@@ -33,7 +32,7 @@ func TestDelete(t *testing.T) {
 		},
 		{
 			Name:      "As only",
-			Builder:   loukoum.Delete(loukoum.Table("table").As("foobar")).Only(),
+			Builder:   loukoum.Delete(loukoum.Table("table").As("foobar").Only()),
 			SameQuery: "DELETE FROM ONLY \"table\" AS \"foobar\"",
 		},
 	})

@@ -7,13 +7,20 @@ import (
 
 // Table is a table identifier.
 type Table struct {
-	Name  string
 	Alias string
+	Name  string
+	only  bool
 }
 
 // NewTable returns a new Table instance.
 func NewTable(name string) Table {
 	return NewTableAlias(name, "")
+}
+
+// Only sets ONLY clause to the table.
+func (table Table) Only() Table {
+	table.only = true
+	return table
 }
 
 // NewTableAlias returns a new Table instance with an alias.
@@ -32,6 +39,10 @@ func (table Table) As(alias string) Table {
 
 // Write exposes statement as a SQL query.
 func (table Table) Write(ctx types.Context) {
+	if table.only {
+		ctx.Write(token.Only.String())
+		ctx.Write(" ")
+	}
 	ctx.Write(quote(table.Name))
 	if table.Alias != "" {
 		ctx.Write(" ")
