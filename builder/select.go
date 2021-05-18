@@ -144,6 +144,9 @@ func (b Select) With(args ...stmt.WithQuery) Select {
 
 // Where adds WHERE clauses.
 func (b Select) Where(condition stmt.Expression) Select {
+	if condition == nil {
+		panic("loukoum: condition must be not nil")
+	}
 	if b.query.Where.IsEmpty() {
 		b.query.Where = stmt.NewWhere(condition)
 		return b
@@ -154,6 +157,9 @@ func (b Select) Where(condition stmt.Expression) Select {
 
 // And adds AND WHERE conditions.
 func (b Select) And(condition stmt.Expression) Select {
+	if condition == nil {
+		panic("loukoum: condition must be not nil")
+	}
 	b.query.Where = b.query.Where.And(condition)
 	return b
 }
