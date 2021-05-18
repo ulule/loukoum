@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	loukoum "github.com/ulule/loukoum/v3"
 	"github.com/ulule/loukoum/v3/builder"
 	"github.com/ulule/loukoum/v3/stmt"
@@ -1628,5 +1629,23 @@ func TestSelect_Extra(t *testing.T) {
 				Suffix("FOR UPDATE"),
 			SameQuery: "SELECT \"name\" FROM \"user\" FOR UPDATE",
 		},
+	})
+}
+
+func TestSelect_NilCondition(t *testing.T) {
+	is := require.New(t)
+	is.Panics(func() {
+		var nilcond stmt.Expression
+		loukoum.Select("col").
+			From("table").
+			Where(loukoum.Condition("col").Equal("value")).
+			And(nilcond)
+	})
+
+	is.Panics(func() {
+		var nilcond stmt.Expression
+		loukoum.Select("col").
+			From("table").
+			Where(nilcond)
 	})
 }
