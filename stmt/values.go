@@ -24,9 +24,8 @@ func (values Values) Write(ctx types.Context) {
 	}
 
 	ctx.Write(token.Values.String())
-	ctx.Write(" (")
+	ctx.Write(" ")
 	values.Values.Write(ctx)
-	ctx.Write(")")
 }
 
 // IsEmpty returns true if statement is undefined.

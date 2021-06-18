@@ -281,6 +281,97 @@ var _ Expression = Value{}
 // Array
 // ----------------------------------------------------------------------------
 
+// ArrayList contains a list of array expression values.
+type ArrayList struct {
+	Values []Expression
+}
+
+// NewArrayListExpression creates a new Expression using a list of values.
+func NewArrayListExpression(values ...interface{}) Expression { // nolint: gocyclo
+	// We pass only one argument and it's a slice or an expression.
+	arraylist := toArrayList(values[0])
+	if len(arraylist.Values) == 0 {
+		arraylist.Values = []Expression{NewArrayExpression(values...)}
+
+	}
+	return arraylist
+}
+
+func toArrayList(value interface{}) ArrayList { // nolint: gocyclo
+	arraylist := ArrayList{}
+	switch values := value.(type) {
+	case [][]interface{}:
+		for i := range values {
+			arraylist.Values = append(arraylist.Values, NewArrayExpression(values[i]...))
+		}
+	case [][]string:
+		for i := range values {
+			raws := make([]interface{}, len(values[i]))
+			for j := range values[i] {
+				raws[j] = values[i][j]
+			}
+
+			arraylist.Values = append(arraylist.Values, NewArrayExpression(raws...))
+		}
+	case [][]int:
+		for i := range values {
+			raws := make([]interface{}, len(values[i]))
+			for j := range values[i] {
+				raws[j] = values[i][j]
+			}
+			arraylist.Values = append(arraylist.Values, NewArrayExpression(raws...))
+		}
+	case [][]int64:
+		for i := range values {
+			raws := make([]interface{}, len(values[i]))
+			for j := range values[i] {
+				raws[j] = values[i][j]
+			}
+			arraylist.Values = append(arraylist.Values, NewArrayExpression(raws...))
+		}
+	case [][]bool:
+		for i := range values {
+			raws := make([]interface{}, len(values[i]))
+			for j := range values[i] {
+				raws[j] = values[i][j]
+			}
+			arraylist.Values = append(arraylist.Values, NewArrayExpression(raws...))
+		}
+	case [][]Expression:
+		for i := range values {
+			raws := make([]interface{}, len(values[i]))
+			for j := range values[i] {
+				raws[j] = values[i][j]
+			}
+			arraylist.Values = append(arraylist.Values, NewArrayExpression(raws...))
+		}
+	}
+
+	return arraylist
+}
+
+func (ArrayList) expression() {}
+
+// Write exposes statement as a SQL query.
+func (array ArrayList) Write(ctx types.Context) {
+	for i, value := range array.Values {
+		if i > 0 {
+			ctx.Write(", ")
+		}
+		ctx.Write("(")
+		value.Write(ctx)
+		ctx.Write(")")
+	}
+}
+
+// IsEmpty returns true if statement is undefined.
+func (array ArrayList) IsEmpty() bool {
+	return len(array.Values) == 0
+}
+
+// Ensure that Array is an Expression
+var _ Expression = ArrayList{}
+
 // Array contains a list of expression values.
 type Array struct {
 	Values []Expression
