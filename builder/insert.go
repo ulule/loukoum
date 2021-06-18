@@ -50,7 +50,7 @@ func (b Insert) Values(values ...interface{}) Insert {
 		panic("loukoum: insert builder has values clause already defined")
 	}
 
-	b.query.Values = stmt.NewValues(stmt.NewArrayExpression(values...))
+	b.query.Values = stmt.NewValues(stmt.NewArrayListExpression(values...))
 
 	return b
 }
@@ -116,7 +116,7 @@ func (b Insert) Set(args ...interface{}) Insert {
 	pairs := ToSet(args).Pairs
 	columns, expressions := pairs.Values()
 
-	array := stmt.NewArrayExpression(expressions)
+	array := stmt.NewArrayListExpression(expressions)
 	values := stmt.NewValues(array)
 
 	b.query.Columns = columns
