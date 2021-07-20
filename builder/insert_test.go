@@ -99,6 +99,17 @@ func TestInsert_Values(t *testing.T) {
 			NamedQuery: "INSERT INTO \"table\" (\"data\") VALUES (:arg_1)",
 			Args:       []interface{}{[]byte{1, 2, 3}},
 		},
+		{
+			Name: "With multiple values",
+			Builders: []builder.Builder{
+				loukoum.Insert("table").Values([][]string{{"va", "vb", "vc"}, {"wa", "wb", "wc"}}),
+				loukoum.Insert("table").Values([][]interface{}{{"va", "vb", "vc"}, {"wa", "wb", "wc"}}),
+			},
+			String:     "INSERT INTO \"table\" VALUES ('va', 'vb', 'vc'), ('wa', 'wb', 'wc')",
+			Query:      "INSERT INTO \"table\" VALUES ($1, $2, $3), ($4, $5, $6)",
+			NamedQuery: "INSERT INTO \"table\" VALUES (:arg_1, :arg_2, :arg_3), (:arg_4, :arg_5, :arg_6)",
+			Args:       []interface{}{"va", "vb", "vc", "wa", "wb", "wc"},
+		},
 	})
 }
 
