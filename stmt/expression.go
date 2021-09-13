@@ -57,11 +57,11 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 
 // Identifier is an identifier.
 type Identifier struct {
-	Identifier string
+	Identifier interface{}
 }
 
 // NewIdentifier returns a new Identifier.
-func NewIdentifier(identifier string) Identifier {
+func NewIdentifier(identifier interface{}) Identifier {
 	return Identifier{
 		Identifier: identifier,
 	}
@@ -71,7 +71,12 @@ func (Identifier) expression() {}
 
 // Write exposes statement as a SQL query.
 func (identifier Identifier) Write(ctx types.Context) {
-	ctx.Write(quote(identifier.Identifier))
+	switch t := identifier.Identifier.(type) {
+	case string:
+		ctx.Write(quote(t))
+	case Raw:
+		t.Write(ctx)
+	}
 }
 
 // IsEmpty returns true if statement is undefined.
