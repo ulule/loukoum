@@ -521,6 +521,21 @@ func TestSelect_WhereOperatorOrder(t *testing.T) {
 			Args:       []interface{}{1, "foo", "hello"},
 		},
 		{
+			Name: "And with three expressions in a single where",
+			Builder: loukoum.
+				Select("id").
+				From("table").
+				Where(
+					loukoum.Condition("id").Equal(1),
+					loukoum.Condition("slug").Equal("foo"),
+					loukoum.Condition("title").Equal("hello"),
+				),
+			String:     "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = 1) AND (\"slug\" = 'foo')) AND (\"title\" = 'hello'))",
+			Query:      "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = $1) AND (\"slug\" = $2)) AND (\"title\" = $3))",
+			NamedQuery: "SELECT \"id\" FROM \"table\" WHERE (((\"id\" = :arg_1) AND (\"slug\" = :arg_2)) AND (\"title\" = :arg_3))", //nolint:lll
+			Args:       []interface{}{1, "foo", "hello"},
+		},
+		{
 			Name: "Or",
 			Builder: loukoum.
 				Select("id").

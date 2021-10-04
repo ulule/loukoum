@@ -140,16 +140,21 @@ func (b Select) With(args ...stmt.WithQuery) Select {
 }
 
 // Where adds WHERE clauses.
-func (b Select) Where(condition stmt.Expression) Select {
+func (b Select) Where(conditions ...stmt.Expression) Select {
+	if len(conditions) == 0 {
+		return b
+	}
+	condition := conditions[0]
+	conditions = conditions[1:]
 	if condition == nil {
 		panic("loukoum: condition must be not nil")
 	}
 	if b.query.Where.IsEmpty() {
 		b.query.Where = stmt.NewWhere(condition)
-		return b
+		return b.Where(conditions...)
 	}
 
-	return b.And(condition)
+	return b.And(condition).Where(conditions...)
 }
 
 // And adds AND WHERE conditions.
