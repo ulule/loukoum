@@ -67,7 +67,7 @@ func OrOn(left stmt.OnExpression, right stmt.OnExpression) stmt.OnExpression {
 }
 
 // Condition is a wrapper to create a new Identifier statement.
-func Condition(column string) stmt.Identifier {
+func Condition(column interface{}) stmt.Identifier {
 	return stmt.NewIdentifier(column)
 }
 

@@ -1649,3 +1649,19 @@ func TestSelect_NilCondition(t *testing.T) {
 			Where(nilcond)
 	})
 }
+
+func TestSelect_RawValue(t *testing.T) {
+	RunBuilderTests(t, []BuilderTest{
+		{
+			Name: "Prefix",
+			Builder: loukoum.
+				Select("name").
+				From("user").
+				Where(loukoum.Condition(loukoum.Raw("COALESCE(contributed_at, created_at)")).Equal("2021-09-13")),
+			String:     "SELECT \"name\" FROM \"user\" WHERE (COALESCE(contributed_at, created_at) = '2021-09-13')",
+			Query:      "SELECT \"name\" FROM \"user\" WHERE (COALESCE(contributed_at, created_at) = $1)",
+			NamedQuery: "SELECT \"name\" FROM \"user\" WHERE (COALESCE(contributed_at, created_at) = :arg_1)",
+			Args:       []interface{}{"2021-09-13"},
+		},
+	})
+}
