@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/jackc/pgx/v5 v5.1.1
-	github.com/lib/pq v1.10.4
+	github.com/lib/pq v1.10.7
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.0
 )
