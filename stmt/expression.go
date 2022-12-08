@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/ulule/loukoum/v3/types"
 )
 
@@ -23,14 +24,15 @@ func NewExpression(arg interface{}) Expression { // nolint: gocyclo
 	case Expression:
 		return value
 	case string, bool, int, int8, int16, int32, int64,
-		uint, uint8, uint16, uint32, uint64, float32, float64, []byte:
+		uint, uint8, uint16, uint32, uint64, float32, float64,
+		[]byte, driver.Valuer, []int64, []string, pgtype.RangeValuer,
+		pgtype.FlatArray[string], pgtype.FlatArray[int64],
+		map[string]string, map[string]interface{}:
 		return NewValue(value)
 	case time.Time:
 		return NewValue(value)
 	case *time.Time:
 		return NewValue(*value)
-	case driver.Valuer:
-		return NewValue(value)
 	case StatementEncoder:
 		stmt := value.Statement()
 		expression, ok := stmt.(Expression)
